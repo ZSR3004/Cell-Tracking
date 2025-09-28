@@ -48,6 +48,18 @@
 
 ### 3.1 Functions and Variables
 
+Our function names will be verbs, and our variable names will be nouns.
+
+The function and variable names will accurately and succinctly describe what the functions and variables do. 
+
+We won't write a comment to explain a function or variable name. If we need to do that, we will change the name so it better explains what the function or variable is.
+
+We won't include the container type in a name (for example, we won't have the name years_dict).
+
+The length of a name should correspond to its scope. So, if something is only used for only a few lines, it's ok for it to be short. However, if something is used throughout the entire code base, it should be longer and much more descriptive.
+
+We will try to start variable names with something general (such as "index", "year", etc.) and then get more specific. This allows us to quickly search for variables while coding.
+
 ### 3.2 Folders and Files
 
 ## 4. Docstrings and Comments
