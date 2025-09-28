@@ -67,6 +67,7 @@ We will try to start variable names with something general (such as "index", "ye
 ## 4. Docstrings and Comments
 
 ### 4.1 Docstrings
+
 Docstrings should be included below all function declarations and follow the following pattern.
 ```python
 """
