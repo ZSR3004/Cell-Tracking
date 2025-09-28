@@ -71,6 +71,7 @@ We will try to start variable names with something general (such as "index", "ye
 ### 4.1 Docstrings
 
 Docstrings should be included below all function declarations and follow the following pattern.
+
 ```python
 """
 Short description of what the function does.
@@ -83,11 +84,12 @@ Returns:
     type: What the output is.
 
 Preconditions:
-    Any preconditons here.
+    Any preconditions here.
 """
 ```
 
 As a more concrete example, we can write something like the following.
+
 ```python
 def my_function(x : int, xs : List[str]) -> bool:
 """
@@ -114,6 +116,7 @@ you are doing something, don't use it to describe what is happening. If you find
 we might need to refactor the code to make it easier to read.
 
 We should also be including comments at the top of every Python file to describe what the file does. For example,
+
 ```python
 """
 File: file_name.py
@@ -160,6 +163,44 @@ We will use Pytest to provide a framework for our unit tests.
 We will use try: except for error handling within our code. When moving into the except branch, we will make sure to log what's happening.
 
 ## 8. Logging
+
+To understand what the software is doing, we'll use the Python logging module. The purpose of these logs are to give
+clear, actionable changes. So, we shouldn't be using the logging module to log every iteration of a loop, but rather
+to give us checkpoints during the execution of the program.
+
+It is important to use the appropriate signals provided by the module.
+
+- debug: Information to help programmers debug the program.
+- info: High level information such as the programming starting or shutting down.
+- warning: An error occurred, but the program can continue.
+- error: An error occurred, and the program cannot continue (ie. it is going to crash).
+- critical: An error occurred that corrupts the state of either the program or (in our case) the videos we are analyzing.
+
+When writing an actual message, try to keep it short and use decorators. We'll be logging everything onto a rotating file
+handler.
+
+Here's an example of our setup.
+
+```python
+import logging
+from logging.handlers import RotatingFileHandler
+
+handler = RotatingFileHandler(
+    "app.log",
+    maxBytes=1_000_000,
+    backupCount=5
+)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    handlers=[handler]
+)
+
+logger = logging.getLogger(__name__)
+
+logger.info("Program starts with %d free GB.", gb_num)
+```
 
 ## 9. Directory Organization
 
