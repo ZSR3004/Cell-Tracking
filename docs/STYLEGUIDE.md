@@ -108,6 +108,34 @@ Once we are done merging a branch with main, we'll delete it from the remote rep
 
 ### 10.2 Commits
 
+We'll keep commits simple. Our primary philosophy is that commits should **wrap related changes**. We'll mostly follow
+Github's best practices for commits.[^10.2.1] To summarize them,
+
+1. Commit Related Changes: Commits are a wrapper for related changes because it makes them easier to read and track.
+2. Commit Often: This helps keeps commits small, which will allow us to rollback changes if something breaks.
+3. Commit Working Code: Make sure to test your code before committing and don't commit half-written code.
+
+On commit messages, we'll try to keep them below 50 characters, but if a commit requires it, we can write more. This is
+not a hard and fast rule because readability is far more important. Commit messages should be descriptive, so we know
+exactly what changed in a given commit.
+For example, the commit message "Fixed bug" is not a good message. Instead, make it more descriptive like
+"Fixed syntax error in heatmap_visualization".
+Commit messages should also be imperative and in the past tense with proper capitalization. For example, "Created README.md" and not "creating README.md".
+
+If
+you need to write a very detailed commit, then use bullet points (using a hyphen as the point) with a hanging indent. For instance, the example given in the
+Github's best practices is:
+
+```text
+Refactor libvirt create calls
+
+ - Minimize duplicated code for create
+
+ - Make wait_for_destroy happen on shutdown instead of undefine
+
+ - Allow for destruction of an instance while leaving the domain
+```
+
 ### 10.3 Pull Requests
 
 ### 10.4 Security
