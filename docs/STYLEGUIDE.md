@@ -136,6 +136,8 @@ Refactor libvirt create calls
  - Allow for destruction of an instance while leaving the domain
 ```
 
+[^10.2.1] Based on [this Github guide](https://gist.github.com/luismts/495d982e8c5b1a0ced4a57cf3d93cf60)
+
 ### 10.3 Pull Requests
 
 ### 10.4 Security
