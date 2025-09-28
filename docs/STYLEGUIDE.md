@@ -54,7 +54,7 @@ Use Python Black to autoformat our code. For linting, we will use Pylint with de
 
 Our function names will be verbs, and our variable names will be nouns.
 
-The function and variable names will accurately and succinctly describe what the functions and variables do. 
+The function and variable names will accurately and succinctly describe what the functions and variables do.
 
 We won't write a comment to explain a function or variable name. If we need to do that, we will change the name so it better explains what the function or variable is.
 
@@ -124,6 +124,22 @@ Description: This file handles things that this file was made for.
 ## 5. Importing and Dependency Management
 
 ### 5.1 Importing Packages or Modules
+
+Use import statements for packages and modules only, not for individual types, classes, or functions.
+
+- Use import x for importing packages and modules.
+- Use from x import y where x is the package prefix and y is the module name with no prefix.
+- Use from x import y as z in any of the following circumstances:
+  - Two modules named y are to be imported.
+  - y conflicts with a top-level name defined in the current module.
+  - y conflicts with a common parameter name that is part of the public API (e.g., features).
+  - y is an inconveniently long name.
+  - y is too generic in the context of your code (e.g., from storage.file_system import options as fs_options).
+- Use import y as z only when z is a standard abbreviation (e.g., import numpy as np).
+
+Do not use relative names in imports. Even if the module is in the same package, use the full package name. This helps prevent unintentionally importing a package twice.
+
+[^5.1.1] Source: Google Python Style Guide
 
 ### 5.2 Managing Dependencies
 
@@ -197,9 +213,7 @@ For example, the commit message "Fixed bug" is not a good message. Instead, make
 "Fixed syntax error in heatmap_visualization".
 Commit messages should also be imperative and in the past tense with proper capitalization. For example, "Created README.md" and not "creating README.md".
 
-If
-you need to write a very detailed commit, then use bullet points (using a hyphen as the point) with a hanging indent. For instance, the example given in the
-Github's best practices is:
+If you need to write a very detailed commit, then use bullet points (using a hyphen as the point) with a hanging indent. For instance, the example given in the Github's best practices is:
 
 ```text
 Refactor libvirt create calls
