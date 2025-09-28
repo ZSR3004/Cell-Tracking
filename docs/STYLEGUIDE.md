@@ -43,6 +43,7 @@
 ### 2.3 Key Differences and When to Follow
 
 ### 2.4 Linting and Autoformatting
+
 Use Python Black to autoformat our code. For linting, we will use Pylint with default settings.
 
 ## 3. Naming Conventions
@@ -104,6 +105,7 @@ Preconditions:
 ```
 
 ### 4.2 Comments
+
 Comments should be used sparingly. We'll adhere to the "why, not what" convention. Only use a comment to explain why
 you are doing something, don't use it to describe what is happening. If you find yourself needing to do the latter,
 we might need to refactor the code to make it easier to read.
@@ -126,7 +128,16 @@ Description: This file handles things that this file was made for.
 
 ### 6.1 Unit Testing
 
+While doing unit testing, we will make sure that the unit tests cover all possible cases. We will test our software on a very large variety of things: from large to small videos, from very clear to very blurry videos, and from long to short videos. We will do all these kinds of tests on all the video types that the lab has. These types of videos are:
+   1. The nuclei are dyed
+   2. The cytoplasms are dyed
+   3. Nothing in the cell is dyed
+
+We will use Pytest to provide a framework for our unit tests.
+
 ## 7. Error Handling
+
+We will use try: except for error handling within our code. When moving into the except branch, we will make sure to log what's happening.
 
 ## 8. Logging
 
