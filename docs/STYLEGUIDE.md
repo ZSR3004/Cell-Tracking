@@ -43,6 +43,7 @@
 ### 2.3 Key Differences and When to Follow
 
 ### 2.4 Linting and Autoformatting
+Use Python Black to autoformat our code. For linting, we will use Pylint with default settings.
 
 ## 3. Naming Conventions
 
