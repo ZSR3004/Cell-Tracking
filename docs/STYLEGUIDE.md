@@ -53,8 +53,55 @@
 ## 4. Docstrings and Comments
 
 ### 4.1 Docstrings
+Docstrings should be included below all function declarations and follow the following pattern.
+```python
+"""
+Short description of what the function does.
+
+Args:
+    first_arg (arg_type): Short description of what this argument represents.
+    second_arg (arg_type): Short description of what this argument represents.
+
+Returns:
+    type: What the output is.
+
+Preconditions:
+    Any preconditons here.
+"""
+```
+
+As a more concrete example, we can write something like the following.
+```python
+def my_function(x : int, xs : List[str]) -> bool:
+"""
+Checks if the string representation of x is in xs.
+
+Args:
+    x (int): The integer we are trying to find.
+    xs (List[str]): A list of integers represented as type strings.
+
+Returns:
+    (bool): True if x is in xs, otherwise False.
+
+Preconditions:
+    xs is not empty.
+
+"""
+# function implementation
+```
 
 ### 4.2 Comments
+Comments should be used sparingly. We'll adhere to the "why, not what" convention. Only use a comment to explain why
+you are doing something, don't use it to describe what is happening. If you find yourself needing to do the latter,
+we might need to refactor the code to make it easier to read.
+
+We should also be including comments at the top of every Python file to describe what the file does. For example,
+```python
+"""
+File: file_name.py
+Description: This file handles things that this file was made for.
+"""
+```
 
 ## 5. Importing and Dependency Management
 
