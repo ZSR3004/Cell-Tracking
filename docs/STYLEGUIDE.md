@@ -66,6 +66,13 @@ We will try to start variable names with something general (such as "index", "ye
 
 ### 3.2 Folders and Files
 
+Folders (directories) should be all lowercase and short (ideally one word, avoiding underscore). Abbreviations or shorthand is okay. For example, the source code
+directory can be named `src/` and utilities `utils/`.
+File names should be in short and in snake case like variables. They should also be descriptive so we know what they do at a glance. If a file contains a single
+class, then the file should be the analogous snake case of that class (ex. `ClassName` becomes `class_name.py`).
+
+We also have test naming schemes (here)(#testing).
+
 ## 4. Docstrings and Comments
 
 ### 4.1 Docstrings
