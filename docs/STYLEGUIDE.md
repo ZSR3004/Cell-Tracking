@@ -45,6 +45,10 @@
 
 ### 2.3 Key Differences and When to Follow
 
+The main differences between the two style guides are that certain conventions are different. For example, PEP 8 recommends that coders use 4 spaces for indentation, but Google recommends that coders use 2 spaces for indentation.
+
+As PEP 8 is the official style guide for Python code, we will look there for references. If something doesn't make sense or we feel like the Google style guide is better in some regards (e.g. we decide we want to use 2 spaces rather than 4), we will discuss and decide which we'd like to follow. We will be explicit about what we decide in the following sections of the style guide.
+
 ### 2.4 Linting and Autoformatting
 
 Use Python Black to autoformat our code. For linting, we will use Pylint with default settings.
