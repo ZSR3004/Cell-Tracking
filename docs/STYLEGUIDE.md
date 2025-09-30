@@ -33,8 +33,8 @@
 
 ## 1. Introduction
 
+Welcome to our team's style guide! You can find the Table of Contents right above the introduction to open any topic that you would like to reach. As a note, these are guidelines and not strict rules that needs to be followed for the project. 
 
-You can reach Ziyad at www.github.com/1234ABC
 ## 2. Baseline Coding Standards
 
 ### 2.1 Overview of PEP 8
