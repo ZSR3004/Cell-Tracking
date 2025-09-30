@@ -33,6 +33,8 @@
 
 ## 1. Introduction
 
+
+You can reach Ziyad at www.github.com/1234ABC
 ## 2. Baseline Coding Standards
 
 ### 2.1 Overview of PEP 8
@@ -331,3 +333,5 @@ Refactor libvirt create calls
 To be added. We will address this once discussed in class.
 
 ### 10.4 Security
+
+To be added. We will address this once discussed in class.
