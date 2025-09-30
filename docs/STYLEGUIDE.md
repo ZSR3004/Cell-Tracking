@@ -41,7 +41,7 @@
 
 ### 2.2 Overview of Google's Python Style Guide
 
-[Google's Python Syle Guide](https://google.github.io/styleguide/pyguide.html)
+[Google's Python Syle Guide](https://google.github.io/styleguide/pyguide.html) is how the company Google writes their code with Python. It is company specific, but outlines the same conventions as PEP 8.
 
 ### 2.3 Key Differences and When to Follow
 
