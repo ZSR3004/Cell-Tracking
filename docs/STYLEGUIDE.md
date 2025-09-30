@@ -10,6 +10,7 @@
     - [2.2 Overview of Google's Python Style Guide](#22-overview-of-googles-python-style-guide)
     - [2.3 Key Differences and When to Follow](#23-key-differences-and-when-to-follow)
     - [2.4 Linting and Autoformatting](#24-linting-and-autoformatting)
+    - [2.5 Markdown Formatting](#25-markdown-formatting)
   - [3. Naming Conventions](#3-naming-conventions)
     - [3.1 Functions and Variables](#31-functions-and-variables)
     - [3.2 Folders and Files](#32-folders-and-files)
@@ -43,6 +44,11 @@
 ### 2.4 Linting and Autoformatting
 
 Use Python Black to autoformat our code. For linting, we will use Pylint with default settings.
+
+### 2.5 Markdown Formatting
+
+We will use the [VSCode markdownlint plugin](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) by David Anson. You can
+see the [`Rules.md` here](https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/Rules.md). There will be no deviations
 
 ## 3. Naming Conventions
 
