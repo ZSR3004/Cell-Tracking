@@ -49,7 +49,7 @@ You can reach Ziyad at www.github.com/1234ABC
 
 The main differences between the two style guides are that certain conventions are different. For example, PEP 8 recommends that coders use 4 spaces for indentation, but Google recommends that coders use 2 spaces for indentation.
 
-As PEP 8 is the official style guide for Python code, we will look there for references. If something doesn't make sense or we feel like the Google style guide is better in some regards (e.g. we decide we want to use 2 spaces rather than 4), we will discuss and decide which we'd like to follow. We will be explicit about what we decide in the following sections of the style guide.
+As PEP 8 is the official style guide for Python code, we will look there for references. In general, we will use the PEP 8 style, but if something in PEP 8 is contradicted by what is in this style guide, use this style guide. If there is something that PEP 8 doesn't address, we will default to the Google style guide. This style guide serves as the first reference for how to write Python code.
 
 ### 2.4 Linting and Autoformatting
 
