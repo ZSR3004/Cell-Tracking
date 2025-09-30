@@ -24,10 +24,6 @@
   - [7. Error Handling](#7-error-handling)
   - [8. Logging](#8-logging)
   - [9. Directory Organization](#9-directory-organization)
-    - [9.1 Root Directory](#91-root-directory)
-    - [9.2 Src](#92-src)
-    - [9.3 Tests](#93-tests)
-    - [9.4 Docs](#94-docs)
   - [10. Version Control and Git](#10-version-control-and-git)
     - [10.1 Branch Naming and Management](#101-branch-naming-and-management)
     - [10.2 Commits](#102-commits)
@@ -211,13 +207,49 @@ logger.info("Program starts with %d free GB.", gb_num)
 
 ## 9. Directory Organization
 
-### 9.1 Root Directory
+Our root directory is organized as follows.
 
-### 9.2 Src
+```text
+Cell-Tracking/
+    |-- datasets/      # example videos or processed videos, mainly for testing
+    |-- docs/          # documentation including style guide, user and contributor docs
+    |-- scripts/       # helper scripts for development and debugging
+    |-- src/           # main application code (frontend + backend)
+    |-- tests/         # unit and integration test scripts
+    |-- .env
+    |-- .gitignore
+    |-- pyproject.toml # project metadata, dependencies, and tool configurations
+    |-- README.md      # project overview, usage, and contribution instructions
+```
 
-### 9.3 Tests
+Here's a short explanation of each file or directory.
 
-### 9.4 Docs
+1. `datasets/`:
+    - Stores `.tiff` video files or processed video arrays.
+    - Mainly used for testing.
+    - Large datasets should be kept out using `.gitignore` and smaller ones uploaded via git large file sharing.
+2. `docs/`
+    - Documentation, including style guide and contributing docs.
+3. `scripts/`
+    - Holds bash scripts to automate tasks.
+4. `src/`
+    - Holds runtime code.
+    - Organized into packages. [See more information here](#5-importing-and-dependency-management).
+5. `tests/`
+    - Contains tests.
+    - [More information here](#6-testing).
+6. `.env`:
+    - Holds environment variables.
+    - Should **not** be committed to git.
+7. `.gitignore`:
+    - Specifies files to not include in commits.
+    - Do not include `.venv`, `.env`, `datasets/`, or any auto-generated machine code.
+8. `pyproject.toml`
+    - Includes project information like dependencies.
+    - Also has configs for linters, formatters, and other tools.
+9. `README.md`
+    - Landing page for the project.
+    - Gives an overview of Cell-Tracking.
 
 ## 10. Version Control and Git
 
