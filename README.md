@@ -7,7 +7,7 @@
 
 ## Creators
 
-slovesjamie: Jamie Sloves \
+[slovesjamie: Jamie Sloves](https://github.com/slovesjamie) \
 ZSR3004: Ziyad Rahman \
 CarolineTracy: Caroline Tracy \
 Shital-Olee: Shital Oli
