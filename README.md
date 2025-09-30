@@ -8,9 +8,9 @@
 ## Creators
 
 [slovesjamie: Jamie Sloves](https://github.com/slovesjamie) \
-ZSR3004: Ziyad Rahman \
-CarolineTracy: Caroline Tracy \
-Shital-Olee: Shital Oli
+[ZSR3004: Ziyad Rahman](https://github.com/ZSR3004) \
+[CarolineTracy: Caroline Tracy](https://github.com/CarolineTracy) \
+[Shital-Olee: Shital Oli](https://github.com/Shital-Olee)
 
 ## Style Guide
 
