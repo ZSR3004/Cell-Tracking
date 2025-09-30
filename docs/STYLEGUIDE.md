@@ -10,6 +10,7 @@
     - [2.2 Overview of Google's Python Style Guide](#22-overview-of-googles-python-style-guide)
     - [2.3 Key Differences and When to Follow](#23-key-differences-and-when-to-follow)
     - [2.4 Linting and Autoformatting](#24-linting-and-autoformatting)
+    - [2.5 Markdown Formatting](#25-markdown-formatting)
   - [3. Naming Conventions](#3-naming-conventions)
     - [3.1 Functions and Variables](#31-functions-and-variables)
     - [3.2 Folders and Files](#32-folders-and-files)
@@ -24,10 +25,6 @@
   - [7. Error Handling](#7-error-handling)
   - [8. Logging](#8-logging)
   - [9. Directory Organization](#9-directory-organization)
-    - [9.1 Root Directory](#91-root-directory)
-    - [9.2 Src](#92-src)
-    - [9.3 Tests](#93-tests)
-    - [9.4 Docs](#94-docs)
   - [10. Version Control and Git](#10-version-control-and-git)
     - [10.1 Branch Naming and Management](#101-branch-naming-and-management)
     - [10.2 Commits](#102-commits)
@@ -42,13 +39,26 @@ You can reach Ziyad at www.github.com/1234ABC
 
 ### 2.1 Overview of PEP 8
 
+[PEP 8](https://peps.python.org/pep-0008/) is the official style guide for Python coding. It outlines coding conventions, including things like indentations, layout, when to use comments and documentation, naming conventions, and more.
+
 ### 2.2 Overview of Google's Python Style Guide
 
+[Google's Python Syle Guide](https://google.github.io/styleguide/pyguide.html) is how the company Google writes their code with Python. It is company specific, but outlines the same conventions as PEP 8.
+
 ### 2.3 Key Differences and When to Follow
+
+The main differences between the two style guides are that certain conventions are different. For example, PEP 8 recommends that coders use 4 spaces for indentation, but Google recommends that coders use 2 spaces for indentation.
+
+As PEP 8 is the official style guide for Python code, we will look there for references. If something doesn't make sense or we feel like the Google style guide is better in some regards (e.g. we decide we want to use 2 spaces rather than 4), we will discuss and decide which we'd like to follow. We will be explicit about what we decide in the following sections of the style guide.
 
 ### 2.4 Linting and Autoformatting
 
 Use Python Black to autoformat our code. For linting, we will use Pylint with default settings.
+
+### 2.5 Markdown Formatting
+
+We will use the [VSCode markdownlint plugin](https://marketplace.visualstudio.com/items?itemName=DavidAnson.vscode-markdownlint) by David Anson. You can
+see the [`Rules.md` here](https://github.com/DavidAnson/markdownlint/blob/v0.38.0/doc/Rules.md). There will be no deviations
 
 ## 3. Naming Conventions
 
@@ -67,6 +77,13 @@ The length of a name should correspond to its scope. So, if something is only us
 We will try to start variable names with something general (such as "index", "year", etc.) and then get more specific. This allows us to quickly search for variables while coding.
 
 ### 3.2 Folders and Files
+
+Folders (directories) should be all lowercase and short (ideally one word, avoiding underscore). Abbreviations or shorthand is okay. For example, the source code
+directory can be named `src/` and utilities `utils/`.
+File names should be in short and in snake case like variables. They should also be descriptive so we know what they do at a glance. If a file contains a single
+class, then the file should be the analogous snake case of that class (ex. `ClassName` becomes `class_name.py`).
+
+We also have test naming schemes (here)(#testing).
 
 ## 4. Docstrings and Comments
 
@@ -148,6 +165,11 @@ Do not use relative names in imports. Even if the module is in the same package,
 
 ### 5.2 Managing Dependencies
 
+We'll be using pyproject.toml to keep track of modules. Any packages we create should have a subdirectory under the `src` directory. [Find the naming scheme here](#32-folders-and-files). Each of these packages should include a `__init__.py` file to denote that it is in fact a package.
+
+We'll also be using pip to install said packages and Python virtual environments to manage packages. The `.venv` folder should be included in your
+`.gitignore` (as in do not commit it).
+
 ## 6. Testing
 
 ### 6.1 Unit Testing
@@ -206,13 +228,49 @@ logger.info("Program starts with %d free GB.", gb_num)
 
 ## 9. Directory Organization
 
-### 9.1 Root Directory
+Our root directory is organized as follows.
 
-### 9.2 Src
+```text
+Cell-Tracking/
+    |-- datasets/      # example videos or processed videos, mainly for testing
+    |-- docs/          # documentation including style guide, user and contributor docs
+    |-- scripts/       # helper scripts for development and debugging
+    |-- src/           # main application code (frontend + backend)
+    |-- tests/         # unit and integration test scripts
+    |-- .env
+    |-- .gitignore
+    |-- pyproject.toml # project metadata, dependencies, and tool configurations
+    |-- README.md      # project overview, usage, and contribution instructions
+```
 
-### 9.3 Tests
+Here's a short explanation of each file or directory.
 
-### 9.4 Docs
+1. `datasets/`:
+    - Stores `.tiff` video files or processed video arrays.
+    - Mainly used for testing.
+    - Large datasets should be kept out using `.gitignore` and smaller ones uploaded via git large file sharing.
+2. `docs/`
+    - Documentation, including style guide and contributing docs.
+3. `scripts/`
+    - Holds bash scripts to automate tasks.
+4. `src/`
+    - Holds runtime code.
+    - Organized into packages. [See more information here](#5-importing-and-dependency-management).
+5. `tests/`
+    - Contains tests.
+    - [More information here](#6-testing).
+6. `.env`:
+    - Holds environment variables.
+    - Should **not** be committed to git.
+7. `.gitignore`:
+    - Specifies files to not include in commits.
+    - Do not include `.venv`, `.env`, `datasets/`, or any auto-generated machine code.
+8. `pyproject.toml`
+    - Includes project information like dependencies.
+    - Also has configs for linters, formatters, and other tools.
+9. `README.md`
+    - Landing page for the project.
+    - Gives an overview of Cell-Tracking.
 
 ## 10. Version Control and Git
 
@@ -272,4 +330,8 @@ Refactor libvirt create calls
 
 ### 10.3 Pull Requests
 
+To be added. We will address this once discussed in class.
+
 ### 10.4 Security
+
+To be added. We will address this once discussed in class.
