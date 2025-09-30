@@ -149,6 +149,11 @@ Do not use relative names in imports. Even if the module is in the same package,
 
 ### 5.2 Managing Dependencies
 
+We'll be using pyproject.toml to keep track of modules. Any packages we create should have a subdirectory under the `src` directory. [Find the naming scheme here](#32-folders-and-files). Each of these packages should include a `__init__.py` file to denote that it is in fact a package.
+
+We'll also be using pip to install said packages and Python virtual environments to manage packages. The `.venv` folder should be included in your
+`.gitignore` (as in do not commit it).
+
 ## 6. Testing
 
 ### 6.1 Unit Testing
