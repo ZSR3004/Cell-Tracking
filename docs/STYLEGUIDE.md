@@ -37,6 +37,8 @@
 
 ### 2.1 Overview of PEP 8
 
+PEP 8 is the official style guide for Python coding. It outlines coding conventions, including things like indentations, layout, when to use comments and documentation, naming conventions, and more.
+
 ### 2.2 Overview of Google's Python Style Guide
 
 ### 2.3 Key Differences and When to Follow
