@@ -33,7 +33,7 @@
 
 ## 1. Introduction
 
-Welcome to our team's style guide! You can find the Table of Contents right above the introduction to open any topic that you would like to reach. As a note, these are guidelines and not strict rules that needs to be followed for the project. 
+Welcome to our team's style guide! You can find the Table of Contents right above the introduction to open any topic that you would like to reach. As a note, these are guidelines and not strict rules that needs to be followed for the project.
 
 ## 2. Baseline Coding Standards
 
