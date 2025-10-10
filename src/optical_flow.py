@@ -87,6 +87,31 @@ def save_optflow_video(flow, idx : int = 0, step : int = 20,
      """
      raise NotImplementedError
 
+def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
+                    step : int = 20, scale : int = 500, color : str = 'blue', 
+                    fps : int = 10, figsize : int | int = (12,8),
+                    title : str = None, flag : str = None) -> None:
+    """
+    Saves a video of optical flow (quiver animation), optionally overlaid on image frames.
+
+    Args:
+        name (str): Name of the video file to save.
+        arr (np.ndarray): Optical flow array of shape (T, H, W, 2) where T is the number of frames,
+                          H is height, W is width, and the last dimension contains the flow vectors (dx, dy).
+        og_arr (np.ndarray): Original image frames array of shape (T, H, W, C). Default is None.
+        step (int): Step size for downsampling the flow vectors for visualization. Default is 20.
+        scale (int): Scale factor for the quiver arrows. Default is 500.
+        color (str): Color of the arrows. Default is 'blue'.
+        fps (int): Frames per second for the video. Default is 10.
+        figsize (tuple): Figure size in inches (width, height). Default is (12, 8).
+        title (str): Title of the video. Default is None.
+        flag (str): Flag to determine if the video should be saved ('f' for flow, 't' for trajectory). Default is None.
+
+    Returns:
+        None
+    """
+    raise NotImplementedError
+
 def calculate_trajectory(flow):
     """
     Calculates the trajectory of the optical flow vectors.
