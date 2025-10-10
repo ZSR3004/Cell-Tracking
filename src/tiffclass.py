@@ -1,3 +1,6 @@
+import numpy as np
+
+
 class Tiff:
     """
     This is a class that imports TIFF file to program, converts TIFF to numpy array using TIFFFILE,
@@ -79,6 +82,21 @@ class Tiff:
         Args:
             idx (int): Index of the channel to visualize. Default is 0.
             figsize (tuple): Figure size in inches (width, height). Default is (12, 8).
+
+        Returns:
+            None
+        """
+        raise NotImplementedError
+    
+    def show_image(image: np.array, title='Image', figsize=(12, 8), save_path=None):
+        """
+        Displays or saves an image using matplotlib.
+
+        Args:
+            image (np.ndarray): Image to display.
+            title (str): Title of the window.
+            figsize (tuple): Figure size in inches (width, height).
+            save_path (str, optional): If provided, saves the image to this path.
 
         Returns:
             None
