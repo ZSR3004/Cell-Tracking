@@ -16,6 +16,7 @@ class Tiff:
             timestamp (str): Timestamp of when the TIFF file was loaded.
             tags (list): List of tags for each frame in the TIFF stack.
             arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width
+            Other metadata attributes as needed.
         """
         raise NotImplementedError
     
