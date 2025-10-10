@@ -102,4 +102,40 @@ class Tiff:
             None
         """
         raise NotImplementedError
+
+    def preprocess_frame(args):
+        """
+        Preprocesses a single frame with optional Gaussian/median blurs, normalization,
+        and type conversion.
+
+        Args:
+            args (tuple): A tuple containing the frame and a dictionary of preprocessing parameters.
+                - frame (np.ndarray): Input frame to preprocess.
+                - kwargs (dict): Dictionary with preprocessing parameters:
+                    - laplace (dict): {'sigma': float} for Gaussian Laplace filter
+                    - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+                    - median (dict): {'ksize': int}
+                    - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+                    - contrast (dict): {'alpha': float, 'beta': int}
+                    - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
+
+        Returns:
+            np.ndarray: Preprocessed image.
+        """
+        raise NotImplementedError
+    
+    def preprocess_stack(arr: np.ndarray, **kwargs) -> np.ndarray:
+        """
+        Preprocesses a stack of frames with optional Gaussian/median blurs, normalization,
+        and type conversion.
+
+        Args:
+            arr (np.ndarray): Input stack of frames (shape: N x H x W).
+            **kwargs: Dictionary with preprocessing parameters (see preprocess_frame).
+
+        Returns:
+            np.ndarray: Preprocessed stack of frames.
+        """
+
+        raise NotImplementedError
     
