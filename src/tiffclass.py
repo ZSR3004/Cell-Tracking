@@ -6,14 +6,15 @@ class Tiff:
     This is a class that imports TIFF file to program, converts TIFF to numpy array using TIFFFILE,
     and stores the video type
     """
-    def __init__ (self, args):
+
+    def __init__(self, args):
         """
         Initializes a TiffStack object by loading a TIFF file and extracting its frames.
         Args:
             path (str): Path to the TIFF file.
             n_channels (int): Number of channels in the TIFF stack. Default is 3.
             dtype (np.dtype): Data type of the image frames. Default is np.uint16.
-        
+
         Attributes:
             path (str): Path to the TIFF file.
             timestamp (str): Timestamp of when the TIFF file was loaded.
@@ -22,8 +23,8 @@ class Tiff:
             Other metadata attributes as needed.
         """
         raise NotImplementedError
-    
-    def import_vid (self, args):
+
+    def import_vid(self, args):
         """
         Imports the TIFF file to the program
 
@@ -37,16 +38,16 @@ class Tiff:
         The path is a valid path to a TIFF video file
         """
         raise NotImplementedError
-    
+
     def _get_name(self) -> str:
         """
         Generates a name for the TiffStack based on the file name.
-        
+
         Returns:
             str: Name of the TiffStack.
         """
         raise NotImplementedError
-    
+
     def isolate_channel(self, args):
         """
         Isolates a specific channel from the TIFF stack.
@@ -58,8 +59,8 @@ class Tiff:
             np.ndarray: Isolated channel as a 3D numpy array.
         """
         raise NotImplementedError
-    
-    def convert_to_numpy (self, args):
+
+    def convert_to_numpy(self, args):
         """
         Converts the TIFF file to a numpy array using TIFFFILE
 
@@ -87,8 +88,8 @@ class Tiff:
             None
         """
         raise NotImplementedError
-    
-    def show_image(image: np.array, title='Image', figsize=(12, 8), save_path=None):
+
+    def show_image(image: np.array, title="Image", figsize=(12, 8), save_path=None):
         """
         Displays or saves an image using matplotlib.
 
@@ -123,7 +124,7 @@ class Tiff:
             np.ndarray: Preprocessed image.
         """
         raise NotImplementedError
-    
+
     def preprocess_stack(arr: np.ndarray, **kwargs) -> np.ndarray:
         """
         Preprocesses a stack of frames with optional Gaussian/median blurs, normalization,
@@ -138,4 +139,3 @@ class Tiff:
         """
 
         raise NotImplementedError
-    
