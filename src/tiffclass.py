@@ -75,7 +75,7 @@ class Tiff:
 
         raise NotImplementedError
 
-    def save_orginal_video(self, args):
+    def save_original_video(self, args):
         """
         Saves a video of the original image frames from the TIFF stack.
 

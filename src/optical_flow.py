@@ -8,7 +8,7 @@ def combine_flows(flow_list : list) -> np.ndarray:
         flow_list (list[np.array]): List of numpy arrays to be combined.
 
     Returns:
-        combined: combined stack of summed and orginal flows.
+        combined: combined stack of summed and original flows.
     """
 
     raise NotImplementedError
