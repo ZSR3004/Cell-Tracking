@@ -1,6 +1,6 @@
 import numpy as np
 
-def implement_lucas_kande(args) -> np.ndarray:
+def implement_lucas_kanade(args) -> np.ndarray:
     """
     Use Lucas-Kanade to generate numpy arrays of sparse optical.
     Take numpy array of original video
@@ -17,6 +17,6 @@ def save_optflow_video(flow, idx : int = 0, step : int = 20,
                           figsize : int | int = (12,8),
                           title : str = None, overlay : bool = False):
      """
-        Saves a video visualizing the optical flow using the Lucas_Kanade.
+        Saves a video visualizing the optical flow using the Lucas-Kanade.
      """
      raise NotImplementedError
