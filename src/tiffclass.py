@@ -1,5 +1,5 @@
 import numpy as np
-
+import tifffile as tf
 
 class Tiff:
     """
@@ -7,7 +7,7 @@ class Tiff:
     and stores the video type
     """
 
-    def __init__(self, args):
+    def __init__(self, path, n_channels, dtype):
         """
         Initializes a TiffStack object by loading a TIFF file and extracting its frames.
         Args:
