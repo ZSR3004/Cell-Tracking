@@ -17,4 +17,4 @@
 You can find our style guide [here](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/STYLEGUIDE.md). We wrote our style guide as a markdown file located in the `docs/` directory in this repository.
 
 
-## User Guide Manual 
+## User Guide Instruction Manual 
