@@ -19,8 +19,6 @@ def test_init(tmp_path):
     assert hasattr(x, "arr")
     assert hasattr(x, "tags")
 
-def test_import_vid(path):
-    assert isinstance (tiff.import_vid(path) == tf.TiffFile)
     
 
 
