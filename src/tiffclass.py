@@ -24,21 +24,6 @@ class Tiff:
         """
         raise NotImplementedError
 
-    def import_vid(self, args):
-        """
-        Imports the TIFF file to the program
-
-        Args:
-        path = string that is a video path
-
-        Returns:
-        The opened file
-
-        Preconditions:
-        The path is a valid path to a TIFF video file
-        """
-        raise NotImplementedError
-
     def _get_name(self) -> str:
         """
         Generates a name for the TiffStack based on the file name.
