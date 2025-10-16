@@ -1,3 +1,4 @@
+from src import tiffclass
 import tiffclass as tiff
 from tiffclass import np
 import pytest
