@@ -1,4 +1,5 @@
 import sys, os
+
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
@@ -6,13 +7,12 @@ from src import tiffclass as tiff
 import numpy as np
 import pytest
 
+
 def test_init(path: str):
     """
     Tests whether the Tiff class initializes correctly.
     """
-    img = tiff.Tiff(path=path,
-                     n_channels=3,
-                     dtype=np.uint16)
+    img = tiff.Tiff(path=path, n_channels=3, dtype=np.uint16)
 
     assert img.path == str(path)
     assert img.n_channels == 3
@@ -27,13 +27,12 @@ def test_init(path: str):
     assert img.arr.shape[2] == 520
     assert img.arr.shape[3] == 2329
 
+
 def test_isolate_channel(path: str):
     """
     Tests whether the isolate_channel method works correctly.
     """
-    img = tiff.Tiff(path = path,
-                     n_channels = 3,
-                     dtype = np.uint16)
+    img = tiff.Tiff(path=path, n_channels=3, dtype=np.uint16)
 
     channel_0 = img.isolate_channel(0)
     channel_1 = img.isolate_channel(1)
@@ -54,3 +53,17 @@ def test_isolate_channel(path: str):
     assert not np.array_equal(channel_0, channel_1)
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
+
+
+def run_tiffclass_test_suite(path_list: list[str]):
+    for path in path_list:
+        test_init(path)
+        test_isolate_channel(path)
+
+
+if __name__ == "__main__":
+    path_list = [
+        "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
+    ]
+
+    run_tiffclass_test_suite(path_list)
