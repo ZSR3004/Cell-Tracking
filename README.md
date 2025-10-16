@@ -38,13 +38,13 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 ##### 1. Download the app
 
-Step 1: Open Google Chrome or a supporting internet browser.
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open Google Chrome or a supporting internet browser.
 
-Step 2: On the search web, type Github.com and press enter or follow this [link](https://github.com/) 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the search web, type Github.com and press enter or follow this [link](https://github.com/) 
 
- - Note: You should have arrived at the GitHub homepage (this page will contain all of the files you need to download.)
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: You should have arrived at the GitHub homepage (this page will contain all of the files you need to download.)
 
-Step 3: 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: 
 
 ##### 2. Upload video to software
 
@@ -60,23 +60,23 @@ Note: Ensure that the desired output is ready to be saved to your computer.
 
 Saving the output on your computer: 
 
-Step 1: Once you are satisfied with the output, click on the "Save" button. 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Once you are satisfied with the output, click on the "Save" button. 
 
-Step 2: A file explorer window will open. Navigate to the folder where you would like to save the result.
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: A file explorer window will open. Navigate to the folder where you would like to save the result.
 
-Step 3: Enter a descriptive name of your output file. 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: Enter a descriptive name of your output file. 
 
-Step 4: Choose the file format that you like to save the video in. 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 4: Choose the file format that you like to save the video in. 
 
-Step 5: After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 5: After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
 
 Receiving an email of the output: 
 
-Step 1: Click the "Email Output" button 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Click the "Email Output" button 
 
-Step 2: On the email space, enter the email addresses of the recepients and add a message (if desired).
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the email space, enter the email addresses of the recepients and add a message (if desired).
 
-Step 3: Click "Send"
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: Click "Send"
 
 #### Additional Resources: 
 
