@@ -37,16 +37,39 @@ In this User guide, there will be step by step instructions on how to upload you
 This next section will go over the sub-tasks that the user can follow to run our software.
 
 ##### 1. Download the app
-Step 1: Open Google Chrome or a supporting internet browser
-Step 2: On the search web, type Github.com and press enter
-    - Note: You should have arrived at the GitHub homepage. 
-
+Step 1: Open Google Chrome or a supporting internet browser.
+Step 2: On the search web, type Github.com and press enter or follow this [link](https://github.com/) 
+    - Note: You should have arrived at the GitHub homepage (this page will contain all of the files you need to download.)
+Step 3: 
 
 ##### 2. Upload video to software
 
 
-##### 3. Select Desired Output
+##### 3. Select desired output
 
 
-##### 4. Save it to your computer
+##### 4. Access the output from your computer
+Our software has two different ways that the user can utilize to access the output: Save the output to your computer or through an email. First we will list the steps to download the output to your computer, then we will go over how to receive the output through an email. 
+
+Note: Ensure that the desired output is ready to be saved to your computer.
+
+Saving the output on your computer: 
+
+Step 1: Once you are satisfied with the output, click on the "Save" button. 
+Step 2: A file explorer window will open. Navigate to the folder where you would like to save the result.
+Step 3: Enter a descriptive name of your output file. 
+Step 4: Choose the file format that you like to save the video in. 
+Step 5: After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
+
+Receiving an email of the output: 
+Step 1: Click the "Email Output" button 
+Step 2: On the email space, enter the email addresses of the recepients and add a message (if desired).
+Step 3: Click "Send"
+
+#### Additional Resources: 
+Contact Support: If you encounter any technical issues not addressed, please contact: 
+[slovesjamie: Jamie Sloves](https://github.com/slovesjamie) \
+[ZSR3004: Ziyad Rahman](https://github.com/ZSR3004) \
+[CarolineTracy: Caroline Tracy](https://github.com/CarolineTracy) \
+[Shital-Olee: Shital Oli](https://github.com/Shital-Olee)
 
