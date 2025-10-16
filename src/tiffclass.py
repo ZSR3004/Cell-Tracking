@@ -33,7 +33,7 @@ class Tiff:
         """
         raise NotImplementedError
 
-    def isolate_channel(self, args):
+    def isolate_channel(self, channel_idx: int) -> np.ndarray:
         """
         Isolates a specific channel from the TIFF stack.
 
