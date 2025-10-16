@@ -46,22 +46,30 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 &nbsp;&nbsp;&nbsp;&nbsp; Step 3: Click on the newest release, and download the attached package.
 
-&nbsp;&nbsp;&nbsp;&nbsp; - Note: Software should now be downloaded and ready to run.
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: Software should now be downloaded and ready to run. You'll likely find it within your downloads folder.
 
 ##### 2. Upload video to software
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open the downloaded application.
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open the downloaded application and run the installer by following the prompts within the installer window. Once, done, click Finish.
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the main page, select "Upload Tiff Video."
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: Open the application by double clicking on the icon on your desktop or by searching for the application "Cell-Tracker" in your Finder app (for Mac) or File Explorer (for Windows 10 and Windows 11).
 
-&nbsp;&nbsp;&nbsp;&nbsp; - Note: Two options should pop up. One will be navigating within the app to find your desired file, the other will be a drag and drop option.
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: On the main page, select "Upload Tiff Video." You'll now see a new window with the a button saying "Upload file". You have two options to upload files.
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 3: If you decide to drag and drop, find your file on your computer, and drag it over to the upload box. If you decide to navigate within the app, click "upload from computer." This will direct you to your downloads. From there, select the desired video and click "open."
+1. Click the "Upload file" button. This will open your Finder or File Explorer. You can navigate to wherever your TIFF file is located, double-click it, and the press "Open" in the bottom right corner of this window. You should see a progress bar and the uploading will have begun.
+2. If you already have the file open (say on your desktop or in Finder/File Explorer), you can select the file and drag it into this window. You will see a progress bar and uploading will have begun.
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 4: Click "next."
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: If the file you attempt to upload is not a TIFF file (specficailly, a file with extension .tiff, .tif, .tiff.ome, or .tif.ome), then the program will tell you this is an invalid file type.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 4: Once the upload is complete, you will see a screen like figure [FIGUREX] with the file name in the middle of the page. Confirm this file name matches the file you intended to upload and click next. If you accidentally uploaded the wrong file, click the "Remove" button and try step 3 again.
 
 
 ##### 3. Select desired output
+Now, you'll need to tell Cell Tracker what type of video you've uploaded. Namely, if its a nuclei or cytoplasm labeled file. You will also tell the program what information or visualizations you'd like the program to output. The current program output types are as follows:
+1. Heatmaps
+2. Kymographs
+3. An array representing the optical flow
+4. An XYZ file representing the optical flow
 
 &nbsp;&nbsp;&nbsp;&nbsp; Step 1: Select the dropdown menu.
 
