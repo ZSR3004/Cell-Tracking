@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 
-def test_init(path: str):
+def test_init(path: str, f: int, h: int, w: int):
     """
     Tests whether the Tiff class initializes correctly.
     """
@@ -22,13 +22,13 @@ def test_init(path: str):
     assert hasattr(img, "arr")
     assert hasattr(img, "tags")
 
-    assert img.arr.shape[0] == 96
-    assert img.arr.shape[1] == 3
-    assert img.arr.shape[2] == 520
-    assert img.arr.shape[3] == 2329
+    assert img.arr.shape[0] == f  # number of frames
+    assert img.arr.shape[1] == 3  # number of channels
+    assert img.arr.shape[2] == h  # height
+    assert img.arr.shape[3] == w  # width
 
 
-def test_isolate_channel(path: str):
+def test_isolate_channel(path: str, f: int, h: int, w: int):
     """
     Tests whether the isolate_channel method works correctly.
     """
@@ -42,9 +42,9 @@ def test_isolate_channel(path: str):
     assert isinstance(channel_1, np.ndarray)
     assert isinstance(channel_2, np.ndarray)
 
-    assert channel_0.shape == (96, 520, 2329)
-    assert channel_1.shape == (96, 520, 2329)
-    assert channel_2.shape == (96, 520, 2329)
+    assert channel_0.shape == (f, h, w)
+    assert channel_1.shape == (f, h, w)
+    assert channel_2.shape == (f, h, w)
 
     assert np.array_equal(channel_0, img.arr[:, 0, :, :])
     assert np.array_equal(channel_1, img.arr[:, 1, :, :])
@@ -55,15 +55,32 @@ def test_isolate_channel(path: str):
     assert not np.array_equal(channel_0, channel_2)
 
 
-def run_tiffclass_test_suite(path_list: list[str]):
+def run_tiffclass_test_suite(path_list: list[dict]):
+    """
+    Runs all tests on a list of paths.
+    """
     for path in path_list:
-        test_init(path)
-        test_isolate_channel(path)
+        test_init(path["path"], path["frames"], path["height"], path["width"])
+        test_isolate_channel(
+            path["path"], path["frames"], path["height"], path["width"]
+        )
+
+
+def make_dict_of_path(path: str, frames: int, height: int, width: int) -> dict:
+    """
+    Makes a dictionary out of a path to a tiff and its metadata.
+    """
+    return {"path": path, "frames": frames, "height": height, "width": width}
 
 
 if __name__ == "__main__":
     path_list = [
-        "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
+        make_dict_of_path(
+            "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+            96,
+            520,
+            2329,
+        )
     ]
 
     run_tiffclass_test_suite(path_list)
