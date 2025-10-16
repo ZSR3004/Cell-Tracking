@@ -10,9 +10,9 @@ def test_init(path: str):
     """
     Tests whether the Tiff class initializes correctly.
     """
-    img = tiff.Tiff(path: str = path,
-                     n_channels: int = 3,
-                     dtype: np.dtype = np.uint16)
+    img = tiff.Tiff(path=path,
+                     n_channels=3,
+                     dtype=np.uint16)
 
     assert img.path == str(path)
     assert img.n_channels == 3
