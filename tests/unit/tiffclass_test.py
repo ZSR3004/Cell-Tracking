@@ -3,9 +3,9 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 from src import tiffclass as tiff
-#from src import tiffclass import np
+import numpy as np
+import tifffile as tf
 import pytest
-#from src import tiffclass import tf
 
 def test_init(tmp_path):
     """
