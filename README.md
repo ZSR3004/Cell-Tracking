@@ -63,6 +63,18 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 ##### 3. Select desired output
 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Select the dropdown menu.
+
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: A dropdown menu should pop up, with a list of outputs.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: Select the outputs you want by clicking the checkbox next to each one.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: Click "next."
+
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: A new screen will pop up listing the outputs you want to receive. Check and make sure that everything you want is there.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 4: Click "Get results."
+
 
 ##### 4. Access the output from your computer
 
