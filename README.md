@@ -27,10 +27,9 @@ In this User guide, there will be step by step instructions on how to upload you
 
 #### Equipment and Supplies
 
-1. Computer
-2. Storage space
-3. Completed Tiff video
-4. Internet access
+1. Computer with storage space available
+2. Completed Tiff video
+3. Internet access
 
 
 #### Operating/Using/How To
