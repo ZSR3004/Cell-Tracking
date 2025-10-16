@@ -34,5 +34,19 @@ In this User guide, there will be step by step instructions on how to upload you
 
 
 #### Operating/Using/How To
+This next section will go over the sub-tasks that the user can follow to run our software.
 
+##### 1. Download the app
+Step 1: Open Google Chrome or a supporting internet browser
+Step 2: On the search web, type Github.com and press enter
+    - Note: You should have arrived at the GitHub homepage. 
+
+
+##### 2. Upload video to software
+
+
+##### 3. Select Desired Output
+
+
+#### 4. Save it to your computer
 
