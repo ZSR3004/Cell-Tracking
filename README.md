@@ -82,12 +82,12 @@ Receiving an email of the output:
 
 Contact Support: If you encounter any technical issues not addressed, please contact: 
 
-[CarolineTracy: Caroline Tracy](https://github.com/CarolineTracy) \
+[CarolineTracy: Caroline Tracy](https://github.com/CarolineTracy) 
 
-[slovesjamie: Jamie Sloves](https://github.com/slovesjamie) \
+[slovesjamie: Jamie Sloves](https://github.com/slovesjamie) 
 
 [Shital-Olee: Shital Oli](https://github.com/Shital-Olee)
 
-[ZSR3004: Ziyad Rahman](https://github.com/ZSR3004) \
+[ZSR3004: Ziyad Rahman](https://github.com/ZSR3004)
 
 
