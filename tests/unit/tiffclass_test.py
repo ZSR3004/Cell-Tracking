@@ -1,8 +1,11 @@
-from src import tiffclass
-import tiffclass as tiff
-from tiffclass import np
+import sys, os
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "../.."))
+if project_root not in sys.path:
+    sys.path.insert(0, project_root)
+from src import tiffclass as tiff
+#from src import tiffclass import np
 import pytest
-from tiffclass import tf
+#from src import tiffclass import tf
 
 def test_init(tmp_path):
     """
