@@ -48,5 +48,5 @@ Step 2: On the search web, type Github.com and press enter
 ##### 3. Select Desired Output
 
 
-#### 4. Save it to your computer
+##### 4. Save it to your computer
 
