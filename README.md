@@ -40,13 +40,25 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 &nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open Google Chrome or a supporting internet browser.
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the search web, type Github.com and press enter or follow this [link](https://github.com/) 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the search web, type Github.com and press enter or follow this [link](https://github.com/ZSR3004/Cell-Tracking/) 
 
-&nbsp;&nbsp;&nbsp;&nbsp; - Note: You should have arrived at the GitHub homepage (this page will contain all of the files you need to download.)
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: After step 2, you should have arrived at the GitHub homepage (this page will contain all of the files you need to download.)
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 3: 
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: Click on the newest release, and download the attached package.
+
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: Software should now be downloaded and ready to run.
 
 ##### 2. Upload video to software
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open the downloaded application.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the main page, select "Upload Tiff Video."
+
+&nbsp;&nbsp;&nbsp;&nbsp; - Note: Two options should pop up. One will be navigating within the app to find your desired file, the other will be a drag and drop option.
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 3: If you decide to drag and drop, find your file on your computer, and drag it over to the upload box. If you decide to navigate within the app, click "upload from computer." This will direct you to your downloads. From there, select the desired video and click "open."
+
+&nbsp;&nbsp;&nbsp;&nbsp; Step 4: Click "next."
 
 
 ##### 3. Select desired output
