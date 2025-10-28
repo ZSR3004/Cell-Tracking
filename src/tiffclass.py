@@ -1,5 +1,9 @@
 import numpy as np
-import tifffile as tf
+import tifffile as tiff
+import datetime
+import cv2
+from scipy.ndimage import gaussian_laplace
+from multiprocessing import Pool, cpu_count
 
 class Tiff:
     """
@@ -7,13 +11,11 @@ class Tiff:
     and stores the video type
     """
 
-    def __init__(self, path, n_channels, dtype):
+    def __init__(self, path : str):
         """
         Initializes a TiffStack object by loading a TIFF file and extracting its frames.
         Args:
             path (str): Path to the TIFF file.
-            n_channels (int): Number of channels in the TIFF stack. Default is 3.
-            dtype (np.dtype): Data type of the image frames. Default is np.uint16.
 
         Attributes:
             path (str): Path to the TIFF file.
@@ -22,17 +24,24 @@ class Tiff:
             arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width
             Other metadata attributes as needed.
         """
-        raise NotImplementedError
+        self.path = path
+        self.timestamp = datetime.datetime.now()
+        self.image = tiff.Tiff(path)
+        self.arr = self.image.arr
+        self.tags = self.extract_tags()
 
-    def _get_name(self) -> str:
+    def extract_tags(self) -> list[dict]:
         """
-        Generates a name for the TiffStack based on the file name.
+        Extracts the XML tags from each image in the Tiff stack.
+
+        Args: 
+            None
 
         Returns:
-            str: Name of the TiffStack.
+            list[dict]: A list of dictionaries of tags
         """
         raise NotImplementedError
-
+    
     def isolate_channel(self, channel_idx: int) -> np.ndarray:
         """
         Isolates a specific channel from the TIFF stack.
@@ -43,25 +52,9 @@ class Tiff:
         Returns:
             np.ndarray: Isolated channel as a 3D numpy array.
         """
-        raise NotImplementedError
+        return self.arr[channel_idx]
 
-    def convert_to_numpy(self, args):
-        """
-        Converts the TIFF file to a numpy array using TIFFFILE
-
-        Args:
-        The channel you want to convert to a numpy
-
-        Returns:
-        numpy array
-
-        Preconditions:
-        Will have to call import_vid in this function
-        """
-
-        raise NotImplementedError
-
-    def save_original_video(self, args):
+    def save_original_video(self, save_path: str, **kwargs: dict) -> None:
         """
         Saves a video of the original image frames from the TIFF stack.
 
@@ -74,7 +67,7 @@ class Tiff:
         """
         raise NotImplementedError
 
-    def show_image(image: np.array, title="Image", figsize=(12, 8), save_path=None):
+    def show_image(self, image: np.array, title="Image", figsize=(12, 8), save_path=None):
         """
         Displays or saves an image using matplotlib.
 
@@ -89,7 +82,7 @@ class Tiff:
         """
         raise NotImplementedError
 
-    def preprocess_frame(args):
+    def preprocess_frame(self, args: tuple[np.ndarray, dict]) -> np.ndarray:
         """
         Preprocesses a single frame with optional Gaussian/median blurs, normalization,
         and type conversion.
@@ -98,7 +91,6 @@ class Tiff:
             args (tuple): A tuple containing the frame and a dictionary of preprocessing parameters.
                 - frame (np.ndarray): Input frame to preprocess.
                 - kwargs (dict): Dictionary with preprocessing parameters:
-                    - laplace (dict): {'sigma': float} for Gaussian Laplace filter
                     - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
                     - median (dict): {'ksize': int}
                     - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
@@ -108,9 +100,36 @@ class Tiff:
         Returns:
             np.ndarray: Preprocessed image.
         """
-        raise NotImplementedError
+        frame, kwargs = args
+        skip = kwargs.get("skip", [])
 
-    def preprocess_stack(arr: np.ndarray, **kwargs) -> np.ndarray:
+        if "gauss" not in skip:
+            gauss_cfg = kwargs.get("gauss", {})
+            ksize = gauss_cfg.get("ksize", (5, 5))
+            sigmaX = gauss_cfg.get("sigmaX", 1.5)
+            frame = cv2.GaussianBlur(frame, ksize, sigmaX)
+
+        if "median" not in skip:
+            median_cfg = kwargs.get("median", {})
+            ksize = median_cfg.get("ksize", 5)
+            frame = cv2.medianBlur(frame, ksize)
+
+        if "minmax" not in skip:
+            normalize_cfg = kwargs.get("normalize", {})
+            alpha = normalize_cfg.get("alpha", 0)
+            beta = normalize_cfg.get("beta", 255)
+            norm_type = normalize_cfg.get("norm_type", cv2.NORM_MINMAX)
+            frame = cv2.normalize(frame, None, alpha, beta, norm_type)
+
+        if "contrast" not in skip:
+            contrast_cfg = kwargs.get("contrast", {})
+            alpha = contrast_cfg.get("alpha", 1.0)  # Contrast factor
+            beta = contrast_cfg.get("beta", 0)      # Brightness offset
+            frame = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
+
+        return frame
+
+    def preprocess_stack(self, arr: np.ndarray, **kwargs) -> np.ndarray:
         """
         Preprocesses a stack of frames with optional Gaussian/median blurs, normalization,
         and type conversion.
@@ -123,4 +142,7 @@ class Tiff:
             np.ndarray: Preprocessed stack of frames.
         """
 
-        raise NotImplementedError
+        frames = [(arr[i], kwargs) for i in range(arr.shape[0])]
+        with Pool(cpu_count()) as pool:
+            preprocessed_frames = pool.map(self.preprocess_frame, frames)
+        return np.stack(preprocessed_frames, axis=0)
