@@ -49,24 +49,6 @@ def test_isolate_channel(path: str, f: int, h: int, w: int):
     assert not np.array_equal(channel_0, channel_2)
 
 
-def run_tiffclass_test_suite(path_list: list[dict]):
-    """
-    Runs all tests on a list of paths.
-    """
-    for path in path_list:
-        test_init(path["path"], path["frames"], path["height"], path["width"])
-        test_isolate_channel(
-            path["path"], path["frames"], path["height"], path["width"]
-        )
-
-
-def make_dict_of_path(path: str, frames: int, height: int, width: int) -> dict:
-    """
-    Makes a dictionary out of a path to a tiff and its metadata.
-    """
-    return {"path": path, "frames": frames, "height": height, "width": width}
-
-
 if __name__ == "__main__":
     path_list = [
         make_dict_of_path(
@@ -76,5 +58,3 @@ if __name__ == "__main__":
             2329,
         )
     ]
-
-    run_tiffclass_test_suite(path_list)
