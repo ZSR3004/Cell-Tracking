@@ -52,6 +52,8 @@ class Tiff:
         Returns:
             np.ndarray: Isolated channel as a 3D numpy array.
         """
+        assert(channel_idx >= 0)
+        assert(channel_idx < len(self.arr))
         return self.arr[channel_idx]
 
     def save_original_video(self, save_path: str, **kwargs: dict) -> None:
