@@ -5,6 +5,7 @@ import cv2
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 class Tiff:
     """
@@ -57,18 +58,35 @@ class Tiff:
         assert(channel_idx < len(self.arr))
         return self.arr[channel_idx]
 
-    def save_original_video(self, save_path: str, **kwargs: dict) -> None:
+    def save_original_video(name : str, file_path: str, **kwargs) -> None:
         """
-        Saves a video of the original image frames from the TIFF stack.
-
+        Saves a video of image frames using matplotlib.
         Args:
-            idx (int): Index of the channel to visualize. Default is 0.
-            figsize (tuple): Figure size in inches (width, height). Default is (12, 8).
-
-        Returns:
-            None
+            name (str): Name of the video file to save.
+            **kwargs: Additional keyword arguments that include:
+                - im: Matplotlib image display object for the original frames.
+                - image_stack: Image stack of shape (T, H, W) or (T, H, W, 3) for RGB.
+                - ax: Matplotlib axes object for the plot.
+                - fig: Matplotlib figure object for the plot.
+                - T: Total number of frames in the image stack.
+                - fps: Frames per second for the video.
+            Returns:
+                None: Just saves the video to the specified path.
         """
-        raise NotImplementedError
+        im = kwargs.get('im', None)
+        image_stack = kwargs.get('image_stack', None)
+        ax = kwargs.get('ax', None)
+        fig = kwargs.get('fig', None)
+        T = kwargs.get('T', image_stack.shape[0])
+        fps = kwargs.get('fps', 10)
+
+        def update(frame):
+            im.set_data(image_stack[frame])
+            ax.set_title(f"Frame {frame}")
+
+        ani = animation.FuncAnimation(fig, update, frames=T, interval=1000/fps, blit=False)
+        writer = animation.FFMpegWriter(fps=fps)
+        ani.save(file_path, writer=writer)
 
     def show_image(image : np.array, title='Image', figsize=(12, 8), save_path=None) -> None:
         """
