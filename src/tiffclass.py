@@ -4,6 +4,7 @@ import datetime
 import cv2
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
+import matplotlib.pyplot as plt
 
 class Tiff:
     """
@@ -69,7 +70,7 @@ class Tiff:
         """
         raise NotImplementedError
 
-    def show_image(self, image: np.array, title="Image", figsize=(12, 8), save_path=None):
+    def show_image(image : np.array, title='Image', figsize=(12, 8), save_path=None) -> None:
         """
         Displays or saves an image using matplotlib.
 
@@ -82,7 +83,14 @@ class Tiff:
         Returns:
             None
         """
-        raise NotImplementedError
+        plt.figure(figsize=figsize)
+        plt.imshow(image, cmap='gray')
+        plt.title(title)
+        plt.axis('off')
+        if save_path:
+            plt.savefig(save_path, bbox_inches='tight')
+        else:
+            plt.show()
 
     def preprocess_frame(self, args: tuple[np.ndarray, dict]) -> np.ndarray:
         """
