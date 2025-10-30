@@ -121,6 +121,7 @@ Our software has two different ways that the user can utilize to access the outp
 
 Below, you will find steps on how to test our software using the various tests we wrote (such as unit tests). Users from the Mitchel lab will likely not need to do these steps. Please disregard these steps if you only intend to use our software (as opposed to testing it). Note that we will be using pytest to test our software. 
 
+
 ### How To Clone And Open Our Repository
 
 Before you test our software, you must clone and open our GitHub repository. The steps below will explain how to do this.
@@ -134,6 +135,7 @@ Before you test our software, you must clone and open our GitHub repository. The
 7. Now, open the repository that you just cloned.
    - First, follow the **How To Get Cell-Tracking's Path** steps below. The path you just copied will be referred to as CELL-TRACKING-PATH.
    - Run ```cd CELL-TRACKING-PATH```
+
 
 ### How To Test Our Software
 
