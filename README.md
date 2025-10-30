@@ -149,7 +149,7 @@ Before you test our software, you must clone and open our GitHub repository. The
 5. Find the file whose tests you want to run. This file will be referred to as TEST_FILE. (Make sure TEST_FILE includes ".py" at the end. For example, TEST_FILE could be tiffclass_test.py).
 6. Figure out which folder TEST_FILE lies in. Note that this folder is a folder within the "tests" folder. This folder will be referred to as TEST_FOLDER.
    - You can do this by navigating to the "Cell-Tracking" folder on your computer and looking through the folders that are inside the "tests" folder.
-7. Run ```pytest /TEST_FOLDER/TEST_FILE```
+7. Run ```pytest tests/TEST_FOLDER/TEST_FILE```
 
 ### How To Get Cell-Tracking's Path
 Use your computer's search bar (the one that searches the contents of your computer), and search "Cell-Tracking". Click on the folder called "Cell-Tracking".
