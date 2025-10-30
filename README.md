@@ -26,6 +26,7 @@ You can find our style guide [here](https://github.com/ZSR3004/Cell-Tracking/blo
 In this user guide, there are step by step instructions on how to upload your Tiff file to our software and receive the desired output (kymograph, heatmap, vector field, sparse-like optical flow visualization, and raw data [xyz file, arrays]). This user guide is intended for the Mitchel lab and its members, as well as any other lab that would like to utilize this software. We will describe how to download our app, upload the video, choose the desired outputs, and save the results on your device/email the output to others.
 
 
+
 ### Equipment and Supplies
 
 1. Computer with storage space available
