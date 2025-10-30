@@ -53,7 +53,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 1. Open the downloaded application.
 
-2. Run the installer by following the prompts within the installer window. Figure [FIGUREX] displays the first screen that initiates the installer window. Once completed, you should arricve at a screen that says "Finish". Click Finish.
+2. Run the installer by following the prompts within the installer window. Figure [FIGUREX] displays the first screen that initiates the installer window. Once completed, you should arricve at a screen that says "Finish". Click "Finish".
 
 3. Open the application (that you downloaded in the previous step) by double clicking on the icon on your desktop or by searching for the application "Cell-Tracker" in your Finder app (for Mac) or File Explorer (for Windows 10 and Windows 11).
 
@@ -66,7 +66,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
     - Note: If the file you attempt to upload is not a TIFF file (specficailly, a file with extension .tiff, .tif, .tiff.ome, or .tif.ome), then the program will tell you this is an invalid file type.
 
-5. Once the upload is complete, you will see a screen like figure [FIGUREX] with the file name in the middle of the page. Confirm this file name matches the file you intended to upload and click next. If you accidentally uploaded the wrong file, click the "Remove" button on the same screen and try step 3 again.
+5. Once the upload is complete, you will see a screen like figure [FIGUREX] with the file name in the middle of the page. Confirm this file name matches the file you intended to upload and click "Next". If you accidentally uploaded the wrong file, click the "Remove" button on the same screen and try step 3 again.
 
 
 #### 3. Select desired output
@@ -82,7 +82,7 @@ Now, you will need to tell Cell Tracker what type of video you have uploaded int
 
 2. Select the outputs you want by clicking the checkbox next to each one.
 
-3. Click the "next" button from the same page.
+3. Click the "Next" button from the same page.
 
     - Note: A new screen, as shown in figure [FIGUREX], will pop up listing the outputs you want to receive. Check and make sure that everything you want is there.
 
@@ -116,18 +116,27 @@ Our software has two different ways that the user can utilize to access the outp
 3. Click "Send".
 
 
-## How To Test Our Software
+## Testing Our Software
 
 ### Introduction
 
 Below, you will find steps on how to test our software using the various tests we wrote (such as unit tests). Users from the Mitchel lab will likely not need to do these steps. Please disregard these steps if you only intend to use our software (as opposed to testing it). Note that we will be using pytest to test our software. 
 
+### How To Clone Our Repository
+
+Before you test our software, you must clone our GitHub repository. The steps below will explain how to do this.
+1. 
+
 ### How To Test Our Software
 
-1. Make sure you are in the "Cell-Tracking" directory.
+1.
+2. Double-check that you are in the "Cell-Tracking" directory.
     - In the command line, type ```pwd``` (for Mac users) or ```cd``` (for Windows users).
+    - You should get a file path ending in ```/Cell-Tracking```. For example, you should get something that looks like this: ```/Users/carolinetracy/Desktop/Cell-Tracking```
+      - If you don't get a file path ending in ```/Cell-Tracking```, 
+    - 
 
-2. 
+3. 
 
 
 ## Additional Resources: 
