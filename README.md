@@ -92,7 +92,7 @@ Our software has two different ways that the user can utilize to access the outp
 
    - Note: At this point, ensure that the desired output is ready to be saved to your computer.
 
-**Saving the output on your computer:**
+- **Saving the output on your computer:**
 
 1. Once you are satisfied with the output, click on the "Save" button. 
 
@@ -104,15 +104,14 @@ Our software has two different ways that the user can utilize to access the outp
 
 5. After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
 
-**Receiving an email of the output:**
+- **Receiving an email of the output:**
 
 1. Once you have clicked the "save" button, click the "Email Output" button.
 
 2. On the email space, as seen on figure [FIGUREX], enter the email addresses of the recepients and add a message (if desired).
 
 3. Click "Send".
-
-
+<br><br>
 ## Testing Our Software
 
 ### Introduction
@@ -176,8 +175,7 @@ Use your computer's search bar (the one that searches the contents of your compu
    - For Mac users: A window should have opened, and at the bottom of this window there should be a folder icon that says "Cell-Tracking". Right-click this folder icon. Then, click the button that says "Copy Cell-Tracking as Pathname".
      
    - For Windows users: Click the address bar (it should turn into Cell-Tracking's full path). Type CTRL+C to copy this path.
-
-
+<br><br>
 ## Additional Resources: 
 
 Contact Support: If you encounter any technical issues not addressed, please contact: 
