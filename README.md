@@ -116,6 +116,20 @@ Our software has two different ways that the user can utilize to access the outp
 3. Click "Send".
 
 
+## How To Test Our Software
+
+### Introduction
+
+Below, you will find steps on how to test our software using the various tests we wrote (such as unit tests). Users from the Mitchel lab will likely not need to do these steps. Please disregard these steps if you only intend to use our software (as opposed to testing it). Note that we will be using pytest to test our software. 
+
+### How To Test Our Software
+
+1. Make sure you are in the "Cell-Tracking" directory.
+    - In the command line, type ```pwd``` (for Mac users) or ```cd``` (for Windows users).
+
+2. 
+
+
 ## Additional Resources: 
 
 Contact Support: If you encounter any technical issues not addressed, please contact: 
