@@ -57,7 +57,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 3. Open the application (that you downloaded in the previous step) by double clicking on the icon on your desktop or by searching for the application "Cell-Tracker" in your Finder app (for Mac) or File Explorer (for Windows 10 and Windows 11).
 
-    - Note: You should have arrived at the main page of the application as shown in figure [FIGUREX]
+    - Note: You should have arrived at the main page of the application as shown in figure [FIGUREX].
 
 4. On the main page, select "Upload Tiff Video." You'll now see a new window with a button saying "Upload file". You have two options to upload files.
 
@@ -71,10 +71,10 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 #### 3. Select desired output
 Now, you will need to tell Cell Tracker what type of video you have uploaded into the system. Namely, if it's a nuclei or cytoplasm labeled file. You will also tell the program what information or visualizations you would like the program to output. The current program output types are as follows:
-  - Heatmaps
-  - Kymographs
-  - An array representing the optical flow
-  - An XYZ file representing the optical flow
+    - Heatmaps
+    - Kymographs
+    - An array representing the optical flow
+    - An XYZ file representing the optical flow
 
 1. Select the dropdown menu. 
 
