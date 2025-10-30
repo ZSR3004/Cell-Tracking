@@ -47,7 +47,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 3. Click on the newest release (which looks like figure [FIGUREX] below), and download the attached package by clicking the "Download" button as seen on figrue [FIGUREX].
 
-- Note: Software should now be downloaded and ready to run. You'll likely find it within your downloads folder.
+    - Note: Software should now be downloaded and ready to run. You'll likely find it within your downloads folder.
 
 #### 2. Upload video to software
 
@@ -57,34 +57,34 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 3. Open the application (that you downloaded in the previous step) by double clicking on the icon on your desktop or by searching for the application "Cell-Tracker" in your Finder app (for Mac) or File Explorer (for Windows 10 and Windows 11).
 
-- Note: You should have arrived at the main page of the application as shown in figure [FIGUREX]
+    - Note: You should have arrived at the main page of the application as shown in figure [FIGUREX]
 
 4. On the main page, select "Upload Tiff Video." You'll now see a new window with a button saying "Upload file". You have two options to upload files.
 
-- Click the "Upload file" button. This will open your Finder or File Explorer. You can navigate to wherever your TIFF file is located, double-click it, and then press "Open" in the bottom right corner of this window. You should see a progress bar and the uploading will have begun.
-- If you already have the file open (say on your desktop or in Finder/File Explorer), you can select the file and drag it into this window. You will see a progress bar and uploading will have begun.
+  - Click the "Upload file" button. This will open your Finder or File Explorer. You can navigate to wherever your TIFF file is located, double-click it, and then press "Open" in the bottom right corner of this window. You should see a progress bar and the uploading will have begun.
+  - If you already have the file open (say on your desktop or in Finder/File Explorer), you can select the file and drag it into this window. You will see a progress bar and uploading will have begun.
 
-+ Note: If the file you attempt to upload is not a TIFF file (specficailly, a file with extension .tiff, .tif, .tiff.ome, or .tif.ome), then the program will tell you this is an invalid file type.
+    - Note: If the file you attempt to upload is not a TIFF file (specficailly, a file with extension .tiff, .tif, .tiff.ome, or .tif.ome), then the program will tell you this is an invalid file type.
 
 5. Once the upload is complete, you will see a screen like figure [FIGUREX] with the file name in the middle of the page. Confirm this file name matches the file you intended to upload and click next. If you accidentally uploaded the wrong file, click the "Remove" button on the same screen and try step 3 again.
 
 
 #### 3. Select desired output
 Now, you will need to tell Cell Tracker what type of video you have uploaded into the system. Namely, if it's a nuclei or cytoplasm labeled file. You will also tell the program what information or visualizations you would like the program to output. The current program output types are as follows:
-- Heatmaps
-- Kymographs
-- An array representing the optical flow
-- An XYZ file representing the optical flow
+  - Heatmaps
+  - Kymographs
+  - An array representing the optical flow
+  - An XYZ file representing the optical flow
 
 1. Select the dropdown menu. 
 
-- Note: A dropdown menu, as shown in figure [FIGUREX] should pop up, with a list of outputs.
+    - Note: A dropdown menu, as shown in figure [FIGUREX] should pop up, with a list of outputs.
 
 2. Select the outputs you want by clicking the checkbox next to each one.
 
 3. Click the "next" button from the same page.
 
-- Note: A new screen, as shown in figure [FIGUREX] will pop up listing the outputs you want to receive. Check and make sure that everything you want is there.
+    - Note: A new screen, as shown in figure [FIGUREX] will pop up listing the outputs you want to receive. Check and make sure that everything you want is there.
 
 4. From the same screen, click "Get results".
 
@@ -93,7 +93,7 @@ Now, you will need to tell Cell Tracker what type of video you have uploaded int
 
 Our software has two different ways that the user can utilize to access the output: Save the output to your computer or through an email. First we will list the steps to download the output to your computer, then we will go over how to receive the output through an email. 
 
-+ Note: At this point, ensure that the desired output is ready to be saved to your computer.
+    - Note: At this point, ensure that the desired output is ready to be saved to your computer.
 
 **Saving the output on your computer:**
 
