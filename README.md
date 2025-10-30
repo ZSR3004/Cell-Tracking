@@ -118,8 +118,7 @@ Our software has two different ways that the user can utilize to access the outp
 ### Introduction
 
 Below, you will find steps on how to test our software using the various tests we wrote (such as unit tests). Users from the Mitchel lab will likely not need to do these steps. Please disregard these steps if you only intend to use our software (as opposed to testing it). Note that we will be using pytest to test our software. 
-
-
+<br><br>
 ### How To Clone And Open Our Repository
 
 Before you test our software, you must clone and open our GitHub repository. The steps below will explain how to do this.
@@ -141,8 +140,7 @@ Before you test our software, you must clone and open our GitHub repository. The
    - First, follow the **How To Get Cell-Tracking's Path** steps below. The path you just copied will be referred to as CELL-TRACKING-PATH.
      
    - Run ```cd CELL-TRACKING-PATH```
-
-
+<br><br>
 ### How To Test Our Software
 
 1. Double-check that you are in the "Cell-Tracking" directory.
@@ -170,7 +168,7 @@ Before you test our software, you must clone and open our GitHub repository. The
    - You can do this by navigating to the "Cell-Tracking" folder on your computer and looking through the folders that are inside the "tests" folder.
      
 7. Run ```pytest tests/TEST_FOLDER/TEST_FILE```
-
+<br><br>
 ### How To Get Cell-Tracking's Path
 
 Use your computer's search bar (the one that searches the contents of your computer), and search "Cell-Tracking". Click on the folder called "Cell-Tracking".
