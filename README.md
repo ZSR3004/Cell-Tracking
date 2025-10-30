@@ -49,7 +49,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
     - Note: Software should now be downloaded and ready to run. You'll likely find it within your downloads folder.
 
-#### 2. Upload video to software
+#### 2. Upload video to our software
 
 1. Open the downloaded application.
 
