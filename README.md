@@ -38,7 +38,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 ##### 1. Download the app
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open Google Chrome or a supporting internet browser.
+1. Open Google Chrome or a supporting internet browser.
 
 &nbsp;&nbsp;&nbsp;&nbsp; Step 2: On the search web, type Github.com and press enter or follow this [link](https://github.com/ZSR3004/Cell-Tracking/) 
 
