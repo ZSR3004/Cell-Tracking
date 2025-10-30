@@ -93,7 +93,7 @@ Note: At this point, ensure that the desired output is ready to be saved to your
 
 + **Saving the output on your computer:**
 
-  1. Once you are satisfied with the output, click on the "Save" button. 
+    1. Once you are satisfied with the output, click on the "Save" button. 
 
   2. A file explorer window will open, as seen on figure [FIGUREX]. Navigate to the folder where you would like to save the result.
 
