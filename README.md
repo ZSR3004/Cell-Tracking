@@ -30,8 +30,7 @@ In this user guide, there are step by step instructions on how to upload your Ti
 1. Computer with storage space available
 2. Completed Tiff video
 3. Internet access
-   
-
+<br><br>
 ### How To Use Our Software
 
 This next section will go over the sub-tasks that the user can follow to run our software.
