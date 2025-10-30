@@ -41,7 +41,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 1. Open Google Chrome or a supporting internet browser.
 
-2. Follow this [link](https://github.com/ZSR3004/Cell-Tracking/) 
+2. Follow this [link](https://github.com/ZSR3004/Cell-Tracking/)
     - Note: After step 2, you should have arrived at the GitHub homepage (this page will contain all of the files you need to download.) You will see a screen like figure [FIGUREX], which displays the GitHub homepage.
 
 3. Click on the newest release (which looks like figure [FIGUREX] below), and download the attached package by clicking the "Download" button as seen on figrue [FIGUREX].
