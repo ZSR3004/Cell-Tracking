@@ -95,6 +95,7 @@ Our software has two different ways that the user can utilize to access the outp
 
     - Note: At this point, ensure that the desired output is ready to be saved to your computer.
 
+
 **Saving the output on your computer:**
 
 1. Once you are satisfied with the output, click on the "Save" button. 
