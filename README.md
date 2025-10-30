@@ -93,7 +93,7 @@ Now, you will need to tell Cell Tracker what type of video you have uploaded int
 
 Our software has two different ways that the user can utilize to access the output: Save the output to your computer or through an email. First we will list the steps to download the output to your computer, then we will go over how to receive the output through an email. 
 
-Note: At this point, ensure that the desired output is ready to be saved to your computer.
++ Note: At this point, ensure that the desired output is ready to be saved to your computer.
 
 **Saving the output on your computer:**
 
@@ -116,7 +116,7 @@ Note: At this point, ensure that the desired output is ready to be saved to your
 3. Click "Send".
 
 
-### Additional Resources: 
+## Additional Resources: 
 
 Contact Support: If you encounter any technical issues not addressed, please contact: 
 
