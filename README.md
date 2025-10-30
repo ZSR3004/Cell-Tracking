@@ -126,11 +126,12 @@ Below, you will find steps on how to test our software using the various tests w
 Before you test our software, you must clone and open our GitHub repository. The steps below will explain how to do this.
 1. At the top right of this page, click on the green "Code" button.
 2. Make sure that "HTTPS" is selected.
+   
    - If "HTTPS" isn't selected, select it now.
-3. Copy the URL (which is located above the words "Clone using the web URL.").
-4. Open a Command Line Interface (CLI), such as VSCode.
-5. In your CLI's terminal, run ```git clone COPIED_URL``` (where COPIED_URL is the URL you just copied from our GitHub).
-6. Now, open the repository that you just cloned.
+4. Copy the URL (which is located above the words "Clone using the web URL.").
+5. Open a Command Line Interface (CLI), such as VSCode.
+6. In your CLI's terminal, run ```git clone COPIED_URL``` (where COPIED_URL is the URL you just copied from our GitHub).
+7. Now, open the repository that you just cloned.
    - First, follow the **How To Get Cell-Tracking's Path** steps below. The path you just copied will be referred to as CELL-TRACKING-PATH.
    - Run ```cd CELL-TRACKING-PATH```
 
