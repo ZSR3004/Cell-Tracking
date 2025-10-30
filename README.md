@@ -17,13 +17,13 @@
 You can find our style guide [here](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/STYLEGUIDE.md). We wrote our style guide as a markdown file located in the `docs/` directory in this repository.
 
 
-# User Guide 
+## User Guide 
 
 ### How to Upload Your Tiff Video for Desired Output
 
 #### Introduction
 
-In this User guide, there will be step by step instructions on how to upload your Tiff file to our software and receive the desired output (kymograph, heatmap, vector field, sparse-like optical flow visualization, and raw data [xyz file, arrays]). This user guide is intended for the Mitchel lab and its members, as well as any other lab that would like to utilize this software. We will describe how to download our app, upload the video, choose the desired outputs, and save the results on your device/email the output to others.
+In this user guide, there are step by step instructions on how to upload your Tiff file to our software and receive the desired output (kymograph, heatmap, vector field, sparse-like optical flow visualization, and raw data [xyz file, arrays]). This user guide is intended for the Mitchel lab and its members, as well as any other lab that would like to utilize this software. We will describe how to download our app, upload the video, choose the desired outputs, and save the results on your device/email the output to others.
 
 #### Equipment and Supplies
 
@@ -50,7 +50,7 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 ##### 2. Upload video to software
 
-&nbsp;&nbsp;&nbsp;&nbsp; Step 1: Open the downloaded application.
+1. Open the downloaded application.
 
 &nbsp;&nbsp;&nbsp;&nbsp; Step 2: Run the installer by following the prompts within the installer window. Figure [FIGUREX] displays the first screen that initiates the installer window. Once completed, you should arricve at a screen that says "Finish". Click Finish.
 
