@@ -101,9 +101,9 @@ Our software has two different ways that the user can utilize to access the outp
 
 2. A file explorer window will open, as seen on figure [FIGUREX]. Navigate to the folder where you would like to save the result.
 
-3. Enter a descriptive name of your output file. 
+3. Enter a descriptive name for your output file. 
 
-4. Like previosuly, from the explorer window, choose the file format that you like to save the video in. 
+4. Like previously, from the explorer window, choose the file format that you like to save the video in. 
 
 5. After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
 
