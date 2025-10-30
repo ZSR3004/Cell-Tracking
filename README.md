@@ -71,10 +71,10 @@ This next section will go over the sub-tasks that the user can follow to run our
 
 #### 3. Select desired output
 Now, you will need to tell Cell Tracker what type of video you have uploaded into the system. Namely, if it's a nuclei or cytoplasm labeled file. You will also tell the program what information or visualizations you would like the program to output. The current program output types are as follows:
-    - Heatmaps
-    - Kymographs
-    - An array representing the optical flow
-    - An XYZ file representing the optical flow
+  - Heatmaps
+  - Kymographs
+  - An array representing the optical flow
+  - An XYZ file representing the optical flow
 
 1. Select the dropdown menu. 
 
@@ -84,7 +84,7 @@ Now, you will need to tell Cell Tracker what type of video you have uploaded int
 
 3. Click the "next" button from the same page.
 
-    - Note: A new screen, as shown in figure [FIGUREX] will pop up listing the outputs you want to receive. Check and make sure that everything you want is there.
+    - Note: A new screen, as shown in figure [FIGUREX], will pop up listing the outputs you want to receive. Check and make sure that everything you want is there.
 
 4. From the same screen, click "Get results".
 
