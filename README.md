@@ -96,19 +96,19 @@ Our software has two different ways that the user can utilize to access the outp
 
   2. A file explorer window will open, as seen on figure [FIGUREX]. Navigate to the folder where you would like to save the result.
 
-3. Enter a descriptive name for your output file. 
+  3. Enter a descriptive name for your output file. 
 
-4. Like previously, from the explorer window, choose the file format that you like to save the video in. 
+  4. Like previously, from the explorer window, choose the file format that you like to save the video in. 
 
-5. After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
+  5. After naming and selecting the file format, click "Save" to finalize the process to save the output to your computer. 
 
-- **Receiving an email of the output:**
+- Receiving an email of the output:
 
-1. Once you have clicked the "save" button, click the "Email Output" button.
+  1. Once you have clicked the "save" button, click the "Email Output" button.
 
-2. On the email space, as seen on figure [FIGUREX], enter the email addresses of the recepients and add a message (if desired).
+  2. On the email space, as seen on figure [FIGUREX], enter the email addresses of the recepients and add a message (if desired).
 
-3. Click "Send".
+  3. Click "Send".
 <br><br>
 ## Testing Our Software
 
