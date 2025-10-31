@@ -2,10 +2,17 @@ import sys, os, pytest
 from src import tiffclass as tiff
 import numpy as np
 
-def test_init(path: str, f: int, h: int, w: int):
+@pytest.fixture
+def sample_tiff():
+    path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
+    f, h, w = 96, 520, 2329
+    return tiff.Tiff(path=path, n_channels=3, dtype=np.uint16), f, h, w
+
+def test_init(sample_tiff):
     """
     Tests whether the Tiff class initializes correctly.
     """
+    path, f, h, w = sample_tiff
     img = tiff.Tiff(path=path, n_channels=3, dtype=np.uint16)
 
     assert img.path == str(path)
@@ -22,10 +29,11 @@ def test_init(path: str, f: int, h: int, w: int):
     assert img.arr.shape[3] == w  # width
 
 
-def test_isolate_channel(path: str, f: int, h: int, w: int):
+def test_isolate_channel(sample_tiff):
     """
     Tests whether the isolate_channel method works correctly.
     """
+    path, f, h, w = sample_tiff
     img = tiff.Tiff(path=path, n_channels=3, dtype=np.uint16)
 
     channel_0 = img.isolate_channel(0)
@@ -49,6 +57,24 @@ def test_isolate_channel(path: str, f: int, h: int, w: int):
     assert not np.array_equal(channel_0, channel_2)
 
 
+def run_tiffclass_test_suite(path_list: list[dict]):
+    """
+    Runs all tests on a list of paths.
+    """
+    for path in path_list:
+        test_init(path["path"], path["frames"], path["height"], path["width"])
+        test_isolate_channel(
+            path["path"], path["frames"], path["height"], path["width"]
+        )
+
+
+def make_dict_of_path(path: str, frames: int, height: int, width: int) -> dict:
+    """
+    Makes a dictionary out of a path to a tiff and its metadata.
+    """
+    return {"path": path, "frames": frames, "height": height, "width": width}
+
+
 if __name__ == "__main__":
     path_list = [
         make_dict_of_path(
@@ -58,3 +84,5 @@ if __name__ == "__main__":
             2329,
         )
     ]
+
+    run_tiffclass_test_suite(path_list)
