@@ -28,7 +28,7 @@ class Tiff:
         """
         self.path = path
         self.timestamp = datetime.datetime.now()
-        self.image = tiff.Tiff(path)
+        self.image = tiff.imread(path)
         self.arr = self.image.arr
         self.tags = self.extract_tags()
 

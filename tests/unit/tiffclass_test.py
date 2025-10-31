@@ -6,14 +6,14 @@ import numpy as np
 def sample_tiff():
     path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
     f, h, w = 96, 520, 2329
-    return tiff.Tiff(path=path, n_channels=3, dtype=np.uint16), f, h, w
+    return tiff.Tiff(path), f, h, w
 
 def test_init(sample_tiff):
     """
     Tests whether the Tiff class initializes correctly.
     """
     path, f, h, w = sample_tiff
-    img = tiff.Tiff(path=path, n_channels=3, dtype=np.uint16)
+    img = tiff.Tiff(path)
 
     assert img.path == str(path)
     assert img.n_channels == 3
@@ -34,7 +34,7 @@ def test_isolate_channel(sample_tiff):
     Tests whether the isolate_channel method works correctly.
     """
     path, f, h, w = sample_tiff
-    img = tiff.Tiff(path=path, n_channels=3, dtype=np.uint16)
+    img = tiff.Tiff(path)
 
     channel_0 = img.isolate_channel(0)
     channel_1 = img.isolate_channel(1)
