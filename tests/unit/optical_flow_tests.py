@@ -68,7 +68,31 @@ def test_optical_flow(sample_tiff):
     """
     Tests whether the optical_flow function works correctly.
     """
-    raise NotImplementedError
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+
+
+    # isolate channel for testing
+    channel = tiff.isolate_channel(0)
+
+    #arguments for testing
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
+
+    my_flow = flow.optical_flow(channel, flow_args)
+
+    # Test output type
+    assert isinstance(my_flow, np.ndarray)
+
+    # Test output shape
+    assert my_flow.shape == (f-1, h, w, 2)
 
 def test_calculate_optical_flow(sample_tiff):
         """
