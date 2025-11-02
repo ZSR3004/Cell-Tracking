@@ -95,10 +95,37 @@ def test_optical_flow(sample_tiff):
     assert my_flow.shape == (f-1, h, w, 2)
 
 def test_calculate_optical_flow(sample_tiff):
-        """
-        Tests whether the calculate_optical_flow function works correctly.
-        """
-        raise NotImplementedError
+    """
+    Tests whether the calculate_optical_flow function works correctly.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+
+    
+    # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
+    process_args = {
+        "normalize": True,
+        "gaussian_blur": 3
+    }
+
+    #arguments for testing
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
+
+    my_flow = flow.calculate_optical_flow(process_args, flow_args, False)
+
+    # Test output type
+    assert isinstance(my_flow, np.ndarray)
+
+    # Test output shape
+    assert my_flow.shape == (f-1, h, w, 2)
 
 def test_save_optflow_video(sample_tiff):
      """

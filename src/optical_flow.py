@@ -64,7 +64,7 @@ def optical_flow(   arr : np.array,
     """ 
     raise NotImplementedError
 
-def calculate_optical_flow(self, process_args=None, flow_args=None, default=False):
+def calculate_optical_flow(process_args=None, flow_args=None, default=False):
         """
         Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
 
