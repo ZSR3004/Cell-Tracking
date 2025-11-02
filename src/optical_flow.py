@@ -1,5 +1,6 @@
 import numpy as np
-import matplotlib as pltfrom multiprocessing import Pool, cpu_count
+import matplotlib as plt
+from multiprocessing import Pool, cpu_count
 import cv2
 
 def combine_flows(flow_list : list) -> np.ndarray:
