@@ -46,31 +46,25 @@ def test_optical_flow(sample_tiff):
     """
     raise NotImplementedError
 
-def test_calculate_optical_flow(self, process_args=None, flow_args=None, default=False):
+def test_calculate_optical_flow(sample_tiff):
         """
         Tests whether the calculate_optical_flow function works correctly.
         """
         raise NotImplementedError
 
-def test_save_optflow_video(flow, idx : int = 0, step : int = 20, 
-                          scale : int = 500, color : str = 'blue', fps : int = 10, 
-                          figsize : int | int = (12,8),
-                          title : str = None, overlay : bool = False):
+def test_save_optflow_video(sample_tiff):
      """
         Saves a video visualizing the optical flow.
      """
      raise NotImplementedError
 
-def test_create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
-                    step : int = 20, scale : int = 500, color : str = 'blue', 
-                    fps : int = 10, figsize : int | int = (12,8),
-                    title : str = None, flag : str = None) -> None:
+def test_create_vector_field_video(sample_tiff):
     """
     Tests whether the create_vector_field_video function works correctly.
     """
     raise NotImplementedError
 
-def test_calculate_trajectory(flow):
+def test_calculate_trajectory(sample_tiff):
     """
     Tests whether the calculate_trajectory function works correctly.
     """
