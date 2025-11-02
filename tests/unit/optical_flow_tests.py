@@ -206,19 +206,12 @@ def test_save_optflow_video(sample_tiff, tmp_path):
                                         'blue', 10, (12, 8), "Optical Flow Test", None, False)
     
     assert save_path.exists()
-    assert save_path.suffix == ".mp4"
-        
+    assert save_path.suffix == ".mp4"       
     
 
 def test_create_vector_field_video(sample_tiff):
     """
     Tests whether the create_vector_field_video function works correctly.
-    """
-    raise NotImplementedError
-
-def test_calculate_trajectory(sample_tiff):
-    """
-    Tests whether the calculate_trajectory function works correctly.
     """
     raise NotImplementedError
 

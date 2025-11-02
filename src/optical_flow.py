@@ -148,12 +148,3 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
         None
     """
     raise NotImplementedError
-
-def calculate_trajectory(flow):
-    """
-    Calculates the trajectory of the optical flow vectors.
-
-    Returns:
-        np.ndarray: Trajectory of the optical flow vectors.
-    """
-    raise NotImplementedError
