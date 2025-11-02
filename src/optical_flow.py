@@ -3,6 +3,7 @@ import numpy as np
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib as plt
+import tiffclass as tc
 
 def combine_flows(flow_list : list) -> np.ndarray:
     """
@@ -92,7 +93,7 @@ def optical_flow(   arr : np.array,
         flow_list = pool.map(compute_flow_pair, pairs)
     return np.stack(flow_list)
 
-def calculate_optical_flow(arr: np.array, process_args=None, flow_args=None, default=False):
+def calculate_optical_flow(arr: np.array, process_args=None, default=False):
         """
         Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
 
@@ -104,53 +105,7 @@ def calculate_optical_flow(arr: np.array, process_args=None, flow_args=None, def
         Returns:
             np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
         """
-        raise NotImplementedError
-
-def save_optflow_video(flow, save_path, idx : int = 0, step : int = 20, 
-                                  scale : int = 500, color : str = 'blue', fps : int = 10, 
-                                  figsize : int | int = (12,8),
-                                  title : str = None, overlay : bool = False):
-      """
-          Saves a video visualizing the optical flow.
-      """
-      raise NotImplementedError
-
-def show_flow(flow : np.array, title='Optical Flow', 
-              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
-              pivot : str = 'tail', color : str = 'blue', save_path : str = None) -> None:
-    """
-    Displays optical flow as a quiver plot using matplotlib.
-
-    Args:
-        flow (np.ndarray): Optical flow array of shape (H, W, 2) where H is height, W is width,
-                           and the last dimension contains the flow vectors (dx, dy).
-        title (str): Title of the plot. Default is 'Optical Flow'.
-        step (int): Step size for downsampling the flow vectors for visualization. Default is 25.
-        figsize (tuple): Size of the figure in inches (width, height). Default is (12, 6).
-        scale (float): Scale factor for the quiver arrows. Default is 200.
-        pivot (str): Pivot point for the arrows. Default is 'tail'.
-        color (str): Color of the arrows. Default is 'white'.
-
-    Returns:
-        None: Just displays the plot.
-    """
-    Y, X = np.mgrid[0:flow.shape[0]:step, 0:flow.shape[1]:step]
-    U = flow[::step, ::step, 0]  # dx
-    V = flow[::step, ::step, 1]  # dy
-
-    # Create plot
-    plt.figure(figsize=figsize)
-    plt.quiver(X, Y, U, V, scale=scale, pivot=pivot, color=color)
-    plt.title(title)
-    plt.xlim(0, flow.shape[1])
-    plt.ylim(flow.shape[0], 0)
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.tight_layout()
-    if save_path:
-        plt.savefig(save_path, bbox_inches='tight')
-    else:
-        plt.show()
+        return optical_flow(tc.preprocess_stack(arr, process_args), 0.5, 3, 15, 3, 5, 1.2,0)
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
                     step : int = 20, scale : int = 500, color : str = 'blue', 
@@ -214,3 +169,66 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
                    })
 
     plt.close(fig)
+
+def save_optflow_video(name, flow, save_path, idx : int = 0, step : int = 20, 
+                                  scale : int = 500, color : str = 'blue', fps : int = 10, 
+                                  figsize : int | int = (12,8),
+                                  title : str = None, overlay : bool = False):
+    """
+        Saves a video visualizing the optical flow.
+    """
+    if overlay:
+        og_arr = tc.isolate_channel(idx)
+    else:
+        og_arr = None 
+
+        create_vector_field_video(
+            name, 
+            flow[:, idx, ...], 
+            og_arr, 
+            step=step, 
+            scale=scale,
+            color=color, 
+            fps=fps, 
+            figsize=figsize, 
+            title=title,
+            flag='f'
+        )
+    
+
+def show_flow(flow : np.array, title='Optical Flow', 
+              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
+              pivot : str = 'tail', color : str = 'blue', save_path : str = None) -> None:
+    """
+    Displays optical flow as a quiver plot using matplotlib.
+
+    Args:
+        flow (np.ndarray): Optical flow array of shape (H, W, 2) where H is height, W is width,
+                           and the last dimension contains the flow vectors (dx, dy).
+        title (str): Title of the plot. Default is 'Optical Flow'.
+        step (int): Step size for downsampling the flow vectors for visualization. Default is 25.
+        figsize (tuple): Size of the figure in inches (width, height). Default is (12, 6).
+        scale (float): Scale factor for the quiver arrows. Default is 200.
+        pivot (str): Pivot point for the arrows. Default is 'tail'.
+        color (str): Color of the arrows. Default is 'white'.
+
+    Returns:
+        None: Just displays the plot.
+    """
+    Y, X = np.mgrid[0:flow.shape[0]:step, 0:flow.shape[1]:step]
+    U = flow[::step, ::step, 0]  # dx
+    V = flow[::step, ::step, 1]  # dy
+
+    # Create plot
+    plt.figure(figsize=figsize)
+    plt.quiver(X, Y, U, V, scale=scale, pivot=pivot, color=color)
+    plt.title(title)
+    plt.xlim(0, flow.shape[1])
+    plt.ylim(flow.shape[0], 0)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight')
+    else:
+        plt.show()
