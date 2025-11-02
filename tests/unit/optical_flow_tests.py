@@ -1,4 +1,5 @@
 import sys, os, pytest
+from sympy import Idx
 from src import optical_flow as flow
 import numpy as np
 from src import tiffclass as tiff
@@ -127,11 +128,35 @@ def test_calculate_optical_flow(sample_tiff):
     # Test output shape
     assert my_flow.shape == (f-1, h, w, 2)
 
-def test_save_optflow_video(sample_tiff):
-     """
-        Saves a video visualizing the optical flow.
-     """
-     raise NotImplementedError
+def test_save_optflow_video(sample_tiff, tmp_path):
+    """
+       Saves a video visualizing the optical flow.
+    """
+     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
+    process_args = {
+        "normalize": True,
+        "gaussian_blur": 3
+    }
+
+    #arguments for testing
+    flow_args = {
+            "pyr_scale": 0.5,
+            "levels": 3,
+            "winsize": 15,
+            "iterations": 3,
+            "poly_n": 5,
+            "poly_sigma": 1.2,
+            "flags": 0
+        }
+    save_path = tmp_path / "optflow_video.mp4"
+    flow_calculated = flow.calculate_optical_flow(process_args, flow_args, False)
+    my_video = flow.save_optflow_video(flow_calculated, save_path, 0, 20, 500, 
+                                        'blue', 10, (12, 8), "Optical Flow Test", None, False)
+    
+    assert save_path.exists()
+    assert save_path.suffix == ".mp4"
+        
+    
 
 def test_create_vector_field_video(sample_tiff):
     """

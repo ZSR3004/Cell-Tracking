@@ -78,14 +78,14 @@ def calculate_optical_flow(process_args=None, flow_args=None, default=False):
         """
         raise NotImplementedError
 
-def save_optflow_video(flow, idx : int = 0, step : int = 20, 
-                          scale : int = 500, color : str = 'blue', fps : int = 10, 
-                          figsize : int | int = (12,8),
-                          title : str = None, overlay : bool = False):
-     """
-        Saves a video visualizing the optical flow.
-     """
-     raise NotImplementedError
+def save_optflow_video(flow, save_path, idx : int = 0, step : int = 20, 
+                                  scale : int = 500, color : str = 'blue', fps : int = 10, 
+                                  figsize : int | int = (12,8),
+                                  title : str = None, overlay : bool = False):
+      """
+          Saves a video visualizing the optical flow.
+      """
+      raise NotImplementedError
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
                     step : int = 20, scale : int = 500, color : str = 'blue', 
