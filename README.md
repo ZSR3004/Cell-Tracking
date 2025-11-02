@@ -42,7 +42,9 @@ This next section will go over the sub-tasks that the user can follow to run our
 2. Follow this [link](https://github.com/ZSR3004/Cell-Tracking/tree/main)
     - Note: After step 2, you should have arrived at the GitHub homepage, titled "Cell Tracking." (this page will contain all of the files you need to download.) You will see a screen like the image below, ![FIGURE 1](images/Homepage.png) which displays the GitHub homepage.
 
-3. Click on the newest release (which looks like image below) ![FIGURE 2](images/Release.png), and download the attached package by clicking the "Source Code" button as seen on the image below. ![FIGURE 3](images/Download.png)
+3. Click on the newest release (which looks like image below) 
+![FIGURE 2](images/Release.png)
+and download the attached package by clicking the "Source Code" button as seen on the image below. ![FIGURE 3](images/Download.png)
 
     - Note: Software should now be downloaded and ready to run. You'll likely find it within your downloads folder.
 
