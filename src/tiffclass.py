@@ -22,28 +22,12 @@ class Tiff:
         Attributes:
             path (str): Path to the TIFF file.
             timestamp (str): Timestamp of when the TIFF file was loaded.
-            tags (list): List of tags for each frame in the TIFF stack.
             arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width
             Other metadata attributes as needed.
         """
         self.path = path
         self.timestamp = datetime.datetime.now()
-        self.image = tiff.imread(path)
-        self.arr = self.image.arr
-        self.tags = self.extract_tags()
-
-    def extract_tags(self) -> list[dict]:
-        """
-        Extracts the XML tags from each image in the Tiff stack.
-
-        Args: 
-            None
-
-        Returns:
-            list[dict]: A list of dictionaries of tags
-        """
-        raise NotImplementedError
-    
+        self.arr = tiff.imread(path)
     def isolate_channel(self, channel_idx: int) -> np.ndarray:
         """
         Isolates a specific channel from the TIFF stack.
@@ -56,7 +40,7 @@ class Tiff:
         """
         assert(channel_idx >= 0)
         assert(channel_idx < len(self.arr))
-        return self.arr[channel_idx]
+        return self.arr[:,channel_idx,:,:]
 
     def save_original_video(name : str, file_path: str, **kwargs) -> None:
         """
