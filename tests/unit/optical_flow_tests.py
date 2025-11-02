@@ -1,6 +1,7 @@
 import sys, os, pytest
 from src import optical_flow as flow
 import numpy as np
+from src import tiffclass as tiff
 
 @pytest.fixture
 def sample_tiff():
@@ -13,8 +14,23 @@ def test_combine_flows(sample_tiff):
     Tests whether the combine_flows function works correctly.
     """
     path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
 
-    raise NotImplementedError
+    channel_0 = img.isolate_channel(0)
+    channel_1 = img.isolate_channel(1)
+    channel_2 = img.isolate_channel(2)
+
+    combine_0_1 = img.combine_flows([channel_0,channel_1])
+    combine_0_2 = img.combine_flows([channel_0,channel_2])
+    combine_1_2 = img.combine_flows([channel_1,channel_2])
+
+    assert combine_0_1.shape == (f, h, w)
+    assert combine_0_2.shape == (f, h, w)
+    assert combine_1_2 == (f, h, w)
+
+    np.testing.assert_array_equal(combine_0_1, channel_0 + channel_1)
+    np.testing.assert_array_equal(combine_0_2, channel_0 + channel_2)
+    np.testing.assert_array_equal(combine_1_2, channel_1 + channel_2)
 
 
 def test_compute_flow_pair(sample_tiff):
