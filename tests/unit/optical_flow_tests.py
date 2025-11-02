@@ -38,7 +38,31 @@ def test_compute_flow_pair(sample_tiff):
     Tests whether the compute_flow_pair function works correctly.
     """
     path, f, c, h, w = sample_tiff
-    raise NotImplementedError
+    img = tiff.Tiff(path)
+
+
+    # Grab the first two frames of channel 0
+    f1 = img.arr[0, 0]  # shape: (height, width)
+    f2 = img.arr[1, 0]  # shape: (height, width)
+
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
+
+    args = (f1, f2, flow_args)
+    my_flow = flow.compute_flow_pair(args)
+
+    # Test output type
+    assert isinstance(my_flow, np.ndarray)
+
+    # Test output shape
+    assert my_flow.shape == (h, w, 2)
 
 def test_optical_flow(sample_tiff):
     """
