@@ -1,5 +1,5 @@
 import numpy as np
-from multiprocessing import Pool, cpu_count
+import matplotlib as pltfrom multiprocessing import Pool, cpu_count
 import cv2
 
 def combine_flows(flow_list : list) -> np.ndarray:
@@ -87,7 +87,7 @@ def optical_flow(   arr : np.array,
         flow_list = pool.map(compute_flow_pair, pairs)
     return np.stack(flow_list)
 
-def calculate_optical_flow(self, process_args=None, flow_args=None, default=False):
+def calculate_optical_flow(arr: np.array, process_args=None, flow_args=None, default=False):
         """
         Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
 
@@ -101,14 +101,51 @@ def calculate_optical_flow(self, process_args=None, flow_args=None, default=Fals
         """
         raise NotImplementedError
 
-def save_optflow_video(flow, idx : int = 0, step : int = 20, 
-                          scale : int = 500, color : str = 'blue', fps : int = 10, 
-                          figsize : int | int = (12,8),
-                          title : str = None, overlay : bool = False):
-     """
-        Saves a video visualizing the optical flow.
-     """
-     raise NotImplementedError
+def save_optflow_video(flow, save_path, idx : int = 0, step : int = 20, 
+                                  scale : int = 500, color : str = 'blue', fps : int = 10, 
+                                  figsize : int | int = (12,8),
+                                  title : str = None, overlay : bool = False):
+      """
+          Saves a video visualizing the optical flow.
+      """
+      raise NotImplementedError
+
+def show_flow(flow : np.array, title='Optical Flow', 
+              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
+              pivot : str = 'tail', color : str = 'blue', save_path : str = None) -> None:
+    """
+    Displays optical flow as a quiver plot using matplotlib.
+
+    Args:
+        flow (np.ndarray): Optical flow array of shape (H, W, 2) where H is height, W is width,
+                           and the last dimension contains the flow vectors (dx, dy).
+        title (str): Title of the plot. Default is 'Optical Flow'.
+        step (int): Step size for downsampling the flow vectors for visualization. Default is 25.
+        figsize (tuple): Size of the figure in inches (width, height). Default is (12, 6).
+        scale (float): Scale factor for the quiver arrows. Default is 200.
+        pivot (str): Pivot point for the arrows. Default is 'tail'.
+        color (str): Color of the arrows. Default is 'white'.
+
+    Returns:
+        None: Just displays the plot.
+    """
+    Y, X = np.mgrid[0:flow.shape[0]:step, 0:flow.shape[1]:step]
+    U = flow[::step, ::step, 0]  # dx
+    V = flow[::step, ::step, 1]  # dy
+
+    # Create plot
+    plt.figure(figsize=figsize)
+    plt.quiver(X, Y, U, V, scale=scale, pivot=pivot, color=color)
+    plt.title(title)
+    plt.xlim(0, flow.shape[1])
+    plt.ylim(flow.shape[0], 0)
+    plt.xlabel("X")
+    plt.ylabel("Y")
+    plt.tight_layout()
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight')
+    else:
+        plt.show()
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
                     step : int = 20, scale : int = 500, color : str = 'blue', 
@@ -132,14 +169,5 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
 
     Returns:
         None
-    """
-    raise NotImplementedError
-
-def calculate_trajectory(flow):
-    """
-    Calculates the trajectory of the optical flow vectors.
-
-    Returns:
-        np.ndarray: Trajectory of the optical flow vectors.
     """
     raise NotImplementedError
