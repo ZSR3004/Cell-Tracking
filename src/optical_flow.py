@@ -4,6 +4,7 @@ from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib as plt
 import tiffclass as tc
+import saving as save
 
 def combine_flows(flow_list : list) -> np.ndarray:
     """
@@ -153,7 +154,7 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
     quiver = ax.quiver(X, Y, U, V, scale=scale, pivot='tail', color=color)
 
     if flag != "":
-        save_vector_video(name, flag, 
+        save.save_vector_video(name, flag, 
                    **{
                           'img_disp': img_disp,
                           'arr': arr,
