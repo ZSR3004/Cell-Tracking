@@ -3,6 +3,10 @@ from sympy import Idx
 from src import optical_flow as flow
 import numpy as np
 from src import tiffclass as tiff
+import matplotlib
+from matplotlib.figure import Figure
+from matplotlib.quiver import Quiver
+import matplotlib.pyplot as plt
 
 @pytest.fixture
 def sample_tiff():
@@ -74,7 +78,7 @@ def test_optical_flow(sample_tiff):
 
 
     # isolate channel for testing
-    channel = tiff.isolate_channel(0)
+    channel = img.isolate_channel(0)
 
     #arguments for testing
     flow_args = {
@@ -120,7 +124,7 @@ def test_calculate_optical_flow(sample_tiff):
         "flags": 0
     }
 
-    my_flow = flow.calculate_optical_flow(process_args, flow_args, False)
+    my_flow = flow.calculate_optical_flow(img.arr, process_args, flow_args, False)
 
     # Test output type
     assert isinstance(my_flow, np.ndarray)
@@ -128,10 +132,58 @@ def test_calculate_optical_flow(sample_tiff):
     # Test output shape
     assert my_flow.shape == (f-1, h, w, 2)
 
+def test_show_flow(sample_tiff, title='Optical Flow', 
+              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
+              pivot : str = 'tail', color : str = 'blue', save_path : str = None):
+    """
+        Tests the show_flow function.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+
+    
+    # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
+    process_args = {
+        "normalize": True,
+        "gaussian_blur": 3
+    }
+
+    #arguments for testing
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
+
+    my_flow = flow.calculate_optical_flow(img.arr, process_args, flow_args, False)
+    video = flow.show_flow(my_flow, "Optical Flow", 25, (12,6), 200, 'tail', 'blue', None)
+    assert isinstance(video, Figure)
+
+    ax = video.axes[0]
+    has_quiver = any(isinstance(c, Quiver) for c in ax.collections)
+    assert has_quiver
+
+    assert ax.get_title() == "Optical Flow"
+
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+
+    assert xlim[0] == 0
+    assert ylim[0] >= 0
+
+    assert ax.get_xlabel() == "X"
+    assert ax.get_ylabel() == "Y"
+
 def test_save_optflow_video(sample_tiff, tmp_path):
     """
-       Saves a video visualizing the optical flow.
+       Tests the function that saves a video visualizing the optical flow.
     """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
      # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
     process_args = {
         "normalize": True,
