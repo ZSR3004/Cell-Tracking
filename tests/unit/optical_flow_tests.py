@@ -202,16 +202,40 @@ def test_save_optflow_video(sample_tiff, tmp_path):
         }
     save_path = tmp_path / "optflow_video.mp4"
     flow_calculated = flow.calculate_optical_flow(process_args, flow_args, False)
-    my_video = flow.save_optflow_video(flow_calculated, save_path, 0, 20, 500, 
+    my_video = flow.save_optflow_video("optflow_video.mp4", flow_calculated, save_path, 0, 20, 500, 
                                         'blue', 10, (12, 8), "Optical Flow Test", None, False)
     
     assert save_path.exists()
     assert save_path.suffix == ".mp4"       
     
 
-def test_create_vector_field_video(sample_tiff):
+def test_create_vector_field_video(sample_tiff, tmp_path):
     """
     Tests whether the create_vector_field_video function works correctly.
     """
-    raise NotImplementedError
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
+    process_args = {
+        "normalize": True,
+        "gaussian_blur": 3
+    }
+
+    #arguments for testing
+    flow_args = {
+            "pyr_scale": 0.5,
+            "levels": 3,
+            "winsize": 15,
+            "iterations": 3,
+            "poly_n": 5,
+            "poly_sigma": 1.2,
+            "flags": 0
+        }
+    save_path = tmp_path / "optflow_video.mp4"
+    flow_calculated = flow.calculate_optical_flow(process_args, flow_args, False)
+    my_video = flow.create_vector_field_video("optflow_video.mp4", flow_calculated, save_path, 0, 20, 500, 
+                                        'blue', 10, (12, 8), "Optical Flow Test", None, False)
+    
+    assert save_path.exists()
+    assert save_path.suffix == ".mp4"  
 
