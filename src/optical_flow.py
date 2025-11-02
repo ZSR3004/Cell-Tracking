@@ -1,4 +1,6 @@
 import numpy as np
+from multiprocessing import Pool, cpu_count
+import cv2
 
 def combine_flows(flow_list : list) -> np.ndarray:
     """
@@ -33,8 +35,16 @@ def compute_flow_pair(args) -> np.ndarray:
     Returns:
         np.ndarray: Optical flow vectors for the pair of frames.
     """
-
-    raise NotImplementedError
+    f1, f2, flow_args = args
+    return cv2.calcOpticalFlowFarneback(
+        f1, f2, None,
+        flow_args['pyr_scale'],
+        flow_args['levels'],
+        flow_args['winsize'],
+        flow_args['iterations'],
+        flow_args['poly_n'],
+        flow_args['poly_sigma'],
+        flow_args['flag'])
 
 def optical_flow(   arr : np.array,
                     pyr_scale : float = 0.5, 
@@ -43,7 +53,7 @@ def optical_flow(   arr : np.array,
                     iterations : int = 3, 
                     poly_n : int = 5, 
                     poly_sigma : float = 1.2,
-                    flag : int = 0):
+                    flag : int = 0) -> np.ndarray:
     """
     Computes dense optical flow using Farneback method on a preprocessed channel. Allows manual
     changes to the params for optical flow.
@@ -62,7 +72,20 @@ def optical_flow(   arr : np.array,
     Returns:
         np.ndarray: (N-1, H, W, 2) flow vectors between frames.
     """ 
-    raise NotImplementedError
+ 
+    flow_args = {
+        'pyr_scale': pyr_scale,
+        'levels': levels,
+        'winsize': winsize,
+        'iterations': iterations,
+        'poly_n': poly_n,
+        'poly_sigma': poly_sigma,
+        'flag': flag
+    }
+    pairs = [(arr[i], arr[i+1], flow_args) for i in range(arr.shape[0] - 1)]
+    with Pool(cpu_count()) as pool:
+        flow_list = pool.map(compute_flow_pair, pairs)
+    return np.stack(flow_list)
 
 def calculate_optical_flow(self, process_args=None, flow_args=None, default=False):
         """
