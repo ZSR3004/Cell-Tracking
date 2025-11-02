@@ -1,7 +1,8 @@
-import numpy as np
-import matplotlib as plt
-from multiprocessing import Pool, cpu_count
 import cv2
+import numpy as np
+from scipy.ndimage import gaussian_laplace
+from multiprocessing import Pool, cpu_count
+import matplotlib as plt
 
 def combine_flows(flow_list : list) -> np.ndarray:
     """
@@ -14,7 +15,10 @@ def combine_flows(flow_list : list) -> np.ndarray:
         combined: combined stack of summed and original flows.
     """
 
-    raise NotImplementedError
+    sum_arr = flow_list[0] + flow_list[1]
+    combined = np.stack([sum_arr, flow_list[0], flow_list[1]], axis=1)
+    return combined
+
 
 def compute_flow_pair(args) -> np.ndarray:
     """
@@ -171,4 +175,42 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
     Returns:
         None
     """
-    raise NotImplementedError
+    T, H, W, _ = arr.shape
+    Y, X = np.mgrid[0:H:step, 0:W:step]
+
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.set_xlim(0, W)
+    ax.set_ylim(H, 0)
+    ax.set_xlabel("X")
+    ax.set_ylabel("Y")
+    ax.set_title("Optical Flow")
+    ax.set_aspect('equal')
+    ax.axis('off')
+
+    if og_arr is not None:
+        is_gray = og_arr.ndim == 3
+        img_disp = ax.imshow(og_arr[0], cmap='gray' if is_gray else None)
+    else:
+        img_disp = None
+
+    U = arr[0, ::step, ::step, 0]
+    V = arr[0, ::step, ::step, 1]
+    quiver = ax.quiver(X, Y, U, V, scale=scale, pivot='tail', color=color)
+
+    if flag != "":
+        save_vector_video(name, flag, 
+                   **{
+                          'img_disp': img_disp,
+                          'arr': arr,
+                          'og_arr': og_arr,
+                          'step': step,
+                          'fps': fps,
+                          'figsize': figsize,
+                          'title': title,
+                          'quiver': quiver,
+                          'ax': ax,
+                          'fig': fig,
+                          'T': T
+                   })
+
+    plt.close(fig)
