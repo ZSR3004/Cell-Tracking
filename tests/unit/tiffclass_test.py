@@ -118,8 +118,12 @@ def test_show_image():
     """
 
     #finish this docstring
+    #ask if image is teh same as a frame. then use that info to get an image. if so then maybe preprocess the image using the preprocess function and
+    #then make sure preprocessed images also work?
     #test both cases: if save_path is a str, and if it's None
     #if save_path is a str, test if it's saved. If save_path is None, test if it's shown.
+
+    #NOW RUN ALL THESE TESTS!
 
     raise NotImplemented
 
@@ -138,7 +142,6 @@ def test_preprocess_frame(sample_tiff):
     Return:
         None
     """
-
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
 
@@ -204,18 +207,117 @@ def test_preprocess_frame(sample_tiff):
     assert isinstance(kwargs5_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs5_preprocess_middle_frame, np.ndarray)
     
-    assert kwargs1_preprocess_first_frame.shape == (f, h, w)
-    assert kwargs1_preprocess_middle_frame.shape == (f, h, w)
-    assert kwargs2_preprocess_first_frame.shape == (f, h, w)
-    assert kwargs2_preprocess_middle_frame.shape == (f, h, w)
-    assert kwargs3_preprocess_first_frame.shape == (f, h, w)
-    assert kwargs3_preprocess_middle_frame.shape == (f, h, w)
-    assert kwargs4_preprocess_first_frame.shape == (f, h, w)
-    assert kwargs4_preprocess_middle_frame.shape == (f, h, w)
-    assert kwargs5_preprocess_first_frame.shape == (f, h, w)
-    assert kwargs5_preprocess_middle_frame.shape == (f, h, w)
+    assert kwargs1_preprocess_first_frame.shape == first_frame.shape
+    assert kwargs1_preprocess_middle_frame.shape == middle_frame.shape
+    assert kwargs2_preprocess_first_frame.shape == first_frame.shape
+    assert kwargs2_preprocess_middle_frame.shape == middle_frame.shape
+    assert kwargs3_preprocess_first_frame.shape == first_frame.shape
+    assert kwargs3_preprocess_middle_frame.shape == middle_frame.shape
+    assert kwargs4_preprocess_first_frame.shape == first_frame.shape
+    assert kwargs4_preprocess_middle_frame.shape == middle_frame.shape
+    assert kwargs5_preprocess_first_frame.shape == first_frame.shape
+    assert kwargs5_preprocess_middle_frame.shape == middle_frame.shape
 
 def test_preprocess_stack():
+    """
+    Tests whether the preprocess_stack method works correctly.
 
-    raise NotImplemented
-    #THEN RUN THESE TESTS!
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file:
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+
+    Return:
+        None
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+
+    stack1 = []
+    stack2 = img.arr
+    stack3 = [img.arr[0]]
+    stack4 = [img.arr[0], img.arr[(f-1)//2], img.arr[f-1]]
+    stack5 = img.arr[:(f-1)//2]
+
+    kwargs6 = {"gauss": {"ksize": (8, 8), "sigmaX": 2.5}, "median": {"ksize": 4}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs7 = {"gauss": {"ksize": (4, 4)}, "median": {"ksize": 10}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
+    kwargs8 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["gauss", "median"]}
+
+    kwargs6_preprocess_stack1 = img.preprocess_stack(stack1, kwargs6)
+    kwargs6_preprocess_stack2 = img.preprocess_stack(stack2, kwargs6)
+    kwargs6_preprocess_stack3 = img.preprocess_stack(stack3, kwargs6)
+    kwargs6_preprocess_stack4 = img.preprocess_stack(stack4, kwargs6)
+    kwargs6_preprocess_stack5 = img.preprocess_stack(stack5, kwargs6)
+    kwargs7_preprocess_stack1 = img.preprocess_stack(stack1, kwargs7)
+    kwargs7_preprocess_stack2 = img.preprocess_stack(stack2, kwargs7)
+    kwargs7_preprocess_stack3 = img.preprocess_stack(stack3, kwargs7)
+    kwargs7_preprocess_stack4 = img.preprocess_stack(stack4, kwargs7)
+    kwargs7_preprocess_stack5 = img.preprocess_stack(stack5, kwargs7)
+    kwargs8_preprocess_stack1 = img.preprocess_stack(stack1, kwargs8)
+    kwargs8_preprocess_stack2 = img.preprocess_stack(stack2, kwargs8)
+    kwargs8_preprocess_stack3 = img.preprocess_stack(stack3, kwargs8)
+    kwargs8_preprocess_stack4 = img.preprocess_stack(stack4, kwargs8)
+    kwargs8_preprocess_stack5 = img.preprocess_stack(stack5, kwargs8)
+
+    assert [] == kwargs6_preprocess_stack1
+    assert [] == kwargs7_preprocess_stack1
+    assert [] == kwargs8_preprocess_stack1
+
+    assert [img.preprocess_frame((img.arr[0], kwargs6))] == kwargs6_preprocess_stack3
+    assert [img.preprocess_frame((img.arr[0], kwargs7))] == kwargs7_preprocess_stack3
+    assert [img.preprocess_frame((img.arr[0], kwargs8))] == kwargs8_preprocess_stack3
+
+    assert [img.preprocess_frame((img.arr[0], kwargs6)), img.preprocess_frame((img.arr[(f-1)//2], kwargs6)), img.preprocess_frame((img.arr[f-1], kwargs6))] == kwargs6_preprocess_stack4
+    assert [img.preprocess_frame((img.arr[0], kwargs7)), img.preprocess_frame((img.arr[(f-1)//2], kwargs7)), img.preprocess_frame((img.arr[f-1], kwargs7))] == kwargs7_preprocess_stack4
+    assert [img.preprocess_frame((img.arr[0], kwargs8)), img.preprocess_frame((img.arr[(f-1)//2], kwargs8)), img.preprocess_frame((img.arr[f-1], kwargs8))] == kwargs8_preprocess_stack4
+
+    assert kwargs6_preprocess_stack1 != stack1
+    assert kwargs6_preprocess_stack2 != stack2
+    assert kwargs6_preprocess_stack3 != stack3
+    assert kwargs6_preprocess_stack4 != stack4
+    assert kwargs6_preprocess_stack5 != stack5
+    assert kwargs7_preprocess_stack1 == stack1
+    assert kwargs7_preprocess_stack2 == stack2
+    assert kwargs7_preprocess_stack3 == stack3
+    assert kwargs7_preprocess_stack4 == stack4
+    assert kwargs7_preprocess_stack5 == stack5
+    assert kwargs8_preprocess_stack1 != stack1
+    assert kwargs8_preprocess_stack2 != stack2
+    assert kwargs8_preprocess_stack3 != stack3
+    assert kwargs8_preprocess_stack4 != stack4
+    assert kwargs8_preprocess_stack5 != stack5
+
+    assert isinstance(kwargs6_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack5, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack5, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack5, np.ndarray)
+
+    assert kwargs6_preprocess_stack1.shape == stack1.shape
+    assert kwargs6_preprocess_stack2.shape == stack2.shape
+    assert kwargs6_preprocess_stack3.shape == stack3.shape
+    assert kwargs6_preprocess_stack4.shape == stack4.shape
+    assert kwargs6_preprocess_stack5.shape == stack5.shape
+    assert kwargs7_preprocess_stack1.shape == stack1.shape
+    assert kwargs7_preprocess_stack2.shape == stack2.shape
+    assert kwargs7_preprocess_stack3.shape == stack3.shape
+    assert kwargs7_preprocess_stack4.shape == stack4.shape
+    assert kwargs7_preprocess_stack5.shape == stack5.shape
+    assert kwargs8_preprocess_stack1.shape == stack1.shape
+    assert kwargs8_preprocess_stack2.shape == stack2.shape
+    assert kwargs8_preprocess_stack3.shape == stack3.shape
+    assert kwargs8_preprocess_stack4.shape == stack4.shape
+    assert kwargs8_preprocess_stack5.shape == stack5.shape

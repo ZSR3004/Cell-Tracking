@@ -80,7 +80,7 @@ class Tiff:
         writer = animation.FFMpegWriter(fps=fps)
         ani.save(file_path, writer=writer)
 
-    def show_image(image: np.array, title='Image', figsize=(12, 8), save_path=None) -> None:
+    def show_image(image: np.ndarray, title='Image', figsize=(12, 8), save_path=None) -> None:
         """
         Displays or saves an image using matplotlib.
 
