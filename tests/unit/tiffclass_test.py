@@ -91,6 +91,8 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     #finish this docstring
     #Note: i'm gonna use tmp_path by calling save_original_video and having it save the video to tmp_path
+    #finish once i ask Ziyad (who wrote this function) why we don't assert that im, image_stack, ax, and fig are not None. Because it breaks if either
+    #im, image_stack, ax, or fig are None
 
     #what to assert: check if exists, check if not empty
     """
@@ -112,6 +114,7 @@ def test_show_image():
     Args:
 
     Return:
+        None
     """
 
     #finish this docstring
@@ -213,5 +216,6 @@ def test_preprocess_frame(sample_tiff):
     assert kwargs5_preprocess_middle_frame.shape == (f, h, w)
 
 def test_preprocess_stack():
-    
+
     raise NotImplemented
+    #THEN RUN THESE TESTS!
