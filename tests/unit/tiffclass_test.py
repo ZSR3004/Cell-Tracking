@@ -13,7 +13,7 @@ def test_init(sample_tiff):
     Tests whether the Tiff class initializes correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -45,7 +45,7 @@ def test_isolate_channel(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file.
+            - path (str): The path to the TIFF file:
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -83,15 +83,13 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     Args:
 
-        tmp_path: A temporary directory (a fixture in Pytest).
+        tmp_path: A path to a temporary directory (this is a fixture in Pytest).
 
     Return:
     """
     path, f, c, h, w = sample_tiff
 
     #finish this docstring
-    #once i install pytest, make sure tmp_path is actually a temp path and not something random. if installing pytest doesnt automatically 
-    #make tmp_path a temp path, then figure out how to make tmp_path a temp path
     #Note: i'm gonna use tmp_path by calling save_original_video and having it save the video to tmp_path
 
     #what to assert: check if exists, check if not empty
@@ -122,15 +120,29 @@ def test_show_image():
 
     raise NotImplemented
 
-def test_preprocess_frame():
+def test_preprocess_frame(sample_tiff):
     """
     Tests whether the preprocess_frame method works correctly.
 
     Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file:
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
 
     Return:
+        None
     """
-    #finish this docstring
+
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+
+    first_frame = img.arr[0]
+    middle_frame = img.arr[f-1//2]
+    last_frame = img.arr[f-1]
+
 
     """
     cases to test:

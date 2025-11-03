@@ -23,7 +23,7 @@ class Tiff:
         Attributes:
             path (str): Path to the TIFF file.
             timestamp (str): Timestamp of when the TIFF file was loaded.
-            arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width
+            arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width)
             Other metadata attributes as needed.
 
         Returns: 
