@@ -13,9 +13,10 @@ class Tiff:
     and stores the video type
     """
 
-    def __init__(self, path : str):
+    def __init__(self, path: str):
         """
         Initializes a TiffStack object by loading a TIFF file and extracting its frames.
+
         Args:
             path (str): Path to the TIFF file.
 
@@ -24,10 +25,14 @@ class Tiff:
             timestamp (str): Timestamp of when the TIFF file was loaded.
             arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width
             Other metadata attributes as needed.
+
+        Returns: 
+            None
         """
         self.path = path
         self.timestamp = datetime.datetime.now()
         self.arr = tiff.imread(path)
+
     def isolate_channel(self, channel_idx: int) -> np.ndarray:
         """
         Isolates a specific channel from the TIFF stack.
@@ -42,11 +47,13 @@ class Tiff:
         assert(channel_idx < len(self.arr))
         return self.arr[:,channel_idx,:,:]
 
-    def save_original_video(name : str, file_path: str, **kwargs) -> None:
+    def save_original_video(name: str, file_path: str, **kwargs) -> None:
         """
         Saves a video of image frames using matplotlib.
+
         Args:
             name (str): Name of the video file to save.
+            file_path (str): The path to save the video file to.
             **kwargs: Additional keyword arguments that include:
                 - im: Matplotlib image display object for the original frames.
                 - image_stack: Image stack of shape (T, H, W) or (T, H, W, 3) for RGB.
@@ -54,8 +61,9 @@ class Tiff:
                 - fig: Matplotlib figure object for the plot.
                 - T: Total number of frames in the image stack.
                 - fps: Frames per second for the video.
-            Returns:
-                None: Just saves the video to the specified path.
+
+        Returns:
+            None: Just saves the video to the specified path.
         """
         im = kwargs.get('im', None)
         image_stack = kwargs.get('image_stack', None)
@@ -72,7 +80,7 @@ class Tiff:
         writer = animation.FFMpegWriter(fps=fps)
         ani.save(file_path, writer=writer)
 
-    def show_image(image : np.array, title='Image', figsize=(12, 8), save_path=None) -> None:
+    def show_image(image: np.array, title='Image', figsize=(12, 8), save_path=None) -> None:
         """
         Displays or saves an image using matplotlib.
 
@@ -148,12 +156,16 @@ class Tiff:
 
         Args:
             arr (np.ndarray): Input stack of frames (shape: N x H x W).
-            **kwargs: Dictionary with preprocessing parameters (see preprocess_frame).
+            **kwargs: Dictionary with preprocessing parameters:
+                - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+                - median (dict): {'ksize': int}
+                - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+                - contrast (dict): {'alpha': float, 'beta': int}
+                - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
 
         Returns:
             np.ndarray: Preprocessed stack of frames.
         """
-
         frames = [(arr[i], kwargs) for i in range(arr.shape[0])]
         with Pool(cpu_count()) as pool:
             preprocessed_frames = pool.map(self.preprocess_frame, frames)

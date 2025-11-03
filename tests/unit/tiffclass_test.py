@@ -11,6 +11,17 @@ def sample_tiff():
 def test_init(sample_tiff):
     """
     Tests whether the Tiff class initializes correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+
+    Return:
+        None
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -31,6 +42,17 @@ def test_init(sample_tiff):
 def test_isolate_channel(sample_tiff):
     """
     Tests whether the isolate_channel method works correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+
+    Return:
+        None
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -55,4 +77,84 @@ def test_isolate_channel(sample_tiff):
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
 
+def test_save_original_video(sample_tiff, tmp_path):
+    """
+    Tests whether the save_original_video method works correctly.
+
+    Args:
+
+        tmp_path: A temporary directory (a fixture in Pytest).
+
+    Return:
+    """
+    path, f, c, h, w = sample_tiff
+
+    #finish this docstring
+    #once i install pytest, make sure tmp_path is actually a temp path and not something random. if installing pytest doesnt automatically 
+    #make tmp_path a temp path, then figure out how to make tmp_path a temp path
+    #Note: i'm gonna use tmp_path by calling save_original_video and having it save the video to tmp_path
+
+    #what to assert: check if exists, check if not empty
+    """
+    also do if im, image_stack, ax, fig, T, or fps are None:
+        - case: im, image_stack, ax, fig, T, and fps are all not None
+        - case: im, image_stack, ax, fig, T, and fps are all None
+            - image_stack is (T, H, W)
+        - case: im, image_stack, fig, and fps are None. ax and T are not None.
+        - case: ax and T are None. im, image_stack, fig, and fps are not None.
+            - image_stack is (T, H, W, 3)
+    """
+
+    raise NotImplemented
+    
+def test_show_image():
+    """
+    Tests whether the show_image method works correctly.
+
+    Args:
+
+    Return:
+    """
+
+    #finish this docstring
+    #test both cases: if save_path is a str, and if it's None
+    #if save_path is a str, test if it's saved. If save_path is None, test if it's shown.
+
+    raise NotImplemented
+
+def test_preprocess_frame():
+    """
+    Tests whether the preprocess_frame method works correctly.
+
+    Args:
+
+    Return:
+    """
+    #finish this docstring
+
+    """
+    cases to test:
+        - skip == [] (this accounts for all cases of "gauss", "median", "minmax", and "contrast" not being in skip)
+            - "gauss" in kwargs
+            - "median" in kwargs
+            - "minmax" in kwargs
+            - "contrast" in kwargs
+        - skip == ["gauss", "median", "minmax", "contrast"] (this accounts for all cases of "gauss", "median", "minmax", and "contrast" being in skip)
+            - doesn't matter what's in kwargs
+        - skip == ["gauss", "median"] (this accounts for just a few things in skip, and different things in kwargs and different things not in kwargs)
+            - "gauss" not in kwargs
+            - "median" in kwargs
+            - "minmax" not in kwargs
+            - "contrast" in kwargs
+        - skip == ["minmax", "contrast"] (this accounts for just a few things in skip, and different things in kwargs and different things not in kwargs)
+            - "gauss" in kwargs
+            - "median" not in kwargs
+            - "minmax" in kwargs
+            - "contrast" not in kwargs
+    """
+
+    raise NotImplemented
+
+
+#ADD MORE!!
 
