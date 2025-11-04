@@ -250,8 +250,8 @@ def test_preprocess_stack():
     stack4 = [img.arr[0], img.arr[(f-1)//2], img.arr[f-1]]
     stack5 = img.arr[:(f-1)//2]
 
-    kwargs6 = {"gauss": {"ksize": (8, 8), "sigmaX": 2.5}, "median": {"ksize": 4}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
-    kwargs7 = {"gauss": {"ksize": (4, 4)}, "median": {"ksize": 10}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
+    kwargs6 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 4}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs7 = {"gauss": {"ksize": (7, 7)}, "median": {"ksize": 10}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
     kwargs8 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["gauss", "median"]}
 
     kwargs6_preprocess_stack1 = img.preprocess_stack(stack1, kwargs6)
