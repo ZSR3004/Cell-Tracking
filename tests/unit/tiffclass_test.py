@@ -157,7 +157,7 @@ def test_preprocess_frame(sample_tiff):
     middle_frame = img.arr[(f-1)//2]
 
     kwargs1 = {"gauss": {}, "median": {}, "minmax": {}, "contrast": {}, "skip": []}
-    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 150, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
     kwargs3 = {"gauss": {"ksize": (1, 1)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
     kwargs4 = {"median": {"ksize": 7}, "contrast": {"alpha": 0.5}, "skip": ["gauss", "median"]}
     kwargs5 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
@@ -181,7 +181,7 @@ def test_preprocess_frame(sample_tiff):
 
     kwargs2_gauss = cv2.GaussianBlur(first_frame, (3, 3), 2.5)
     kwargs2_median = cv2.medianBlur(kwargs2_gauss, 3)
-    kwargs2_minmax = cv2.normalize(kwargs2_median, None, 50, 200, cv2.NORM_MINMAX)
+    kwargs2_minmax = cv2.normalize(kwargs2_median, None, 0, 150, cv2.NORM_MINMAX)
     kwargs2_contrast = cv2.convertScaleAbs(kwargs2_minmax, alpha=1.5, beta=20)
     assert np.array_equal(kwargs2_preprocess_first_frame, kwargs2_contrast)
 
@@ -215,6 +215,10 @@ def test_preprocess_frame(sample_tiff):
     assert isinstance(kwargs5_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs5_preprocess_middle_frame, np.ndarray)
     
+    #THE PROBLEM IS THE ORDER OF FRAMES, CHANNELS, HEIGHT, WIDTH
+
+    assert first_frame.shape == (c, h, w)
+    assert middle_frame.shape == (c, h, w)
     assert kwargs1_preprocess_first_frame.shape == first_frame.shape
     assert kwargs1_preprocess_middle_frame.shape == middle_frame.shape
     assert kwargs2_preprocess_first_frame.shape == first_frame.shape
