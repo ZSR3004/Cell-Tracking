@@ -122,6 +122,7 @@ class Tiff:
         if "gauss" not in skip:
             gauss_cfg = kwargs.get("gauss", {})
             ksize = gauss_cfg.get("ksize", (5, 5))
+            assert (ksize[0] > 0) and (ksize[1] > 0) and (ksize[0]%2 == 1) and (ksize[1]%2 == 1)
             sigmaX = gauss_cfg.get("sigmaX", 1.5)
             frame = cv2.GaussianBlur(frame, ksize, sigmaX)
 

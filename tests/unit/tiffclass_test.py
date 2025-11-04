@@ -157,8 +157,8 @@ def test_preprocess_frame(sample_tiff):
     middle_frame = img.arr[(f-1)//2]
 
     kwargs1 = {"gauss": {}, "median": {}, "minmax": {}, "contrast": {}, "skip": []}
-    kwargs2 = {"gauss": {"ksize": (8, 8), "sigmaX": 2.5}, "median": {"ksize": 4}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
-    kwargs3 = {"gauss": {"ksize": (4, 4)}, "median": {"ksize": 10}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
+    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 4}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs3 = {"gauss": {"ksize": (1, 1)}, "median": {"ksize": 10}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
     kwargs4 = {"median": {"ksize": 7}, "contrast": {"alpha": 0.5}, "skip": ["gauss", "median"]}
     kwargs5 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
 
