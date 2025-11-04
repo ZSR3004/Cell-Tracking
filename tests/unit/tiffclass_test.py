@@ -1,4 +1,11 @@
-import sys, os, cv2, pytest
+import os
+import sys
+
+# Add the project root (Cell-Tracking) to sys.path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+import cv2, pytest
 from src import tiffclass as tiff
 import numpy as np
 
