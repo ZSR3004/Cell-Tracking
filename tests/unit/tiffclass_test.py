@@ -157,8 +157,8 @@ def test_preprocess_frame(sample_tiff):
     middle_frame = img.arr[(f-1)//2]
 
     kwargs1 = {"gauss": {}, "median": {}, "minmax": {}, "contrast": {}, "skip": []}
-    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 4}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
-    kwargs3 = {"gauss": {"ksize": (1, 1)}, "median": {"ksize": 10}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
+    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 50, "beta": 200, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs3 = {"gauss": {"ksize": (1, 1)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
     kwargs4 = {"median": {"ksize": 7}, "contrast": {"alpha": 0.5}, "skip": ["gauss", "median"]}
     kwargs5 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
 
@@ -177,32 +177,32 @@ def test_preprocess_frame(sample_tiff):
     kwargs1_median = cv2.medianBlur(kwargs1_gauss, 5)
     kwargs1_minmax = cv2.normalize(kwargs1_median, None, 0, 255, cv2.NORM_MINMAX)
     kwargs1_contrast = cv2.convertScaleAbs(kwargs1_minmax, alpha=1.0, beta=0)
-    assert kwargs1_preprocess_middle_frame == kwargs1_contrast
+    assert np.array_equal(kwargs1_preprocess_middle_frame, kwargs1_contrast)
 
-    kwargs2_gauss = cv2.GaussianBlur(first_frame, (8, 8), 2.5)
-    kwargs2_median = cv2.medianBlur(kwargs2_gauss, 4)
+    kwargs2_gauss = cv2.GaussianBlur(first_frame, (3, 3), 2.5)
+    kwargs2_median = cv2.medianBlur(kwargs2_gauss, 3)
     kwargs2_minmax = cv2.normalize(kwargs2_median, None, 50, 200, cv2.NORM_MINMAX)
     kwargs2_contrast = cv2.convertScaleAbs(kwargs2_minmax, alpha=1.5, beta=20)
-    assert kwargs2_preprocess_first_frame == kwargs2_contrast
+    assert np.array_equal(kwargs2_preprocess_first_frame, kwargs2_contrast)
 
     kwargs4_minmax = cv2.normalize(middle_frame, None, 0, 255, cv2.NORM_MINMAX)
     kwargs4_contrast = cv2.convertScaleAbs(kwargs4_minmax, alpha=0.5, beta=0)
-    assert kwargs4_preprocess_middle_frame == kwargs4_contrast
+    assert np.array_equal(kwargs4_preprocess_middle_frame, kwargs4_contrast)
 
     kwargs5_gauss = cv2.GaussianBlur(first_frame, (5, 5), 1.0)
     kwargs5_median = cv2.medianBlur(kwargs5_gauss, 5)
-    assert kwargs5_preprocess_first_frame == kwargs5_median
+    assert np.array_equal(kwargs5_preprocess_first_frame, kwargs5_median)
 
-    assert kwargs1_preprocess_first_frame != first_frame
-    assert kwargs1_preprocess_middle_frame != middle_frame
-    assert kwargs2_preprocess_first_frame != first_frame
-    assert kwargs2_preprocess_middle_frame != middle_frame
-    assert kwargs3_preprocess_first_frame == first_frame
-    assert kwargs3_preprocess_middle_frame == middle_frame
-    assert kwargs4_preprocess_first_frame != first_frame
-    assert kwargs4_preprocess_middle_frame != middle_frame
-    assert kwargs5_preprocess_first_frame != first_frame
-    assert kwargs5_preprocess_middle_frame != middle_frame
+    assert not np.array_equal(kwargs1_preprocess_first_frame, first_frame)
+    assert not np.array_equal(kwargs1_preprocess_middle_frame, middle_frame)
+    assert not np.array_equal(kwargs2_preprocess_first_frame, first_frame)
+    assert not np.array_equal(kwargs2_preprocess_middle_frame, middle_frame)
+    assert np.array_equal(kwargs3_preprocess_first_frame, first_frame)
+    assert np.array_equal(kwargs3_preprocess_middle_frame, middle_frame)
+    assert not np.array_equal(kwargs4_preprocess_first_frame, first_frame)
+    assert not np.array_equal(kwargs4_preprocess_middle_frame, middle_frame)
+    assert not np.array_equal(kwargs5_preprocess_first_frame, first_frame)
+    assert not np.array_equal(kwargs5_preprocess_middle_frame, middle_frame)
 
     assert isinstance(kwargs1_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs1_preprocess_middle_frame, np.ndarray)
