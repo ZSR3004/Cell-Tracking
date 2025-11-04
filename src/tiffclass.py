@@ -47,28 +47,24 @@ class Tiff:
         assert(channel_idx < len(self.arr))
         return self.arr[:,channel_idx,:,:]
 
-    def save_original_video(name: str, file_path: str, **kwargs) -> None:
+    def save_original_video(name: str, file_path: str, im, image_stack, fig, ax, **kwargs) -> None:
         """
         Saves a video of image frames using matplotlib.
 
         Args:
             name (str): Name of the video file to save.
             file_path (str): The path to save the video file to.
+            im: Matplotlib image display object for the original frames.
+            image_stack: Image stack of shape (T, H, W) or (T, H, W, 3) for RGB.
+            fig: Matplotlib figure object for the plot.
+            ax: Matplotlib axes object for the plot.
             **kwargs: Additional keyword arguments that include:
-                - im: Matplotlib image display object for the original frames.
-                - image_stack: Image stack of shape (T, H, W) or (T, H, W, 3) for RGB.
-                - ax: Matplotlib axes object for the plot.
-                - fig: Matplotlib figure object for the plot.
-                - T: Total number of frames in the image stack.
-                - fps: Frames per second for the video.
+                - T (int): Total number of frames in the image stack.
+                - fps (int): Frames per second for the video.
 
         Returns:
             None: Just saves the video to the specified path.
         """
-        im = kwargs.get('im', None)
-        image_stack = kwargs.get('image_stack', None)
-        ax = kwargs.get('ax', None)
-        fig = kwargs.get('fig', None)
         T = kwargs.get('T', image_stack.shape[0])
         fps = kwargs.get('fps', 10)
 
