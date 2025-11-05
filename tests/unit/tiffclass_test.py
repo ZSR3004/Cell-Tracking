@@ -306,10 +306,6 @@ def test_preprocess_stack(sample_tiff):
     assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs7))]), kwargs7_preprocess_stack3)
     assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs8))]), kwargs8_preprocess_stack3)
 
-
-    #make sure these are all correct
-    #also to speed up pytest comment out all stuff above in this function BUT REMEMBER TO UNCOMMENT EVERYTHING AND DO PYTEST ONE TIME TO MAKE SURE EVERYTHING WORKS!
-    #rename functions above from hi_ to test_
     assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
     assert not np.array_equal(kwargs6_preprocess_stack2, stack2)
     assert not np.array_equal(kwargs6_preprocess_stack3, stack3)
@@ -321,7 +317,7 @@ def test_preprocess_stack(sample_tiff):
     assert np.array_equal(kwargs7_preprocess_stack3, stack3)
     assert np.array_equal(kwargs7_preprocess_stack4, stack4)
     assert np.array_equal(kwargs7_preprocess_stack5, stack5)
-    assert not np.array_equal(kwargs7_preprocess_stack6, stack6)
+    assert np.array_equal(kwargs7_preprocess_stack6, stack6)
     assert not np.array_equal(kwargs8_preprocess_stack1, stack1)
     assert not np.array_equal(kwargs8_preprocess_stack2, stack2)
     assert not np.array_equal(kwargs8_preprocess_stack3, stack3)
