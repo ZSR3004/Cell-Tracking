@@ -16,7 +16,7 @@ def sample_tiff():
     f, c, h, w = 96, 3, 520, 2329
     return path, f, c, h, w
 
-def test_init(sample_tiff):
+def hi_init(sample_tiff):
     """
     Tests whether the Tiff class initializes correctly.
 
@@ -47,7 +47,7 @@ def test_init(sample_tiff):
     assert img.arr.shape[3] == w  # width
 
 
-def test_isolate_channel(sample_tiff):
+def hi_isolate_channel(sample_tiff):
     """
     Tests whether the isolate_channel method works correctly.
 
@@ -85,7 +85,7 @@ def test_isolate_channel(sample_tiff):
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
 
-def test_save_original_video(sample_tiff, tmp_path):
+def hi_save_original_video(sample_tiff, tmp_path):
     """
     Tests whether the save_original_video method works correctly.
 
@@ -115,7 +115,7 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     raise NotImplemented
     
-def test_show_image():
+def hi_show_image():
     """
     Tests whether the show_image method works correctly.
 
@@ -135,7 +135,7 @@ def test_show_image():
 
     raise NotImplemented
 
-def test_preprocess_frame(sample_tiff):
+def hi_preprocess_frame(sample_tiff):
     """
     Tests whether the preprocess_frame method works correctly.
 
@@ -306,6 +306,10 @@ def test_preprocess_stack(sample_tiff):
     assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs7))]), kwargs7_preprocess_stack3)
     assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs8))]), kwargs8_preprocess_stack3)
 
+
+    #make sure these are all correct
+    #also to speed up pytest comment out all stuff above in this function BUT REMEMBER TO UNCOMMENT EVERYTHING AND DO PYTEST ONE TIME TO MAKE SURE EVERYTHING WORKS!
+    #rename functions above from hi_ to test_
     assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
     assert not np.array_equal(kwargs6_preprocess_stack2, stack2)
     assert not np.array_equal(kwargs6_preprocess_stack3, stack3)
