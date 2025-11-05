@@ -298,13 +298,13 @@ def test_preprocess_stack(sample_tiff):
     kwargs8_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs8)
     kwargs8_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs8)
 
-    assert np.array_equal([img.preprocess_frame((img.arr[0], kwargs6))], kwargs6_preprocess_stack3)
-    assert np.array_equal([img.preprocess_frame((img.arr[0], kwargs7))], kwargs7_preprocess_stack3)
-    assert np.array_equal([img.preprocess_frame((img.arr[0], kwargs8))], kwargs8_preprocess_stack3)
+    assert np.array_equal([img.preprocess_frame((np.asarray([img.arr[0, 1, :, :]]), kwargs6))], kwargs6_preprocess_stack2)
+    assert np.array_equal([img.preprocess_frame((np.asarray([img.arr[0, 1, :, :]]), kwargs7))], kwargs7_preprocess_stack2)
+    assert np.array_equal([img.preprocess_frame((np.asarray([img.arr[0, 1, :, :]]), kwargs8))], kwargs8_preprocess_stack2)
 
-    assert np.array_equal([img.preprocess_frame((img.arr[0], kwargs6)), img.preprocess_frame((img.arr[(f-1)//2], kwargs6)), img.preprocess_frame((img.arr[f-1], kwargs6))], kwargs6_preprocess_stack4)
-    assert np.array_equal([img.preprocess_frame((img.arr[0], kwargs7)), img.preprocess_frame((img.arr[(f-1)//2], kwargs7)), img.preprocess_frame((img.arr[f-1], kwargs7))], kwargs7_preprocess_stack4)
-    assert np.array_equal([img.preprocess_frame((img.arr[0], kwargs8)), img.preprocess_frame((img.arr[(f-1)//2], kwargs8)), img.preprocess_frame((img.arr[f-1], kwargs8))], kwargs8_preprocess_stack4)
+    assert np.array_equal([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs6)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs6)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs6))], kwargs6_preprocess_stack3)
+    assert np.array_equal([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :], kwargs7))), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs7))], kwargs7_preprocess_stack3)
+    assert np.array_equal([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :], kwargs8))), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs8))], kwargs8_preprocess_stack3)
 
     assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
     assert not np.array_equal(kwargs6_preprocess_stack2, stack2)
