@@ -163,6 +163,11 @@ class Tiff:
                 - contrast (dict): {'alpha': float, 'beta': int}
                 - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
 
+        Assumptions:
+            arr is not empty
+            The 'ksize' value in the gauss dictionary must be a tuple of two positive odd integers
+            The 'ksize' value in the median dictionary must be a positive odd integer
+
         Returns:
             np.ndarray: Preprocessed stack of frames.
         """
