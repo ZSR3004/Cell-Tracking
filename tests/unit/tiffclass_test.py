@@ -155,23 +155,29 @@ def test_preprocess_frame(sample_tiff):
 
     first_frame_channel_0 = img.arr[0, 0, :, :]
     middle_frame_channel_1 = img.arr[(f-1)//2, 1, :, :]
+    last_frame_channel_2 = img.arr[f-1, 2, :, :]
 
     kwargs1 = {"gauss": {}, "median": {}, "minmax": {}, "contrast": {}, "skip": []}
-    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 150, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
     kwargs3 = {"gauss": {"ksize": (1, 1)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
     kwargs4 = {"median": {"ksize": 7}, "contrast": {"alpha": 0.5}, "skip": ["gauss", "median"]}
     kwargs5 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
 
     kwargs1_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs1))
     kwargs1_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs1))
+    kwargs1_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs1))
     kwargs2_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs2))
     kwargs2_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs2))
+    kwargs2_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs2))
     kwargs3_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs3))
     kwargs3_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs3))
+    kwargs3_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs3))
     kwargs4_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs4))
     kwargs4_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs4))
+    kwargs4_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs4))
     kwargs5_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs5))
     kwargs5_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs5))
+    kwargs5_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs5))
 
     kwargs1_gauss = cv2.GaussianBlur(middle_frame_channel_1, (5, 5), 1.5)
     kwargs1_median = cv2.medianBlur(kwargs1_gauss, 5)
@@ -181,13 +187,13 @@ def test_preprocess_frame(sample_tiff):
 
     kwargs2_gauss = cv2.GaussianBlur(first_frame_channel_0, (3, 3), 2.5)
     kwargs2_median = cv2.medianBlur(kwargs2_gauss, 3)
-    kwargs2_minmax = cv2.normalize(kwargs2_median, None, 0, 150, cv2.NORM_MINMAX)
+    kwargs2_minmax = cv2.normalize(kwargs2_median, None, 0, 255, cv2.NORM_MINMAX)
     kwargs2_contrast = cv2.convertScaleAbs(kwargs2_minmax, alpha=1.5, beta=20)
     assert np.array_equal(kwargs2_preprocess_first_frame, kwargs2_contrast)
 
-    kwargs4_minmax = cv2.normalize(middle_frame_channel_1, None, 0, 255, cv2.NORM_MINMAX)
+    kwargs4_minmax = cv2.normalize(last_frame_channel_2, None, 0, 255, cv2.NORM_MINMAX)
     kwargs4_contrast = cv2.convertScaleAbs(kwargs4_minmax, alpha=0.5, beta=0)
-    assert np.array_equal(kwargs4_preprocess_middle_frame, kwargs4_contrast)
+    assert np.array_equal(kwargs4_preprocess_last_frame, kwargs4_contrast)
 
     kwargs5_gauss = cv2.GaussianBlur(first_frame_channel_0, (5, 5), 1.0)
     kwargs5_median = cv2.medianBlur(kwargs5_gauss, 5)
@@ -195,41 +201,54 @@ def test_preprocess_frame(sample_tiff):
 
     assert not np.array_equal(kwargs1_preprocess_first_frame, first_frame_channel_0)
     assert not np.array_equal(kwargs1_preprocess_middle_frame, middle_frame_channel_1)
+    assert not np.array_equal(kwargs1_preprocess_last_frame, last_frame_channel_2)
     assert not np.array_equal(kwargs2_preprocess_first_frame, first_frame_channel_0)
     assert not np.array_equal(kwargs2_preprocess_middle_frame, middle_frame_channel_1)
+    assert not np.array_equal(kwargs2_preprocess_last_frame, last_frame_channel_2)
     assert np.array_equal(kwargs3_preprocess_first_frame, first_frame_channel_0)
     assert np.array_equal(kwargs3_preprocess_middle_frame, middle_frame_channel_1)
+    assert np.array_equal(kwargs3_preprocess_last_frame, last_frame_channel_2)
     assert not np.array_equal(kwargs4_preprocess_first_frame, first_frame_channel_0)
     assert not np.array_equal(kwargs4_preprocess_middle_frame, middle_frame_channel_1)
+    assert not np.array_equal(kwargs4_preprocess_last_frame, last_frame_channel_2)
     assert not np.array_equal(kwargs5_preprocess_first_frame, first_frame_channel_0)
     assert not np.array_equal(kwargs5_preprocess_middle_frame, middle_frame_channel_1)
+    assert not np.array_equal(kwargs5_preprocess_last_frame, last_frame_channel_2)
 
     assert isinstance(kwargs1_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs1_preprocess_middle_frame, np.ndarray)
+    assert isinstance(kwargs1_preprocess_last_frame, np.ndarray)
     assert isinstance(kwargs2_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs2_preprocess_middle_frame, np.ndarray)
+    assert isinstance(kwargs2_preprocess_last_frame, np.ndarray)
     assert isinstance(kwargs3_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs3_preprocess_middle_frame, np.ndarray)
+    assert isinstance(kwargs3_preprocess_last_frame, np.ndarray)
     assert isinstance(kwargs4_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs4_preprocess_middle_frame, np.ndarray)
+    assert isinstance(kwargs4_preprocess_last_frame, np.ndarray)
     assert isinstance(kwargs5_preprocess_first_frame, np.ndarray)
     assert isinstance(kwargs5_preprocess_middle_frame, np.ndarray)
-    
-    #THE PROBLEM IS THE ORDER OF FRAMES, CHANNELS, HEIGHT, WIDTH
-    #MAKE A LAST_FRAME_CHANNEL_2 AND ADD TESTS FOR IT
+    assert isinstance(kwargs5_preprocess_last_frame, np.ndarray)
 
     assert first_frame_channel_0.shape == (h, w)
     assert middle_frame_channel_1.shape == (h, w)
+    assert last_frame_channel_2.shape == (h, w)
     assert kwargs1_preprocess_first_frame.shape == first_frame_channel_0.shape
     assert kwargs1_preprocess_middle_frame.shape == middle_frame_channel_1.shape
+    assert kwargs1_preprocess_last_frame.shape == last_frame_channel_2.shape
     assert kwargs2_preprocess_first_frame.shape == first_frame_channel_0.shape
     assert kwargs2_preprocess_middle_frame.shape == middle_frame_channel_1.shape
+    assert kwargs2_preprocess_last_frame.shape == last_frame_channel_2.shape
     assert kwargs3_preprocess_first_frame.shape == first_frame_channel_0.shape
     assert kwargs3_preprocess_middle_frame.shape == middle_frame_channel_1.shape
+    assert kwargs3_preprocess_last_frame.shape == last_frame_channel_2.shape
     assert kwargs4_preprocess_first_frame.shape == first_frame_channel_0.shape
     assert kwargs4_preprocess_middle_frame.shape == middle_frame_channel_1.shape
+    assert kwargs4_preprocess_last_frame.shape == last_frame_channel_2.shape
     assert kwargs5_preprocess_first_frame.shape == first_frame_channel_0.shape
     assert kwargs5_preprocess_middle_frame.shape == middle_frame_channel_1.shape
+    assert kwargs5_preprocess_last_frame.shape == last_frame_channel_2.shape
 
 def test_preprocess_stack():
     """
