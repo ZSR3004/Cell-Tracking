@@ -38,13 +38,23 @@ class NdarrayHelpers:
 
 class TestPadToMultipleOf8(TensorHelpers):
     def _check_divisible_by_8(self, ten: torch.Tensor) -> None:
-        raise NotImplementedError
+        shape = ten.shape
+        for dim in shape:
+            assert dim % 8 == 0
 
     def _check_preserved_values(self, ten: torch.Tensor, pad_ten: torch.Tensor) -> None:
-        raise NotImplementedError
+        og_shape = ten.shape 
+        pad_ten_og_dims = pad_ten[og_shape[0], og_shape[1], og_shape[2], og_shape[3]]
+        assert torch.equal(ten, pad_ten_og_dims)
 
     def _check_idempotence(self, ten: torch.Tensor) -> None:
-        raise NotImplementedError
+        ten2 = raft.pad_to_multiple_of_8(ten)
+        ten3 = raft.pad_to_multiple_of_8(ten)
+        ten4 = raft.pad_to_multiple_of_8(ten)
+
+        assert torch.equal(ten, ten2)
+        assert torch.equal(ten, ten3)
+        assert torch.equal(ten, ten4)
 
     def test_pad_to_multiple_of_8(self, init_tiff: tiff.Tiff) -> None:
         raise NotImplementedError
@@ -77,7 +87,7 @@ class TestGetRAFTOpticalFlow(TensorHelpers):
         raise NotImplementedError
 
 
-class TestMakeRAFTOutputArray(ndarrayHelpers):
+class TestMakeRAFTOutputArray(NdarrayHelpers):
     def test_make_raft_output_array(self, init_tiff: tiff.Tiff) -> None:
         raise NotImplementedError
 
