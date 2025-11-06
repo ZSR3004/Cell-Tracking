@@ -15,15 +15,18 @@ TIFF_PATHS = [
     "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
 ]
 
+
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     return tiff.Tiff(request.param)
+
 
 @pytest.fixture(params=TIFF_PATHS)
 def init_torch_tensor(request: pytest.FixtureRequest) -> torch.Tensor:
     tiff_file = tiff.Tiff(request.param)
     arr = tiff_file.arr[:, 0, ...]
     return torch.from_numpy(arr).unsqueeze(1).repeat(1, 3, 1, 1)
+
 
 class TensorHelpers:
     def _check_if_float32_tensor(self, ten: torch.Tensor) -> None:
@@ -54,7 +57,7 @@ class TestPadToMultipleOf8(TensorHelpers):
             assert dim % 8 == 0
 
     def _check_preserved_values(self, ten: torch.Tensor, pad_ten: torch.Tensor) -> None:
-        og_shape = ten.shape 
+        og_shape = ten.shape
         pad_ten_og_dims = pad_ten[og_shape[0], og_shape[1], og_shape[2], og_shape[3]]
         assert torch.equal(ten, pad_ten_og_dims)
 
@@ -77,13 +80,32 @@ class TestPadToMultipleOf8(TensorHelpers):
 
 
 class TestPreprocessTensor(TensorHelpers):
-    def test_preprocess_tensor(self, init_tiff: tiff.Tiff) -> None:
-        raise NotImplementedError
+    def test_preprocess_tensor(
+        self, init_tiff: tiff.Tiff, init_torch_tensor: torch.Tensor
+    ) -> None:
+        tiff_file = init_tiff
+        ten = init_torch_tensor
+        pad_ten = raft.pad_to_multiple_of_8(ten)
+        expected_shape = pad_ten.shape
+
+        ten = raft.preprocess_tensor(tiff_file)
+
+        self._check_if_float32_tensor(ten)
+        self._check_shape(ten, expected_shape)
+        self._check_normalization(ten)
 
 
 class TestBatchFrames(TensorHelpers):
     def test_batch_frames(self, init_torch_tensor: torch.Tensor) -> None:
-        raise NotImplementedError
+        ten = init_torch_tensor
+        batch1, batch2 = raft.batch_frames(ten)
+
+        assert batch1.shape == batch2.shape
+        assert batch1[0] == ten[0]
+        assert batch1[-1] == ten[-2]
+
+        assert batch2[0] == ten[1]
+        assert batch2[-1] == ten[-1]
 
 
 class TestGetRAFTOpticalFlow(TensorHelpers):
