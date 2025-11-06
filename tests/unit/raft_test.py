@@ -18,7 +18,7 @@ class TensorHelpers:
     def _check_if_float32_tensor(self, ten: torch.Tensor) -> None:
         raise NotImplementedError
 
-    def _check_shape(self, ten: torch.Tensor) -> None:
+    def _check_shape(self, ten: torch.Tensor, expected_shape: tuple[int, ...]) -> None:
         raise NotImplementedError
 
     def _check_normalization(self, ten: torch.Tensor) -> None:
@@ -29,7 +29,7 @@ class NdarrayHelpers:
     def _check_if_float32_np(self, arr: np.ndarray) -> None:
         raise NotImplementedError
 
-    def _check_shape_np(self, arr: np.ndarray) -> None:
+    def _check_shape_np(self, arr: np.ndarray, expected_shape: tuple[int, ...]) -> None:
         raise NotImplementedError
 
     def _check_normalization_np(self, arr: np.ndarray) -> None:
