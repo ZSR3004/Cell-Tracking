@@ -1,10 +1,11 @@
 import os
 import json
 import numpy as np
+import pathlib
 from pathlib import Path
 import matplotlib.animation as animation
 from src.defaults import default_process, default_flow, default_trajectory
-from matplotlib.image import AxesImage
+import matplotlib.image, matplotlib.figure, matplotlib.axes
 
 def save_arr(name: str, arr: np.ndarray) -> None:
     """
@@ -60,11 +61,11 @@ def save_original_video(name: str, file_path: pathlib.PosixPath, im: matplotlib.
 
     Args:
         name (str): Name of the video file to save.
-        file_path (str): The path to save the video file to.
-        im (animation.Figure): Matplotlib image display object for the original frames.
-        image_stack: Image stack of shape (T, H, W).
-        fig: Matplotlib figure object for the plot.
-        ax: Matplotlib axes object for the plot.
+        file_path (pathlib.PosixPath): The path to save the video file to.
+        im (matplotlib.image.AxesImage): Matplotlib image display object for the original frames.
+        image_stack (np.ndarray): Image stack of shape (T, H, W).
+        fig (matplotlib.figure.Figure): Matplotlib figure object for the plot.
+        ax (matplotlib.axes._axes.Axes): Matplotlib axes object for the plot.
         **kwargs: Additional keyword arguments that include:
             - T (int): Total number of frames in the image stack.
             - fps (int): Frames per second for the video.
