@@ -4,6 +4,7 @@ import numpy as np
 from pathlib import Path
 import matplotlib.animation as animation
 from src.defaults import default_process, default_flow, default_trajectory
+from matplotlib.image import AxesImage
 
 def save_arr(name: str, arr: np.ndarray) -> None:
     """
@@ -15,6 +16,7 @@ def save_arr(name: str, arr: np.ndarray) -> None:
     Returns:
         None: Just saves the array to a file.
     """
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
     return NotImplementedError
 
 def save_flow(name: str, arr: np.ndarray):
@@ -30,6 +32,7 @@ def save_flow(name: str, arr: np.ndarray):
     Returns:
         None: Just saves the array to a file.
     """
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
     return NotImplementedError
 
 def save_trajectory(name: str, ftag: str, arr: np.ndarray) -> None:
@@ -48,9 +51,10 @@ def save_trajectory(name: str, ftag: str, arr: np.ndarray) -> None:
     Returns:
         None: Just saves the array to a file.
     """
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
     return NotImplementedError
 
-def save_original_video(self, name: str, file_path: str, im: animation.Figure, image_stack, fig, ax, **kwargs) -> None:
+def save_original_video(name: str, file_path: pathlib.PosixPath, im: matplotlib.image.AxesImage, image_stack: np.ndarray, fig: matplotlib.figure.Figure, ax: matplotlib.axes._axes.Axes, **kwargs) -> None:
     """
     Saves a video of image frames using matplotlib.
 
@@ -107,6 +111,7 @@ def save_vector_video(name: str, flag: str, **kwargs) -> None:
         Assumes, that all values are present in kwargs and are of the correct type. The check occurs in the
         `create_optical_flow_video` function (in TiffVisualize.py) before this function is called.
     """
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
     return NotImplementedError
 
 def load_params(stacktype: str) -> dict:
@@ -117,6 +122,8 @@ def load_params(stacktype: str) -> dict:
         stacktype (str): The type of cell.
     
     Returns:
-        params: Dictionary of parameters.
+        params (dict): Dictionary of parameters.
     """
+    #ALSO ADD THE OPTIONS FOR STACKTYPE. FOR EXAMPLE NUCLEI, CYTOPLASM, ETC. (IDK)
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
     return NotImplementedError
