@@ -47,7 +47,8 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
     arr = tiff_file.arr
     arr = arr[:, 0, ...]
     arr = tiff_file.preprocess_stack(arr, **kwargs)
-    arr = arr.astype("float32") / np.iinfo(arr.dtype).max
+    original_dtype = arr.dtype
+    arr = arr.astype("float32") / np.iinfo(original_dtype).max
 
     ten = (
         torch.from_numpy(arr).unsqueeze(1).repeat(1, 3, 1, 1)

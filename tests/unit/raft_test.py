@@ -45,6 +45,8 @@ def init_torch_tensor(request: pytest.FixtureRequest) -> torch.Tensor:
     """
     tiff_file = tiff.Tiff(request.param)
     arr = tiff_file.arr[:, 0, ...]
+    original_dtype = arr.dtype
+    arr = arr.astype("float32") / np.iinfo(original_dtype).max
     return torch.from_numpy(arr).unsqueeze(1).repeat(1, 3, 1, 1)
 
 
@@ -115,9 +117,8 @@ class TestPadToMultipleOf8(TensorHelpers):
         Args:
             ten (torch.Tensor): tensor to check.
         """
-        shape = ten.shape
-        for dim in shape:
-            assert dim % 8 == 0
+        assert ten.shape[2] % 8 == 0
+        assert ten.shape[3] % 8 == 0
 
     def _check_preserved_values(self, ten: torch.Tensor, pad_ten: torch.Tensor) -> None:
         """
@@ -128,7 +129,7 @@ class TestPadToMultipleOf8(TensorHelpers):
             pad_ten (torch.Tensor): padded tensor.
         """
         og_shape = ten.shape
-        pad_ten_og_dims = pad_ten[og_shape[0], og_shape[1], og_shape[2], og_shape[3]]
+        pad_ten_og_dims = pad_ten[:og_shape[0], :og_shape[1], :og_shape[2], :og_shape[3]]
         assert torch.equal(ten, pad_ten_og_dims)
 
     def _check_idempotence(self, ten: torch.Tensor) -> None:
@@ -186,12 +187,11 @@ class TestBatchFrames(TensorHelpers):
         batch1, batch2 = raft.batch_frames(ten)
 
         assert batch1.shape == batch2.shape
-        assert batch1[0] == ten[0]
-        assert batch1[-1] == ten[-2]
+        assert torch.equal(batch1[0], ten[0])
+        assert torch.equal(batch1[-1], ten[-2])
 
-        assert batch2[0] == ten[1]
-        assert batch2[-1] == ten[-1]
-
+        assert torch.equal(batch2[0], ten[1])
+        assert torch.equal(batch2[-1], ten[-1])
 
 class TestGetRAFTOpticalFlow:
     def _check_model_size_logic(
@@ -425,13 +425,14 @@ class TestMakeRAFTOutputArray(NdarrayHelpers):
         Tests the make_raft_output_array function.
         """
         tiff_file = init_tiff
-        ten = init_torch_tensor
-        flow = raft.get_raft_optical_flow(tiff_file, use_gpu=True)
+        processed_tiff_file = raft.preprocess_tensor(tiff_file)
+        batched_tiff_file = raft.batch_frames(processed_tiff_file)
+        flow = raft.get_raft_optical_flow(batched_tiff_file, gpu_flag=True)
         flow_arr = raft.make_raft_output_array(flow)
 
         self._check_if_float32_np(flow_arr)
 
-        expected_shape = (ten.shape[0] - 1, ten.shape[1], ten.shape[2], 2)
+        expected_shape = (processed_tiff_file.shape[0] - 1, processed_tiff_file.shape[1], processed_tiff_file.shape[2], 2)
         self._check_shape_np(flow_arr, expected_shape)
 
 
