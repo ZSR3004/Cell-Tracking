@@ -138,12 +138,10 @@ def test_show_image(sample_tiff, tmp_path):
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
 
-    kwargs1 = {"gauss": {"ksize": (7, 7), "sigmaX": 1.5}, "median": {"ksize": 9}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs1 = {"gauss": {"ksize": (3, 3), "sigmaX": 1.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
     kwargs2 = {"gauss": {"ksize": (7, 7)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
     kwargs3 = {"gauss": {"sigmaX": 1.5}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
 
-    #image0 probably doesn't work because it has all channels
-    image0 = img.arr[0, :, :, :]
     image1 = img.arr[0, 2, :, :]
     image2 = img.arr[(f-1)//2, 0, :, :]
     image3 = img.arr[f-1, 1, :, :]
@@ -151,47 +149,41 @@ def test_show_image(sample_tiff, tmp_path):
     image5 = img.preprocess_frame((img.arr[(f-1)//2, 2, :, :], kwargs2))
     image6 = img.preprocess_frame((img.arr[f-1, 0, :, :], kwargs3))
 
-    image0_save = img.show_image(image0)
-    """image0_show = img.show_image(image0,
-    image1_save = img.show_image(image1,
-    image1_show = img.show_image(image1,
-    image2_save = img.show_image(image1,
-    image2_show = img.show_image(image1,
-    image3_save = img.show_image(image1,
-    image3_show = img.show_image(image1,
-    image4_save = img.show_image(image1,
-    image4_show = img.show_image(image1,
-    image5_save = img.show_image(image1,
-    image5_show = img.show_image(image1,
-    image6_save = img.show_image(image1,
-    image6_show = img.show_image(image1,"""
+    image1_save_path = tmp_path / 'image1_save'
+    image2_save_path = tmp_path / 'image2_save'
+    image3_save_path = tmp_path / 'image3_save'
+    image4_save_path = tmp_path / 'image4_save'
+    image5_save_path = tmp_path / 'image5_save'
+    image6_save_path = tmp_path / 'image6_save'
 
+    image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
+    image1_show = img.show_image(image1, "image1_show", (10, 6), None)
+    image2_save = img.show_image(image2, save_path=image2_save_path)
+    image2_show = img.show_image(image2)
+    image3_save = img.show_image(image3, figsize=(18, 16), save_path=image3_save_path)
+    image3_show = img.show_image(image3, figsize=(7, 9), save_path=None)
+    image4_save = img.show_image(image4, title="image4_save", figsize=(5,7), save_path=image4_save_path)
+    image4_show = img.show_image(image4, title="image4_show")
+    image5_save = img.show_image(image5, title="image5_save", save_path=image5_save_path)
+    image5_show = img.show_image(image5, figsize=(0,3))
+    image6_save = img.show_image(image6, "image6_save", figsize=(2,10), save_path=image6_save_path)
+    image6_show = img.show_image(image6, save_path=None)
 
-    """
-    #() all for everything 
-    #() no title
-    #() no title, no figsize
-    #() no title, no figsize, no save_path
-    #() no title, no figsize, save_path = None
-    #() no title, no save_path
-    #() no title, save_path = None
-    #() no figsize
-    #() no figsize, no save_path
-    #() no figsize, save_path = None
-    #() no figsize, no save_path
-    #() no figsize, save_path = None
-    #() no save_path
-    #() save_path = None
-
+    assert image1_save_path.exists()
+    assert image2_save_path.exists()
+    assert image3_save_path.exists()
+    assert image4_save_path.exists()
+    assert image5_save_path.exists()
+    assert image6_save_path.exists()
 
     #note: an image is the same as a frame. 
-    #another test: preprocess the image using the preprocess function and then make sure preprocessed images also work
-    #test both cases: if save_path is a str, and if it's None
+    #DONE another test: preprocess the image using the preprocess function and then make sure preprocessed images also work
+    #DONE test both cases: if save_path is a str, and if it's None
     #if save_path is a str, test if it's saved to the right path (maybe a tmp_path?). If save_path is None, test if it's shown.
 
-    #NOW RUN ALL THESE TESTS!
+    #then make sure assert image6_save_path.exists() returns false if i erase image6_show above!
 
-    raise NotImplemented
+    #NOW RUN ALL THESE TESTS!
 
 def hi_preprocess_frame(sample_tiff):
     """
