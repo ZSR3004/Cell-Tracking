@@ -5,13 +5,13 @@ import numpy as np
 import tiffclass as tiff
 import enum
 
+
 class ModelSize(enum.IntEnum):
     SMALL = 1
     LARGE = 2
 
-# ModelSize = enum.Enum('ModelSize', [('Small', 1), ('Large', 2)]) 
 
-def make_tiff_into_tensor(tiff_file : tiff.Tiff) -> torch.Tensor :
+def make_tiff_into_tensor(tiff_file: tiff.Tiff) -> torch.Tensor:
     """
     Takes an instance of a tiff.Tiff, extracts the img array and
     casts it as a tensor.Torch.
@@ -24,11 +24,12 @@ def make_tiff_into_tensor(tiff_file : tiff.Tiff) -> torch.Tensor :
     """
     raise NotImplementedError
 
-def preprocess_tensor(t : torch.Tensor) -> torch.Tensor:
+
+def preprocess_tensor(t: torch.Tensor) -> torch.Tensor:
     """
     Applies padding to the tensor. Additionally, copies the
     phase contrast channel and stacks it on itself twice.
-    Creates a copy of t that is ready to use in the 
+    Creates a copy of t that is ready to use in the
     RAFT model.
 
     Args:
@@ -39,7 +40,8 @@ def preprocess_tensor(t : torch.Tensor) -> torch.Tensor:
     """
     raise NotImplementedError
 
-def batch_frames(t : torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+
+def batch_frames(t: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Batches frames together for use in RAFT model.
 
@@ -53,9 +55,12 @@ def batch_frames(t : torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     """
     raise NotImplementedError
 
-def calculate_raft_optical_flow(batches : tuple[torch.Tensor, torch.Tensor], 
-                                model_size : int = ModelSize.SMALL,
-                                gpu_flag : bool = False)  -> torch.Tensor:
+
+def calculate_raft_optical_flow(
+    batches: tuple[torch.Tensor, torch.Tensor],
+    model_size: int = ModelSize.SMALL,
+    gpu_flag: bool = False,
+) -> torch.Tensor:
     """
     Determines the optical_flow of a tiff file using the
     RAFT algorithm.
@@ -65,17 +70,18 @@ def calculate_raft_optical_flow(batches : tuple[torch.Tensor, torch.Tensor],
             raft models.
         model_size: If the small RAFT model or large RAFT model
             should be use. The default is small.
-        gpu_flag: If the GPU should be used if available. Marking 
+        gpu_flag: If the GPU should be used if available. Marking
             this flag as False will use CPU no matter what. The
             default is False.
 
     Returns:
-        torch.Tensor: Optical flow of the tiff file represented by 
+        torch.Tensor: Optical flow of the tiff file represented by
             the batches.
     """
     raise NotImplementedError
 
-def make_raft_output_array(flow : torch.Tensor) -> np.ndarray:
+
+def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
     """
     Casts the optical flow of a tiff file, flow as an np.array.
 
@@ -86,4 +92,3 @@ def make_raft_output_array(flow : torch.Tensor) -> np.ndarray:
         np.ndarray: The same representation, but as an np.ndarray.
     """
     raise NotImplementedError
-
