@@ -15,7 +15,11 @@ from pathlib import Path
 import matplotlib.animation as animation
 from defaults import default_process, default_flow, default_trajectory
 
-
+@pytest.fixture
+def sample_tiff():
+    path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
+    f, c, h, w = 96, 3, 520, 2329
+    return path, f, c, h, w
 
 """
 Tests for all functions in saving.py will go here
