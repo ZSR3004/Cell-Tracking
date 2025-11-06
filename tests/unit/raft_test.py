@@ -19,6 +19,11 @@ TIFF_PATHS = [
 def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     return tiff.Tiff(request.param)
 
+@pytest.fixture(params=TIFF_PATHS)
+def init_torch_tensor(request: pytest.FixtureRequest) -> torch.Tensor:
+    tiff_file = tiff.Tiff(request.param)
+    arr = tiff_file.arr[:, 0, ...]
+    return torch.from_numpy(arr).unsqueeze(1).repeat(1, 3, 1, 1)
 
 class TensorHelpers:
     def _check_if_float32_tensor(self, ten: torch.Tensor) -> None:
@@ -62,8 +67,13 @@ class TestPadToMultipleOf8(TensorHelpers):
         assert torch.equal(ten, ten3)
         assert torch.equal(ten, ten4)
 
-    def test_pad_to_multiple_of_8(self, init_tiff: tiff.Tiff) -> None:
-        raise NotImplementedError
+    def test_pad_to_multiple_of_8(self, init_torch_tensor: torch.Tensor) -> None:
+        ten = init_torch_tensor
+        pad_ten = raft.pad_to_multiple_of_8(ten)
+
+        self._check_divisible_by_8(pad_ten)
+        self._check_preserved_values(ten, pad_ten)
+        self._check_idempotence(pad_ten)
 
 
 class TestPreprocessTensor(TensorHelpers):
@@ -72,7 +82,7 @@ class TestPreprocessTensor(TensorHelpers):
 
 
 class TestBatchFrames(TensorHelpers):
-    def test_batch_frames(self, init_tiff: tiff.Tiff) -> None:
+    def test_batch_frames(self, init_torch_tensor: torch.Tensor) -> None:
         raise NotImplementedError
 
 
