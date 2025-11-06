@@ -17,7 +17,7 @@ def pad_to_multiple_of_8(ten: torch.Tensor) -> torch.Tensor:
     This is required for the RAFT model to work.
 
     Args:
-        ten: A 4D PyTorch tensor.
+        ten (torch.Tensor): A 4D PyTorch tensor.
 
     Returns:
         torch.Tensor: ten, with a padded height and width.
@@ -36,8 +36,9 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
     and pads height/width to multiples of 8.
 
     Args:
-        tiff_file: The tiff file representing the video to be processed.
+        tiff_file (tiff.Tiff): The tiff file representing the video to be processed.
             It holds an array of shape [frames, channels, height, width].
+        kwargs (dict): See preprocess_frame in tiffclass.py
 
     Returns:
         torch.Tensor: A preprocessed representation of the tiff_file; ready
@@ -61,7 +62,7 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     Batches frames together for use in RAFT model.
 
     Args:
-        t: A torch.Tensor representation of a tiff video.
+        ten (torch.Tensor): A torch.Tensor representation of a tiff video.
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple of torch.Tensors.
@@ -75,25 +76,23 @@ def get_raft_optical_flow(
     batches: tuple[torch.Tensor, torch.Tensor],
     model_size: ModelSize = ModelSize.SMALL,
     model_weights: dict | None = None,
-    device_flag: bool = False,
+    gpu_flag: bool = False,
 ) -> torch.Tensor:
     """
     Computes optical flow between frame pairs using the RAFT model.
 
     Args:
-        batches: Tuple of two tensors (batch_1, batch_2),
+        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2),
                  each of shape [f, 3, h, w].
-        model_size: Which RAFT variant to use (SMALL or LARGE).
-        model_weights: A loaded state_dict for the model, or None
+        model_size (ModelSize): Which RAFT variant to use (SMALL or LARGE).
+        model_weights (dict | None): A loaded state_dict for the model, or None
                        to use default pretrained weights.
-        device_flag: If True, use CUDA when available; else CPU.
+        device_flag (bool): If True, use CUDA when available; else CPU.
 
     Returns:
         torch.Tensor: Optical flow tensor [f, 2, h, w].
     """
-    device = torch.device(
-        "cuda" if device_flag and torch.cuda.is_available() else "cpu"
-    )
+    device = torch.device("cuda" if gpu_flag and torch.cuda.is_available() else "cpu")
 
     if model_size == ModelSize.SMALL:
         model = raft_small(progress=False).to(device)
@@ -118,7 +117,7 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
     Casts the optical flow of a tiff file, flow as an np.array.
 
     Args:
-        flow: The torch.Tensor representation of optical flow.
+        flow (torch.Tensor): The torch.Tensor representation of optical flow.
             The shape is [f, 2, h, w]
 
     Returns:
@@ -128,4 +127,39 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
     """
     ten = torch.permute(flow, (0, 2, 3, 1))
     arr = torch.Tensor.numpy(ten)
+    return arr
+
+
+def calcOpticalFlowRAFT(
+    tiff_file: tiff.Tiff,
+    model_size: ModelSize = ModelSize.SMALL,
+    model_weights: dict | None = None,
+    gpu_flag: bool = False,
+    **kwargs,
+) -> np.ndarray:
+    """
+    Wrapper class for RAFT optical flow analysis. Executes all steps necessary to compute RAFT.
+
+    Args:
+        tiff_file (tiff.Tiff): The tiff file representing the video to be processed.
+            It holds an array of shape [frames, channels, height, width].
+        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2),
+                 each of shape [f, 3, h, w].
+        model_size (ModelSize): Which RAFT variant to use (SMALL or LARGE).
+        model_weights (dict | None): A loaded state_dict for the model, or None
+                       to use default pretrained weights.
+        device_flag (bool): If True, use CUDA when available; else CPU.
+        kwargs (dict): See preprocess_frame in tiffclass.py
+
+    Returns:
+        np.ndarray: The same representation, but as an np.ndarray.
+            The shape is [f, h, w, 2] to match the outputs of the
+            other optical flow models.
+    """
+    ten = preprocess_tensor(tiff_file, **kwargs)
+    batches = batch_frames(ten)
+    flow = get_raft_optical_flow(
+        batches, model_size=model_size, model_weights=model_weights, gpu_flag=gpu_flag
+    )
+    arr = make_raft_output_array(flow)
     return arr
