@@ -1,5 +1,6 @@
 import torch
 import torchvision.transforms.functional as F
+import torch.nn.functional as F
 import torchvision.models.optical_flow as torch_of
 import numpy as np
 import tiffclass as tiff
@@ -9,6 +10,25 @@ import enum
 class ModelSize(enum.IntEnum):
     SMALL = 1
     LARGE = 2
+
+
+def pad_to_multiple_of_8(ten : torch.Tensor) -> torch.Tensor:
+    """
+    Pads tensor to make the height and width divisible by 8.
+    This is required for the RAFT model to work.
+
+    Args:
+        ten: A 4D PyTorch tensor.
+
+    Returns:
+        torch.Tensor: ten, with a padded height and width.
+    """
+    _, _, H, W = ten.shape
+    pad_h = (8 - H % 8) % 8
+    pad_w = (8 - W % 8) % 8
+
+    return F.pad(ten, (0, pad_w, 0, pad_h), mode='replicate')
+
 
 
 def make_tiff_into_tensor(tiff_file: tiff.Tiff) -> torch.Tensor:
@@ -22,7 +42,15 @@ def make_tiff_into_tensor(tiff_file: tiff.Tiff) -> torch.Tensor:
     Returns:
         torch.Tensor: a torch.Tensor version of tiff_file.img.
     """
-    raise NotImplementedError
+    arr = tiff_file.arr
+    arr = arr.astype('float32') / 65535.0
+
+    ten = torch.from_numpy(arr)
+    ten = ten.unsqueeze(1)
+    ten = ten.repeat(1, 3, 1, 1)  # [T, 3, H, W]
+    ten = pad_to_multiple_of_8(ten)
+
+    return ten
 
 
 def preprocess_tensor(t: torch.Tensor) -> torch.Tensor:
