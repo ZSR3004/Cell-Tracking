@@ -5,7 +5,7 @@ from pathlib import Path
 import matplotlib.animation as animation
 from defaults import default_process, default_flow, default_trajectory
 
-def save_arr(name : str, arr : np.array) -> None:
+def save_arr(name: str, arr: np.array) -> None:
     """
     Saves a numpy array to a file.
     
@@ -17,7 +17,7 @@ def save_arr(name : str, arr : np.array) -> None:
     """
     return NotImplementedError
 
-def save_flow(name : str, arr : np.array):
+def save_flow(name: str, arr: np.array):
     """
     Saves the optical flow array.
     
@@ -32,7 +32,7 @@ def save_flow(name : str, arr : np.array):
     """
     return NotImplementedError
 
-def save_trajectory(name : str, ftag : str, arr : np.array) -> None:
+def save_trajectory(name: str, ftag: str, arr: np.array) -> None:
     """
     Saves the trajectory flow array.
 
@@ -48,7 +48,7 @@ def save_trajectory(name : str, ftag : str, arr : np.array) -> None:
     """
     return NotImplementedError
 
-def save_original_video(name : str, **kwargs) -> None:
+def save_original_video(name: str, **kwargs) -> None:
     """
     Saves a video of image frames using matplotlib.
     Args:
@@ -65,7 +65,7 @@ def save_original_video(name : str, **kwargs) -> None:
     """
     return NotImplementedError
 
-def save_vector_video(name : str, flag : str, **kwargs) -> None:
+def save_vector_video(name: str, flag: str, **kwargs) -> None:
     """
     Creates a video of optical flow vectors overlaid on the original image frames.
 
@@ -92,12 +92,12 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
     """
     return NotImplementedError
 
-def load_params(stacktype : str) -> dict:
+def load_params(stacktype: str) -> dict:
     """
     Loads parameters from types.json.
 
     Args:
-        stacktype: The type of cell.
+        stacktype (str): The type of cell.
     
     Returns:
         params: Dictionary of parameters.
