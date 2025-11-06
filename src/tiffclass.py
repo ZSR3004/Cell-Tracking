@@ -47,7 +47,7 @@ class Tiff:
         assert(channel_idx < len(self.arr))
         return self.arr[:,channel_idx,:,:]
 
-    def save_original_video(name: str, file_path: str, im, image_stack, fig, ax, **kwargs) -> None:
+    def save_original_video(self, name: str, file_path: str, im, image_stack, fig, ax, **kwargs) -> None:
         """
         Saves a video of image frames using matplotlib.
 
@@ -61,6 +61,9 @@ class Tiff:
             **kwargs: Additional keyword arguments that include:
                 - T (int): Total number of frames in the image stack.
                 - fps (int): Frames per second for the video.
+
+        Assumptions:
+            'T' is greater than or equal to image_stack.shape[0].
 
         Returns:
             None: Just saves the video to the specified path.
@@ -117,8 +120,8 @@ class Tiff:
                     - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
 
         Assumptions:
-            The 'ksize' value in the gauss dictionary must be a tuple of two positive odd integers
-            The 'ksize' value in the median dictionary must be a positive odd integer
+            The 'ksize' value in the gauss dictionary must be a tuple of two positive odd integers.
+            The 'ksize' value in the median dictionary must be a positive odd integer.
 
         Returns:
             np.ndarray: Preprocessed image.
@@ -167,9 +170,9 @@ class Tiff:
                 - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
 
         Assumptions:
-            arr is not empty
-            The 'ksize' value in the gauss dictionary must be a tuple of two positive odd integers
-            The 'ksize' value in the median dictionary must be a positive odd integer
+            arr is not empty.
+            The 'ksize' value in the gauss dictionary must be a tuple of two positive odd integers.
+            The 'ksize' value in the median dictionary must be a positive odd integer.
 
         Returns:
             np.ndarray: Preprocessed stack of frames.

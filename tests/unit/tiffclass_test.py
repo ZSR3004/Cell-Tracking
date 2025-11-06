@@ -17,7 +17,7 @@ def sample_tiff():
     f, c, h, w = 96, 3, 520, 2329
     return path, f, c, h, w
 
-def hi_init(sample_tiff):
+def test_init(sample_tiff):
     """
     Tests whether the Tiff class initializes correctly.
 
@@ -48,7 +48,7 @@ def hi_init(sample_tiff):
     assert img.arr.shape[3] == w  # width
 
 
-def hi_isolate_channel(sample_tiff):
+def test_isolate_channel(sample_tiff):
     """
     Tests whether the isolate_channel method works correctly.
 
@@ -111,9 +111,10 @@ def test_save_original_video(sample_tiff, tmp_path):
     preprocess_kwargs7 = {"gauss": {"sigmaX": 1.5}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
 
     kwargs1 = {'T': 10, 'fps': 20}
-    kwargs2 = {'T': 100}
+    kwargs2 = {'T': 40}
     kwargs3 = {'fps': 35}
     kwargs4 = {}
+    kwargs5 = {'T': 1}
 
     stack1 = np.asarray(img.arr[:, 2, :, :])
     stack2 = np.asarray([img.arr[0, 0, :, :]])
@@ -124,10 +125,10 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     stack1_kwargs1_path = tmp_path / 'stack1_kwargs1.mp4'
     stack1_kwargs3_path = tmp_path / 'stack1_kwargs3.mp4'
-    stack2_kwargs2_path = tmp_path / 'stack2_kwargs2.mp4'
     stack2_kwargs4_path = tmp_path / 'stack2_kwargs4.mp4'
-    stack3_kwargs1_path = tmp_path / 'stack3_kwargs1.mp4'
+    stack2_kwargs5_path = tmp_path / 'stack2_kwargs5.mp4' 
     stack3_kwargs3_path = tmp_path / 'stack3_kwargs3.mp4'
+    stack3_kwargs5_path = tmp_path / 'stack3_kwargs5.mp4'
     stack4_kwargs2_path = tmp_path / 'stack4_kwargs2.mp4'
     stack4_kwargs4_path = tmp_path / 'stack4_kwargs4.mp4'
     stack5_kwargs1_path = tmp_path / 'stack5_kwargs1.mp4'
@@ -144,10 +145,10 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     save_stack1_kwargs1 = img.save_original_video("stack1_kwargs1", stack1_kwargs1_path, im_stack1, stack1, fig, ax, **kwargs1)
     save_stack1_kwargs3 = img.save_original_video("stack1_kwargs3", stack1_kwargs3_path, im_stack1, stack1, fig, ax, **kwargs3)
-    save_stack2_kwargs2 = img.save_original_video("stack2_kwargs2", stack2_kwargs2_path, im_stack2, stack2, fig, ax, **kwargs2)
     save_stack2_kwargs4 = img.save_original_video("stack2_kwargs4", stack2_kwargs4_path, im_stack2, stack2, fig, ax, **kwargs4)
-    save_stack3_kwargs1 = img.save_original_video("stack3_kwargs1", stack3_kwargs1_path, im_stack3, stack3, fig, ax, **kwargs1)
+    save_stack2_kwargs5 = img.save_original_video("stack2_kwargs2", stack2_kwargs5_path, im_stack2, stack2, fig, ax, **kwargs5)
     save_stack3_kwargs3 = img.save_original_video("stack3_kwargs3", stack3_kwargs3_path, im_stack3, stack3, fig, ax, **kwargs3)
+    save_stack3_kwargs5 = img.save_original_video("stack3_kwargs1", stack3_kwargs5_path, im_stack3, stack3, fig, ax, **kwargs5)
     save_stack4_kwargs2 = img.save_original_video("stack4_kwargs2", stack4_kwargs2_path, im_stack4, stack4, fig, ax, **kwargs2)
     save_stack4_kwargs4 = img.save_original_video("stack4_kwargs4", stack4_kwargs4_path, im_stack4, stack4, fig, ax, **kwargs4)
     save_stack5_kwargs1 = img.save_original_video("stack5_kwargs1", stack5_kwargs1_path, im_stack5, stack5, fig, ax, **kwargs1)
@@ -157,10 +158,10 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     assert stack1_kwargs1_path.exists()
     assert stack1_kwargs3_path.exists()
-    assert stack2_kwargs2_path.exists()
     assert stack2_kwargs4_path.exists()
-    assert stack3_kwargs1_path.exists()
+    assert stack2_kwargs5_path.exists()
     assert stack3_kwargs3_path.exists()
+    assert stack3_kwargs5_path.exists()
     assert stack4_kwargs2_path.exists()
     assert stack4_kwargs4_path.exists()
     assert stack5_kwargs1_path.exists()
@@ -170,37 +171,18 @@ def test_save_original_video(sample_tiff, tmp_path):
 
     assert os.path.getsize(stack1_kwargs1_path) > 0
     assert os.path.getsize(stack1_kwargs3_path) > 0
-    assert os.path.getsize(stack2_kwargs2_path) > 0
     assert os.path.getsize(stack2_kwargs4_path) > 0
-    assert os.path.getsize(stack3_kwargs1_path) > 0
+    assert os.path.getsize(stack2_kwargs5_path) > 0
     assert os.path.getsize(stack3_kwargs3_path) > 0
+    assert os.path.getsize(stack3_kwargs5_path) > 0
     assert os.path.getsize(stack4_kwargs2_path) > 0
     assert os.path.getsize(stack4_kwargs4_path) > 0
     assert os.path.getsize(stack5_kwargs1_path) > 0
     assert os.path.getsize(stack5_kwargs3_path) > 0
     assert os.path.getsize(stack6_kwargs2_path) > 0
     assert os.path.getsize(stack6_kwargs4_path) > 0
-
-# I just did grayscale im. If RGB, just do: im = ax.imshow(first_frame)
-
-
-
-    #Based on what Ziyad and Jamie say, add tests for RGB!!
-
-
-
-    #NOW RUN ALL THESE TESTS!
-
-    #what to assert: 
-    # check if exists, check if not empty
-    """
-    cases:
-        - image_stack is (T, H, W)
-        - image_stack is (T, H, W, 3)
-    """
-
     
-def hi_show_image(sample_tiff, tmp_path):
+def test_show_image(sample_tiff, tmp_path):
     """
     Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
 
@@ -264,7 +246,7 @@ def hi_show_image(sample_tiff, tmp_path):
     assert os.path.getsize(image5_save_path) > 0
     assert os.path.getsize(image6_save_path) > 0
 
-def hi_preprocess_frame(sample_tiff):
+def test_preprocess_frame(sample_tiff):
     """
     Tests whether the preprocess_frame method works correctly.
 
@@ -379,7 +361,7 @@ def hi_preprocess_frame(sample_tiff):
     assert kwargs5_preprocess_middle_frame.shape == middle_frame_channel_1.shape
     assert kwargs5_preprocess_last_frame.shape == last_frame_channel_2.shape
 
-def hi_preprocess_stack(sample_tiff):
+def test_preprocess_stack(sample_tiff):
     """
     Tests whether the preprocess_stack method works correctly.
 
