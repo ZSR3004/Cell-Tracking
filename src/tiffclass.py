@@ -40,6 +40,10 @@ class Tiff:
         Args:
             channel_idx (int): Index of the channel to isolate (0-indexed).
 
+        Assertions:
+            'channel_idx' is greater or equal to 0.
+            'channel_idx' is less than the length of self.arr.
+
         Returns:
             np.ndarray: Isolated channel as a 3D numpy array.
         """

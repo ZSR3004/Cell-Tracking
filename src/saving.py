@@ -3,7 +3,7 @@ import json
 import numpy as np
 from pathlib import Path
 import matplotlib.animation as animation
-from defaults import default_process, default_flow, default_trajectory
+from src.defaults import default_process, default_flow, default_trajectory
 
 def save_arr(name: str, arr: np.ndarray) -> None:
     """

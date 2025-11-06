@@ -8,6 +8,7 @@ if ROOT_DIR not in sys.path:
    
 import cv2, json, pytest
 from src import tiffclass as tiff
+from src import saving
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
@@ -89,18 +90,18 @@ def test_save_original_video(sample_tiff, tmp_path):
     im_stack5 = ax.imshow(stack5[0], cmap='gray')
     im_stack6 = ax.imshow(stack6[0], cmap='gray')
 
-    save_stack1_kwargs1 = img.save_original_video("stack1_kwargs1", stack1_kwargs1_path, im_stack1, stack1, fig, ax, **kwargs1)
-    save_stack1_kwargs3 = img.save_original_video("stack1_kwargs3", stack1_kwargs3_path, im_stack1, stack1, fig, ax, **kwargs3)
-    save_stack2_kwargs4 = img.save_original_video("stack2_kwargs4", stack2_kwargs4_path, im_stack2, stack2, fig, ax, **kwargs4)
-    save_stack2_kwargs5 = img.save_original_video("stack2_kwargs2", stack2_kwargs5_path, im_stack2, stack2, fig, ax, **kwargs5)
-    save_stack3_kwargs3 = img.save_original_video("stack3_kwargs3", stack3_kwargs3_path, im_stack3, stack3, fig, ax, **kwargs3)
-    save_stack3_kwargs5 = img.save_original_video("stack3_kwargs1", stack3_kwargs5_path, im_stack3, stack3, fig, ax, **kwargs5)
-    save_stack4_kwargs2 = img.save_original_video("stack4_kwargs2", stack4_kwargs2_path, im_stack4, stack4, fig, ax, **kwargs2)
-    save_stack4_kwargs4 = img.save_original_video("stack4_kwargs4", stack4_kwargs4_path, im_stack4, stack4, fig, ax, **kwargs4)
-    save_stack5_kwargs1 = img.save_original_video("stack5_kwargs1", stack5_kwargs1_path, im_stack5, stack5, fig, ax, **kwargs1)
-    save_stack5_kwargs3 = img.save_original_video("stack5_kwargs3", stack5_kwargs3_path, im_stack5, stack5, fig, ax, **kwargs3)
-    save_stack6_kwargs2 = img.save_original_video("stack6_kwargs2", stack6_kwargs2_path, im_stack6, stack6, fig, ax, **kwargs2)
-    save_stack6_kwargs4 = img.save_original_video("stack6_kwargs4", stack6_kwargs4_path, im_stack6, stack6, fig, ax, **kwargs4)
+    save_stack1_kwargs1 = saving.save_original_video("stack1_kwargs1", stack1_kwargs1_path, im_stack1, stack1, fig, ax, **kwargs1)
+    save_stack1_kwargs3 = saving.save_original_video("stack1_kwargs3", stack1_kwargs3_path, im_stack1, stack1, fig, ax, **kwargs3)
+    save_stack2_kwargs4 = saving.save_original_video("stack2_kwargs4", stack2_kwargs4_path, im_stack2, stack2, fig, ax, **kwargs4)
+    save_stack2_kwargs5 = saving.save_original_video("stack2_kwargs2", stack2_kwargs5_path, im_stack2, stack2, fig, ax, **kwargs5)
+    save_stack3_kwargs3 = saving.save_original_video("stack3_kwargs3", stack3_kwargs3_path, im_stack3, stack3, fig, ax, **kwargs3)
+    save_stack3_kwargs5 = saving.save_original_video("stack3_kwargs1", stack3_kwargs5_path, im_stack3, stack3, fig, ax, **kwargs5)
+    save_stack4_kwargs2 = saving.save_original_video("stack4_kwargs2", stack4_kwargs2_path, im_stack4, stack4, fig, ax, **kwargs2)
+    save_stack4_kwargs4 = saving.save_original_video("stack4_kwargs4", stack4_kwargs4_path, im_stack4, stack4, fig, ax, **kwargs4)
+    save_stack5_kwargs1 = saving.save_original_video("stack5_kwargs1", stack5_kwargs1_path, im_stack5, stack5, fig, ax, **kwargs1)
+    save_stack5_kwargs3 = saving.save_original_video("stack5_kwargs3", stack5_kwargs3_path, im_stack5, stack5, fig, ax, **kwargs3)
+    save_stack6_kwargs2 = saving.save_original_video("stack6_kwargs2", stack6_kwargs2_path, im_stack6, stack6, fig, ax, **kwargs2)
+    save_stack6_kwargs4 = saving.save_original_video("stack6_kwargs4", stack6_kwargs4_path, im_stack6, stack6, fig, ax, **kwargs4)
 
     assert stack1_kwargs1_path.exists()
     assert stack1_kwargs3_path.exists()
