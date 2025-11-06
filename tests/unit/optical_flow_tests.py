@@ -28,116 +28,113 @@ def test_combine_flows(sample_tiff):
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
 
-    channel_0 = img.isolate_channel(0)
-    channel_1 = img.isolate_channel(1)
-    channel_2 = img.isolate_channel(2)
+    flow_0 = flow.optical_flow(img.arr[:,0,...])
+    flow_1 = flow.optical_flow(img.arr[:,1,...])
+    flow_2 = flow.optical_flow(img.arr[:,2,...])
 
-    combine_0_1 = flow.combine_flows([channel_0,channel_1])
-    combine_0_2 = flow.combine_flows([channel_0,channel_2])
-    combine_1_2 = flow.combine_flows([channel_1,channel_2])
-
-    assert combine_0_1.shape == (f, c, h, w)
-    assert combine_0_2.shape == (f, c, h, w)
-    assert combine_1_2 == (f, c, h, w)
-
-    np.testing.assert_array_equal(combine_0_1, channel_0 + channel_1)
-    np.testing.assert_array_equal(combine_0_2, channel_0 + channel_2)
-    np.testing.assert_array_equal(combine_1_2, channel_1 + channel_2)
+    combine_flow_0 = flow.combine_flows([flow_0, flow_1])
+    combine_flow_1 = flow.combine_flows([flow_1, flow_2])
+    combine_flow_2 = flow.combine_flows([flow_0, flow_2])
 
 
-# def test_compute_flow_pair(sample_tiff):
-#     """
-#     Tests whether the compute_flow_pair function works correctly.
-#     """
-#     path, f, c, h, w = sample_tiff
-#     img = tiff.Tiff(path)
+    assert combine_flow_0.shape == (f-1, c, h, w, 2)
+    assert combine_flow_1.shape == (f-1, c, h, w, 2)
+    assert combine_flow_2.shape == (f-1, c, h, w, 2)
 
 
-#     # Grab the first two frames of channel 0
-#     f1 = img.arr[0, 0]  # shape: (height, width)
-#     f2 = img.arr[1, 0]  # shape: (height, width)
-
-#     flow_args = {
-#         "pyr_scale": 0.5,
-#         "levels": 3,
-#         "winsize": 15,
-#         "iterations": 3,
-#         "poly_n": 5,
-#         "poly_sigma": 1.2,
-#         "flags": 0
-#     }
-
-#     args = (f1, f2, flow_args)
-#     my_flow = flow.compute_flow_pair(args)
-
-#     # Test output type
-#     assert isinstance(my_flow, np.ndarray)
-
-#     # Test output shape
-#     assert my_flow.shape == (h, w, 2)
-
-# def test_optical_flow(sample_tiff):
-#     """
-#     Tests whether the optical_flow function works correctly.
-#     """
-#     path, f, c, h, w = sample_tiff
-#     img = tiff.Tiff(path)
+def test_compute_flow_pair(sample_tiff):
+    """
+    Tests whether the compute_flow_pair function works correctly.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
 
 
-#     # isolate channel for testing
-#     channel = img.isolate_channel(0)
+    # Grab the first two frames of channel 0
+    f1 = img.arr[0, 0]  # shape: (height, width)
+    f2 = img.arr[1, 0]  # shape: (height, width)
 
-#     #arguments for testing
-#     flow_args = {
-#         "pyr_scale": 0.5,
-#         "levels": 3,
-#         "winsize": 15,
-#         "iterations": 3,
-#         "poly_n": 5,
-#         "poly_sigma": 1.2,
-#         "flags": 0
-#     }
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
 
-#     my_flow = flow.optical_flow(channel, flow_args)
+    args = (f1, f2, flow_args)
+    my_flow = flow.compute_flow_pair(args)
 
-#     # Test output type
-#     assert isinstance(my_flow, np.ndarray)
+    # Test output type
+    assert isinstance(my_flow, np.ndarray)
 
-#     # Test output shape
-#     assert my_flow.shape == (f-1, h, w, 2)
+    # Test output shape
+    assert my_flow.shape == (h, w, 2)
 
-# def test_calculate_optical_flow(sample_tiff):
-#     """
-#     Tests whether the calculate_optical_flow function works correctly.
-#     """
-#     path, f, c, h, w = sample_tiff
-#     img = tiff.Tiff(path)
+def test_optical_flow(sample_tiff):
+    """
+    Tests whether the optical_flow function works correctly.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
+
+
+    # isolate channel for testing
+    channel = img.isolate_channel(0)
+
+    #arguments for testing
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
+
+    my_flow = flow.optical_flow(channel, **flow_args)
+
+    # Test output type
+    assert isinstance(my_flow, np.ndarray)
+
+    # Test output shape
+    assert my_flow.shape == (f-1, h, w, 2)
+
+def test_calculate_optical_flow(sample_tiff):
+    """
+    Tests whether the calculate_optical_flow function works correctly.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
 
     
-#     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
-#     process_args = {
-#         "normalize": True,
-#         "gaussian_blur": 3
-#     }
+    # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
+    process_args = {
+        "normalize": True,
+        "gaussian_blur": 3
+    }
 
-#     #arguments for testing
-#     flow_args = {
-#         "pyr_scale": 0.5,
-#         "levels": 3,
-#         "winsize": 15,
-#         "iterations": 3,
-#         "poly_n": 5,
-#         "poly_sigma": 1.2,
-#         "flags": 0
-#     }
+    #arguments for testing
+    flow_args = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0
+    }
 
-#     my_flow = flow.calculate_optical_flow(img.arr, process_args, flow_args, False)
+    my_flow = flow.calculate_optical_flow(img.arr, process_args)
 
-#     # Test output type
-#     assert isinstance(my_flow, np.ndarray)
+    # Test output type
+    assert isinstance(my_flow, np.ndarray)
 
-#     # Test output shape
-#     assert my_flow.shape == (f-1, h, w, 2)
+    # Test output shape
+    assert my_flow.shape == (f-1, h, w, 2)
 
 # def test_show_flow(sample_tiff, title='Optical Flow', 
 #               step : int = 25, figsize : int | int = (12,6), scale : int = 200, 

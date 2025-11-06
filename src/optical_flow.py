@@ -51,7 +51,7 @@ def compute_flow_pair(args) -> np.ndarray:
         flow_args['iterations'],
         flow_args['poly_n'],
         flow_args['poly_sigma'],
-        flow_args['flag'])
+        flow_args['flags'])
 
 def optical_flow(   arr : np.array,
                     pyr_scale : float = 0.5, 
@@ -60,7 +60,7 @@ def optical_flow(   arr : np.array,
                     iterations : int = 3, 
                     poly_n : int = 5, 
                     poly_sigma : float = 1.2,
-                    flag : int = 0) -> np.ndarray:
+                    flags : int = 0) -> np.ndarray:
     """
     Computes dense optical flow using Farneback method on a preprocessed channel. Allows manual
     changes to the params for optical flow.
@@ -87,7 +87,7 @@ def optical_flow(   arr : np.array,
         'iterations': iterations,
         'poly_n': poly_n,
         'poly_sigma': poly_sigma,
-        'flag': flag
+        'flags': flags
     }
     pairs = [(arr[i], arr[i+1], flow_args) for i in range(arr.shape[0] - 1)]
     with Pool(cpu_count()) as pool:
@@ -106,7 +106,9 @@ def calculate_optical_flow(arr: np.array, process_args=None, default=False):
         Returns:
             np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
         """
-        return optical_flow(tc.preprocess_stack(arr, process_args), 0.5, 3, 15, 3, 5, 1.2,0)
+        img = tc.Tiff(arr)
+        processed= img.preprocess_stack(img.arr, **process_args)
+        return optical_flow(processed)
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
                     step : int = 20, scale : int = 500, color : str = 'blue', 
