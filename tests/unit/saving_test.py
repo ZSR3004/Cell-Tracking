@@ -6,10 +6,9 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
    
-import pytest
+import cv2, json, pytest
 from src import tiffclass as tiff
 import matplotlib.pyplot as plt
-import json
 import numpy as np
 from pathlib import Path
 import matplotlib.animation as animation
@@ -20,7 +19,6 @@ def sample_tiff():
     path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
     f, c, h, w = 96, 3, 520, 2329
     return path, f, c, h, w
-
 
 
 
