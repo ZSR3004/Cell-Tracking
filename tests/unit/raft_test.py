@@ -231,11 +231,21 @@ class TestGetRAFTOpticalFlow(TensorHelpers):
 
 
 class TestMakeRAFTOutputArray(NdarrayHelpers):
-    def test_make_raft_output_array(self, init_tiff: tiff.Tiff) -> None:
+    def test_make_raft_output_array(
+        self, init_tiff: tiff.Tiff, init_torch_tensor: torch.Tensor
+    ) -> None:
         """
         Tests the make_raft_output_array function.
         """
-        raise NotImplementedError
+        tiff_file = init_tiff
+        ten = init_torch_tensor
+        flow = raft.get_raft_optical_flow(tiff_file, use_gpu=True)
+        flow_arr = raft.make_raft_output_array(flow)
+
+        self._check_if_float32_np(flow_arr)
+
+        expected_shape = (ten.shape[0] - 1, ten.shape[1], ten.shape[2], 2)
+        self._check_shape_np(flow_arr, expected_shape)
 
 
 class TestCalcOpticalFlowRAFT:
