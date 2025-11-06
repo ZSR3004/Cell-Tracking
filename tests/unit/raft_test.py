@@ -4,60 +4,84 @@ import numpy as np
 from src import raft
 from src import tiffclass as tiff
 
-
-@pytest.fixture
-def init_tiff():
-    original_path = (
-        "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-    )
-    return tiff.Tiff(original_path)
+TIFF_PATHS = [
+    "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
+]
 
 
-### pad_to_multiple_of_8 ###
-def _check_divisible_by_8():
-    raise NotImplementedError
+@pytest.fixture(params=TIFF_PATHS)
+def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+    return tiff.Tiff(request.param)
 
 
-def _check_preserved_values():
-    raise NotImplementedError
+class TensorHelpers:
+    def _check_if_float32_tensor(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def _check_shape(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def _check_normalization(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
 
 
-def _check_padding_behavior():
-    raise NotImplementedError
+class NdarrayHelpers:
+    def _check_if_float32_np(self, arr: np.ndarray) -> None:
+        raise NotImplementedError
+
+    def _check_shape_np(self, arr: np.ndarray) -> None:
+        raise NotImplementedError
+
+    def _check_normalization_np(self, arr: np.ndarray) -> None:
+        raise NotImplementedError
 
 
-def _check_no_change_over_device():
-    raise NotImplementedError
+class TestPadToMultipleOf8(TensorHelpers):
+    def _check_divisible_by_8(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def _check_preserved_values(self, ten: torch.Tensor, pad_ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def _check_idempotence(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def test_pad_to_multiple_of_8(self, init_tiff: tiff.Tiff) -> None:
+        raise NotImplementedError
 
 
-def _check_idempotence():
-    raise NotImplementedError
+class TestPreprocessTensor(TensorHelpers):
+    def test_preprocess_tensor(self, init_tiff: tiff.Tiff) -> None:
+        raise NotImplementedError
 
 
-def test_pad_to_multiple_of_8():
-    raise NotImplementedError
+class TestBatchFrames(TensorHelpers):
+    def test_batch_frames(self, init_tiff: tiff.Tiff) -> None:
+        raise NotImplementedError
 
 
-### preprocess_tensor ###
-def test_preprocess_tensor():
-    raise NotImplementedError
+class TestGetRAFTOpticalFlow(TensorHelpers):
+    def _check_model_size_logic(
+        self,
+        ten: torch.Tensor,
+    ) -> None:
+        raise NotImplementedError
+
+    def _check_if_custom_weights_used(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def _check_if_gpu_used(self, ten: torch.Tensor) -> None:
+        raise NotImplementedError
+
+    def test_get_raft_optical_flow(self, init_tiff: tiff.Tiff) -> None:
+        raise NotImplementedError
 
 
-### batch_frames ###
-def test_batch_frames():
-    raise NotImplementedError
+class TestMakeRAFTOutputArray(ndarrayHelpers):
+    def test_make_raft_output_array(self, init_tiff: tiff.Tiff) -> None:
+        raise NotImplementedError
 
 
-### get_raft_optical_flow ###
-def test_get_raft_optical_flow():
-    raise NotImplementedError
-
-
-### make_raft_output_array ###
-def test_make_raft_output_array():
-    raise NotImplementedError
-
-
-### calcOpticalFlowRAFT ###
-def test_calcOpticalFlowRAFT():
-    raise NotImplementedError
+class TestCalcOpticalFlowRAFT:
+    def test_calcOpticalFlowRAFT(self, init_tiff: tiff.Tiff) -> None:
+        raise NotImplementedError
