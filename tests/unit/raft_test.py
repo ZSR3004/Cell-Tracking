@@ -16,24 +16,24 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
 
 class TensorHelpers:
     def _check_if_float32_tensor(self, ten: torch.Tensor) -> None:
-        raise NotImplementedError
+        assert ten.dtype == torch.float32
 
     def _check_shape(self, ten: torch.Tensor, expected_shape: tuple[int, ...]) -> None:
-        raise NotImplementedError
+        assert ten.shape == expected_shape
 
     def _check_normalization(self, ten: torch.Tensor) -> None:
-        raise NotImplementedError
+        assert torch.all((ten >= 0) & (ten <= 255))
 
 
 class NdarrayHelpers:
     def _check_if_float32_np(self, arr: np.ndarray) -> None:
-        raise NotImplementedError
+        assert arr.dtype == np.float32
 
     def _check_shape_np(self, arr: np.ndarray, expected_shape: tuple[int, ...]) -> None:
-        raise NotImplementedError
+        assert arr.shape == expected_shape
 
     def _check_normalization_np(self, arr: np.ndarray) -> None:
-        raise NotImplementedError
+        assert np.all((arr >= 0) & (arr <= 255))
 
 
 class TestPadToMultipleOf8(TensorHelpers):
