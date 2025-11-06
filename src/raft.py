@@ -72,6 +72,7 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     """
     return ten[:-1], ten[1:]
 
+
 def get_raft_optical_flow(
     batches: tuple[torch.Tensor, torch.Tensor],
     model_size: ModelSize = ModelSize.SMALL,
@@ -79,7 +80,7 @@ def get_raft_optical_flow(
     gpu_flag: bool = False,
 ) -> torch.Tensor:
     device = torch.device("cuda" if gpu_flag and torch.cuda.is_available() else "cpu")
-    
+
     try:
         if model_size == ModelSize.SMALL:
             model = raft_small(progress=False).to(device)
@@ -89,21 +90,25 @@ def get_raft_optical_flow(
             model.load_state_dict(model_weights, strict=False)
         model.eval()
         batch_1, batch_2 = batches
-        
+
         with torch.no_grad():
             list_of_flows = model(batch_1.to(device), batch_2.to(device))
             flow = list_of_flows[-1]
         return flow.cpu()
-        
+
     except (torch.cuda.OutOfMemoryError, RuntimeError) as e:
         if "out of memory" in str(e).lower() and device.type == "cuda":
             torch.cuda.empty_cache()
             print("CUDA out of memory, falling back to CPU")
-            return get_raft_optical_flow(batches, model_size, model_weights, gpu_flag=False)
+            return get_raft_optical_flow(
+                batches, model_size, model_weights, gpu_flag=False
+            )
         elif "out of memory" in str(e).lower() and model_size == ModelSize.LARGE:
             torch.cuda.empty_cache()
             print("Out of memory with LARGE model, falling back to SMALL model")
-            return get_raft_optical_flow(batches, ModelSize.SMALL, model_weights, gpu_flag)
+            return get_raft_optical_flow(
+                batches, ModelSize.SMALL, model_weights, gpu_flag
+            )
         else:
             raise
 
