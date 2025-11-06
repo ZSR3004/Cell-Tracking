@@ -1,10 +1,9 @@
+import enum
 import torch
-import torchvision.transforms.functional as F
-import torch.nn.functional as F
-import torchvision.models.optical_flow as torch_of
 import numpy as np
 import tiffclass as tiff
-import enum
+import torch.nn.functional as F
+from torchvision.models.optical_flow import raft_large, raft_small
 
 
 class ModelSize(enum.IntEnum):
@@ -44,10 +43,10 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
         torch.Tensor: A preprocessed representation of the tiff_file; ready
             to be used in the RAFT model.
     """
-    arr = tiff_file.arr.copy()
+    arr = tiff_file.arr
     arr = arr[:, 0, ...]
     arr = tiff_file.preprocess_stack(arr, **kwargs)
-    arr = arr.astype("float32") / 65535.0
+    arr = arr.astype("float32") / np.iinfo(arr.dtype).max
 
     ten = (
         torch.from_numpy(arr).unsqueeze(1).repeat(1, 3, 1, 1)
@@ -72,29 +71,46 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     return ten[:-1], ten[1:]
 
 
-def calculate_raft_optical_flow(
+def get_raft_optical_flow(
     batches: tuple[torch.Tensor, torch.Tensor],
-    model_size: int = ModelSize.SMALL,
-    gpu_flag: bool = False,
+    model_size: ModelSize = ModelSize.SMALL,
+    model_weights: dict | None = None,
+    device_flag: bool = False,
 ) -> torch.Tensor:
     """
-    Determines the optical_flow of a tiff file using the
-    RAFT algorithm.
+    Computes optical flow between frame pairs using the RAFT model.
 
     Args:
-        batches: The two torch.Tensors that act as inputs for the
-            raft models.
-        model_size: If the small RAFT model or large RAFT model
-            should be use. The default is small.
-        gpu_flag: If the GPU should be used if available. Marking
-            this flag as False will use CPU no matter what. The
-            default is False.
+        batches: Tuple of two tensors (batch_1, batch_2),
+                 each of shape [f, 3, h, w].
+        model_size: Which RAFT variant to use (SMALL or LARGE).
+        model_weights: A loaded state_dict for the model, or None
+                       to use default pretrained weights.
+        device_flag: If True, use CUDA when available; else CPU.
 
     Returns:
-        torch.Tensor: Optical flow of the tiff file represented by
-            the batches.
+        torch.Tensor: Optical flow tensor [f, 2, h, w].
     """
-    raise NotImplementedError
+    device = torch.device(
+        "cuda" if device_flag and torch.cuda.is_available() else "cpu"
+    )
+
+    if model_size == ModelSize.SMALL:
+        model = raft_small(progress=False).to(device)
+    else:
+        model = raft_large(progress=False).to(device)
+
+    if model_weights is not None:
+        model.load_state_dict(model_weights, strict=False)
+
+    model.eval()
+    batch_1, batch_2 = batches
+
+    with torch.no_grad():
+        list_of_flows = model(batch_1.to(device), batch_2.to(device))
+        flow = list_of_flows[-1]
+
+    return flow.cpu()
 
 
 def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
@@ -103,8 +119,13 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
 
     Args:
         flow: The torch.Tensor representation of optical flow.
+            The shape is [f, 2, h, w]
 
     Returns:
         np.ndarray: The same representation, but as an np.ndarray.
+            The shape is [f, h, w, 2] to match the outputs of the
+            other optical flow models.
     """
-    raise NotImplementedError
+    ten = torch.permute(flow, (0, 2, 3, 1))
+    arr = torch.Tensor.numpy(ten)
+    return arr
