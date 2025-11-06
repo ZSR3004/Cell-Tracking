@@ -1,7 +1,7 @@
 import enum
 import torch
 import numpy as np
-import tiffclass as tiff
+from src import tiffclass as tiff
 import torch.nn.functional as F
 from torchvision.models.optical_flow import raft_large, raft_small
 

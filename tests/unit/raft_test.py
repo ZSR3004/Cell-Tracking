@@ -1,13 +1,19 @@
+import sys
+import os
+
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
 import torch
 import pytest
 import numpy as np
-from src import raft
 from src import tiffclass as tiff
+from src import raft
 
 TIFF_PATHS = [
     "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
 ]
-
 
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
