@@ -440,4 +440,59 @@ class TestCalcOpticalFlowRAFT:
         """
         Tests the calcOpticalFlowRAFT function.
         """
-        raise NotImplementedError
+        with patch("src.raft.raft_small") as mock_raft:
+            mock_model = type(
+                "MockModel",
+                (),
+                {
+                    "eval": lambda self: None,
+                    "to": lambda self, device: self,
+                    "load_state_dict": lambda self, weights, strict: None,
+                    "__call__": lambda self, b1, b2: [
+                        torch.zeros(b1.shape[0], 2, b1.shape[2], b1.shape[3])
+                    ],
+                },
+            )()
+            mock_raft.return_value = mock_model
+
+            result = raft.calcOpticalFlowRAFT(init_tiff)
+
+            assert isinstance(result, np.ndarray)
+            assert result.ndim == 4
+            assert result.shape[3] == 2
+
+            expected_frames = init_tiff.arr.shape[0] - 1
+            assert result.shape[0] == expected_frames
+
+    def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
+        """
+        Tests calcOpticalFlowRAFT with custom parameters.
+        """
+        custom_weights = {"layer1.weight": torch.randn(10, 10)}
+
+        with patch("src.raft.raft_large") as mock_raft:
+            mock_model = type(
+                "MockModel",
+                (),
+                {
+                    "eval": lambda self: None,
+                    "to": lambda self, device: self,
+                    "load_state_dict": lambda self, weights, strict: None,
+                    "__call__": lambda self, b1, b2: [
+                        torch.zeros(b1.shape[0], 2, b1.shape[2], b1.shape[3])
+                    ],
+                },
+            )()
+            mock_raft.return_value = mock_model
+
+            result = raft.calcOpticalFlowRAFT(
+                init_tiff,
+                model_size=raft.ModelSize.LARGE,
+                model_weights=custom_weights,
+                gpu_flag=False,
+            )
+
+            assert isinstance(result, np.ndarray)
+            assert result.shape[3] == 2
+
+            mock_raft.assert_called_once_with(progress=False)
