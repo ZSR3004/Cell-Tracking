@@ -90,8 +90,13 @@ def hi_save_original_video(sample_tiff, tmp_path):
     Tests whether the save_original_video method works correctly.
 
     Args:
-
-        tmp_path: A path to a temporary directory (this is a fixture in Pytest).
+        sample_tiff (tuple): A tuple containing information about the TIFF file:
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
 
     Return:
     """
@@ -99,8 +104,7 @@ def hi_save_original_video(sample_tiff, tmp_path):
 
     #finish this docstring
     #Note: i'm gonna use tmp_path by calling save_original_video and having it save the video to tmp_path
-    #finish once i ask Ziyad (who wrote this function) why we don't assert that im, image_stack, ax, and fig are not None. Because it breaks if either
-    #im, image_stack, ax, or fig are None
+    #Edit my test cases bc we edited Ziyad's function
 
     #what to assert: check if exists, check if not empty
     """
@@ -115,21 +119,75 @@ def hi_save_original_video(sample_tiff, tmp_path):
 
     raise NotImplemented
     
-def hi_show_image():
+def test_show_image(sample_tiff, tmp_path):
     """
     Tests whether the show_image method works correctly.
 
     Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file:
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
 
     Return:
         None
     """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
 
-    #finish this docstring
-    #ask if image is teh same as a frame. then use that info to get an image. if so then maybe preprocess the image using the preprocess function and
-    #then make sure preprocessed images also work?
+    kwargs1 = {"gauss": {"ksize": (7, 7), "sigmaX": 1.5}, "median": {"ksize": 9}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
+    kwargs2 = {"gauss": {"ksize": (7, 7)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
+    kwargs3 = {"gauss": {"sigmaX": 1.5}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
+
+    #image0 probably doesn't work because it has all channels
+    image0 = img.arr[0, :, :, :]
+    image1 = img.arr[0, 2, :, :]
+    image2 = img.arr[(f-1)//2, 0, :, :]
+    image3 = img.arr[f-1, 1, :, :]
+    image4 = img.preprocess_frame((img.arr[0, 1, :, :], kwargs1))
+    image5 = img.preprocess_frame((img.arr[(f-1)//2, 2, :, :], kwargs2))
+    image6 = img.preprocess_frame((img.arr[f-1, 0, :, :], kwargs3))
+
+    image0_save = img.show_image(image0)
+    """image0_show = img.show_image(image0,
+    image1_save = img.show_image(image1,
+    image1_show = img.show_image(image1,
+    image2_save = img.show_image(image1,
+    image2_show = img.show_image(image1,
+    image3_save = img.show_image(image1,
+    image3_show = img.show_image(image1,
+    image4_save = img.show_image(image1,
+    image4_show = img.show_image(image1,
+    image5_save = img.show_image(image1,
+    image5_show = img.show_image(image1,
+    image6_save = img.show_image(image1,
+    image6_show = img.show_image(image1,"""
+
+
+    """
+    #() all for everything 
+    #() no title
+    #() no title, no figsize
+    #() no title, no figsize, no save_path
+    #() no title, no figsize, save_path = None
+    #() no title, no save_path
+    #() no title, save_path = None
+    #() no figsize
+    #() no figsize, no save_path
+    #() no figsize, save_path = None
+    #() no figsize, no save_path
+    #() no figsize, save_path = None
+    #() no save_path
+    #() save_path = None
+
+
+    #note: an image is the same as a frame. 
+    #another test: preprocess the image using the preprocess function and then make sure preprocessed images also work
     #test both cases: if save_path is a str, and if it's None
-    #if save_path is a str, test if it's saved. If save_path is None, test if it's shown.
+    #if save_path is a str, test if it's saved to the right path (maybe a tmp_path?). If save_path is None, test if it's shown.
 
     #NOW RUN ALL THESE TESTS!
 
@@ -250,7 +308,7 @@ def hi_preprocess_frame(sample_tiff):
     assert kwargs5_preprocess_middle_frame.shape == middle_frame_channel_1.shape
     assert kwargs5_preprocess_last_frame.shape == last_frame_channel_2.shape
 
-def test_preprocess_stack(sample_tiff):
+def hi_preprocess_stack(sample_tiff):
     """
     Tests whether the preprocess_stack method works correctly.
 
