@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
-import matplotlib as plt
+import matplotlib.pyplot as plt
 from src import tiffclass as tc
 from src import saving as save
 
@@ -53,7 +53,7 @@ def compute_flow_pair(args) -> np.ndarray:
         flow_args['poly_sigma'],
         flow_args['flags'])
 
-def optical_flow(   arr : np.array,
+def optical_flow(   arr : np.array, channel : int,
                     pyr_scale : float = 0.5, 
                     levels : int = 3, 
                     winsize : int = 15,
@@ -67,6 +67,7 @@ def optical_flow(   arr : np.array,
 
     Args:
             - arr: np.arr, stack for optical flow processing
+            - channel: the channel for processing
             - pyr_scale: float, scale factor for pyramid
             - levels: int, number of pyramid levels
             - winsize: int, size of the window for averaging
@@ -89,7 +90,8 @@ def optical_flow(   arr : np.array,
         'poly_sigma': poly_sigma,
         'flags': flags
     }
-    pairs = [(arr[i], arr[i+1], flow_args) for i in range(arr.shape[0] - 1)]
+    arr_channel = arr[:, channel, :, :]
+    pairs = [(arr_channel[i], arr_channel[i+1], flow_args) for i in range(arr_channel.shape[0] - 1)]
     with Pool(cpu_count()) as pool:
         flow_list = pool.map(compute_flow_pair, pairs)
     return np.stack(flow_list)
@@ -106,9 +108,10 @@ def calculate_optical_flow(arr: np.array, process_args=None, default=False):
         Returns:
             np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
         """
-        img = tc.Tiff(arr)
-        processed= img.preprocess_stack(img.arr, **process_args)
-        return optical_flow(processed)
+        flow_channel0 = optical_flow(arr, 0)
+        flow_channel1 = optical_flow(arr, 1)
+        combined = combine_flows([flow_channel0, flow_channel1])
+        return combined
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
                     step : int = 20, scale : int = 500, color : str = 'blue', 
@@ -172,32 +175,6 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
                    })
 
     plt.close(fig)
-
-def save_optflow_video(name, flow, save_path, idx : int = 0, step : int = 20, 
-                                  scale : int = 500, color : str = 'blue', fps : int = 10, 
-                                  figsize : int | int = (12,8),
-                                  title : str = None, overlay : bool = False):
-    """
-        Saves a video visualizing the optical flow.
-    """
-    if overlay:
-        og_arr = tc.isolate_channel(idx)
-    else:
-        og_arr = None 
-
-        create_vector_field_video(
-            name, 
-            flow[:, idx, ...], 
-            og_arr, 
-            step=step, 
-            scale=scale,
-            color=color, 
-            fps=fps, 
-            figsize=figsize, 
-            title=title,
-            flag='f'
-        )
-    
 
 def show_flow(flow : np.array, title='Optical Flow', 
               step : int = 25, figsize : int | int = (12,6), scale : int = 200, 

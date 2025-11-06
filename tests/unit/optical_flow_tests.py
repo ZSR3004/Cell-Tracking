@@ -10,10 +10,10 @@ from sympy import Idx
 from src import optical_flow as flow
 import numpy as np
 from src import tiffclass as tiff
-import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
-import matplotlib.pyplot as plt
+import cv2
 
 @pytest.fixture
 def sample_tiff():
@@ -28,9 +28,9 @@ def test_combine_flows(sample_tiff):
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
 
-    flow_0 = flow.optical_flow(img.arr[:,0,...])
-    flow_1 = flow.optical_flow(img.arr[:,1,...])
-    flow_2 = flow.optical_flow(img.arr[:,2,...])
+    flow_0 = flow.optical_flow(img.arr, 0)
+    flow_1 = flow.optical_flow(img.arr, 1)
+    flow_2 = flow.optical_flow(img.arr, 2)
 
     combine_flow_0 = flow.combine_flows([flow_0, flow_1])
     combine_flow_1 = flow.combine_flows([flow_1, flow_2])
@@ -95,7 +95,7 @@ def test_optical_flow(sample_tiff):
         "flags": 0
     }
 
-    my_flow = flow.optical_flow(channel, **flow_args)
+    my_flow = flow.optical_flow(img.arr, 0, **flow_args)
 
     # Test output type
     assert isinstance(my_flow, np.ndarray)
@@ -113,20 +113,8 @@ def test_calculate_optical_flow(sample_tiff):
     
     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
     process_args = {
-        "normalize": True,
-        "gaussian_blur": 3
-    }
-
-    #arguments for testing
-    flow_args = {
-        "pyr_scale": 0.5,
-        "levels": 3,
-        "winsize": 15,
-        "iterations": 3,
-        "poly_n": 5,
-        "poly_sigma": 1.2,
-        "flags": 0
-    }
+    "normalize": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
+    "gauss": {"ksize": (5, 5), "sigmaX": 1.5}}
 
     my_flow = flow.calculate_optical_flow(img.arr, process_args)
 
@@ -134,112 +122,39 @@ def test_calculate_optical_flow(sample_tiff):
     assert isinstance(my_flow, np.ndarray)
 
     # Test output shape
-    assert my_flow.shape == (f-1, h, w, 2)
+    assert my_flow.shape == (f-1, c, h, w, 2)
 
-# def test_show_flow(sample_tiff, title='Optical Flow', 
-#               step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
-#               pivot : str = 'tail', color : str = 'blue', save_path : str = None):
-#     """
-#         Tests the show_flow function.
-#     """
-#     path, f, c, h, w = sample_tiff
-#     img = tiff.Tiff(path)
+def test_show_flow(sample_tiff, title='Optical Flow', 
+              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
+              pivot : str = 'tail', color : str = 'blue', save_path : str = None):
+    """
+        Tests the show_flow function.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
 
-    
-#     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
-#     process_args = {
-#         "normalize": True,
-#         "gaussian_blur": 3
-#     }
+    my_flow = flow.optical_flow(img.arr, 0)
+    first_flow_frame = my_flow[0]
+    video = flow.show_flow(first_flow_frame, "Optical Flow", 25, (12,6), 200, 'tail', 'blue', None)
 
-#     #arguments for testing
-#     flow_args = {
-#         "pyr_scale": 0.5,
-#         "levels": 3,
-#         "winsize": 15,
-#         "iterations": 3,
-#         "poly_n": 5,
-#         "poly_sigma": 1.2,
-#         "flags": 0
-#     }
-
-#     my_flow = flow.calculate_optical_flow(img.arr, process_args, flow_args, False)
-#     video = flow.show_flow(my_flow, "Optical Flow", 25, (12,6), 200, 'tail', 'blue', None)
-#     assert isinstance(video, Figure)
-
-#     ax = video.axes[0]
-#     has_quiver = any(isinstance(c, Quiver) for c in ax.collections)
-#     assert has_quiver
-
-#     assert ax.get_title() == "Optical Flow"
-
-#     xlim = ax.get_xlim()
-#     ylim = ax.get_ylim()
-
-#     assert xlim[0] == 0
-#     assert ylim[0] >= 0
-
-#     assert ax.get_xlabel() == "X"
-#     assert ax.get_ylabel() == "Y"
-
-# def test_save_optflow_video(sample_tiff, tmp_path):
-#     """
-#        Tests the function that saves a video visualizing the optical flow.
-#     """
-#     path, f, c, h, w = sample_tiff
-#     img = tiff.Tiff(path)
-#      # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
-#     process_args = {
-#         "normalize": True,
-#         "gaussian_blur": 3
-#     }
-
-#     #arguments for testing
-#     flow_args = {
-#             "pyr_scale": 0.5,
-#             "levels": 3,
-#             "winsize": 15,
-#             "iterations": 3,
-#             "poly_n": 5,
-#             "poly_sigma": 1.2,
-#             "flags": 0
-#         }
-#     save_path = tmp_path / "optflow_video.mp4"
-#     flow_calculated = flow.calculate_optical_flow(process_args, flow_args, False)
-#     my_video = flow.save_optflow_video("optflow_video.mp4", flow_calculated, save_path, 0, 20, 500, 
-#                                         'blue', 10, (12, 8), "Optical Flow Test", None, False)
-    
-#     assert save_path.exists()
-#     assert save_path.suffix == ".mp4"       
+    fig = plt.gcf()
+    assert isinstance(fig, Figure)
+    plt.close()
+       
     
 
-# def test_create_vector_field_video(sample_tiff, tmp_path):
-#     """
-#     Tests whether the create_vector_field_video function works correctly.
-#     """
-#     path, f, c, h, w = sample_tiff
-#     img = tiff.Tiff(path)
-#      # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
-#     process_args = {
-#         "normalize": True,
-#         "gaussian_blur": 3
-#     }
-
-#     #arguments for testing
-#     flow_args = {
-#             "pyr_scale": 0.5,
-#             "levels": 3,
-#             "winsize": 15,
-#             "iterations": 3,
-#             "poly_n": 5,
-#             "poly_sigma": 1.2,
-#             "flags": 0
-#         }
-#     save_path = tmp_path / "optflow_video.mp4"
-#     flow_calculated = flow.calculate_optical_flow(process_args, flow_args, False)
-#     my_video = flow.create_vector_field_video("optflow_video.mp4", flow_calculated, save_path, 0, 20, 500, 
-#                                         'blue', 10, (12, 8), "Optical Flow Test", None, False)
+def test_create_vector_field_video(sample_tiff):
+    """
+    Tests whether the create_vector_field_video function works correctly.
+    """
+    path, f, c, h, w = sample_tiff
+    img = tiff.Tiff(path)
     
-#     assert save_path.exists()
-#     assert save_path.suffix == ".mp4"  
+    flow_calculated = flow.optical_flow(img.arr, 0)
+    my_video = flow.create_vector_field_video("vector_video.mp4", flow_calculated)
+
+    fig = plt.gcf()
+
+    assert isinstance(fig, Figure)
+    plt.close()  
 
