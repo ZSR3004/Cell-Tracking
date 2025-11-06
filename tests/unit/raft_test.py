@@ -129,7 +129,9 @@ class TestPadToMultipleOf8(TensorHelpers):
             pad_ten (torch.Tensor): padded tensor.
         """
         og_shape = ten.shape
-        pad_ten_og_dims = pad_ten[:og_shape[0], :og_shape[1], :og_shape[2], :og_shape[3]]
+        pad_ten_og_dims = pad_ten[
+            : og_shape[0], : og_shape[1], : og_shape[2], : og_shape[3]
+        ]
         assert torch.equal(ten, pad_ten_og_dims)
 
     def _check_idempotence(self, ten: torch.Tensor) -> None:
@@ -192,6 +194,7 @@ class TestBatchFrames(TensorHelpers):
 
         assert torch.equal(batch2[0], ten[1])
         assert torch.equal(batch2[-1], ten[-1])
+
 
 class TestGetRAFTOpticalFlow:
     def _check_model_size_logic(
@@ -423,32 +426,32 @@ class TestMakeRAFTOutputArray(NdarrayHelpers):
         Tests the make_raft_output_array function using synthetic flow data.
         """
         flow = torch.randn(5, 2, 128, 256)
-        
+
         arr = raft.make_raft_output_array(flow)
-        
+
         expected_shape = (5, 128, 256, 2)
         self._check_if_float32_np(arr)
         self._check_shape_np(arr, expected_shape)
-        
+
         assert isinstance(arr, np.ndarray)
-        
+
     def test_make_raft_output_array_single_frame(self) -> None:
         """
         Tests with a single frame.
         """
         flow = torch.randn(1, 2, 64, 64)
         arr = raft.make_raft_output_array(flow)
-        
+
         assert arr.shape == (1, 64, 64, 2)
         assert isinstance(arr, np.ndarray)
-        
+
     def test_make_raft_output_array_dimension_order(self) -> None:
         """
         Tests that dimensions are correctly transposed from [f, 2, h, w] to [f, h, w, 2].
         """
         flow = torch.arange(2 * 2 * 3 * 4).reshape(2, 2, 3, 4).float()
         arr = raft.make_raft_output_array(flow)
-        
+
         assert arr.shape == (2, 3, 4, 2)
         assert arr[0, 0, 0, 0] == flow[0, 0, 0, 0].item()
         assert arr[0, 0, 0, 1] == flow[0, 1, 0, 0].item()
