@@ -57,7 +57,7 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
     return ten
 
 
-def batch_frames(t: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
+def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Batches frames together for use in RAFT model.
 
@@ -69,7 +69,7 @@ def batch_frames(t: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
                 The first tensor is t[0:len(t) - 1]. The second is
                 t[1:len(t)].
     """
-    raise NotImplementedError
+    return ten[:-1], ten[1:]
 
 
 def calculate_raft_optical_flow(
