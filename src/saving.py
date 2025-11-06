@@ -5,25 +5,25 @@ from pathlib import Path
 import matplotlib.animation as animation
 from defaults import default_process, default_flow, default_trajectory
 
-def save_arr(name: str, arr: np.array) -> None:
+def save_arr(name: str, arr: np.ndarray) -> None:
     """
     Saves a numpy array to a file.
     
     Args:
-        arr (np.array): The numpy array to save.
+        arr (np.ndarray): The numpy array to save.
     
     Returns:
         None: Just saves the array to a file.
     """
     return NotImplementedError
 
-def save_flow(name: str, arr: np.array):
+def save_flow(name: str, arr: np.ndarray):
     """
     Saves the optical flow array.
     
     Args:
         name (str): The name of the file.
-        arr (np.array): The optical flow or trajectory array to save, expected to be of shape (T, H, W, 2)
+        arr (np.ndarray): The optical flow or trajectory array to save, expected to be of shape (T, H, W, 2)
             where T is the number of frames, H is height, W is width, and the last dimension contains
             the flow vectors (dx, dy) or trajectory vectors.
     
@@ -32,16 +32,18 @@ def save_flow(name: str, arr: np.array):
     """
     return NotImplementedError
 
-def save_trajectory(name: str, ftag: str, arr: np.array) -> None:
+def save_trajectory(name: str, ftag: str, arr: np.ndarray) -> None:
     """
     Saves the trajectory flow array.
 
     Args:
         name (str): The name of the file.
-        arr (np.array): The optical flow or trajectory array to save, expected to be of shape (T, H, W, 2)
+        arr (np.ndarray): The optical flow or trajectory array to save, expected to be of shape (T, H, W, 2)
         ftag (str): The tag associated with the optical flow file the trajectory was derived from.
-            where T is the number of frames, H is height, W is width, and the last dimension contains
-            the flow vectors (dx, dy) or trajectory vectors.
+            - T is the number of frames
+            - H is height
+            - W is width
+            - The last dimension contains the flow vectors (dx, dy) or trajectory vectors.
     
     Returns:
         None: Just saves the array to a file.
@@ -63,6 +65,7 @@ def save_original_video(name: str, **kwargs) -> None:
         Returns:
             None: Just saves the video to the specified path.
     """
+    #ASK IF THIS IS THE SAME AS THE SAME FUNCTION FROM TIFFCLASS.PY AND IF SO CAN WE JUST CALL IT FROM TIFFCLASS.PY OR CAN WE COPY AND PASTE
     return NotImplementedError
 
 def save_vector_video(name: str, flag: str, **kwargs) -> None:
