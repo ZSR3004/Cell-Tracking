@@ -51,36 +51,36 @@ def save_trajectory(name: str, ftag: str, arr: np.ndarray) -> None:
     return NotImplementedError
 
 def save_original_video(self, name: str, file_path: str, im, image_stack, fig, ax, **kwargs) -> None:
-        """
-        Saves a video of image frames using matplotlib.
+    """
+    Saves a video of image frames using matplotlib.
 
-        Args:
-            name (str): Name of the video file to save.
-            file_path (str): The path to save the video file to.
-            im: Matplotlib image display object for the original frames.
-            image_stack: Image stack of shape (T, H, W).
-            fig: Matplotlib figure object for the plot.
-            ax: Matplotlib axes object for the plot.
-            **kwargs: Additional keyword arguments that include:
-                - T (int): Total number of frames in the image stack.
-                - fps (int): Frames per second for the video.
+    Args:
+        name (str): Name of the video file to save.
+        file_path (str): The path to save the video file to.
+        im: Matplotlib image display object for the original frames.
+        image_stack: Image stack of shape (T, H, W).
+        fig: Matplotlib figure object for the plot.
+        ax: Matplotlib axes object for the plot.
+        **kwargs: Additional keyword arguments that include:
+            - T (int): Total number of frames in the image stack.
+            - fps (int): Frames per second for the video.
 
-        Assumptions:
-            'T' is greater than or equal to image_stack.shape[0].
+    Assumptions:
+        'T' is greater than or equal to image_stack.shape[0].
 
-        Returns:
-            None: Just saves the video to the specified path.
-        """
-        T = kwargs.get('T', image_stack.shape[0])
-        fps = kwargs.get('fps', 10)
+    Returns:
+        None: Just saves the video to the specified path.
+    """
+    T = kwargs.get('T', image_stack.shape[0])
+    fps = kwargs.get('fps', 10)
 
-        def update(frame):
-            im.set_data(image_stack[frame])
-            ax.set_title(f"Frame {frame}")
+    def update(frame):
+        im.set_data(image_stack[frame])
+        ax.set_title(f"Frame {frame}")
 
-        ani = animation.FuncAnimation(fig, update, frames=T, interval=1000/fps, blit=False)
-        writer = animation.FFMpegWriter(fps=fps)
-        ani.save(file_path, writer=writer)
+    ani = animation.FuncAnimation(fig, update, frames=T, interval=1000/fps, blit=False)
+    writer = animation.FFMpegWriter(fps=fps)
+    ani.save(file_path, writer=writer)
 
 def save_vector_video(name: str, flag: str, **kwargs) -> None:
     """

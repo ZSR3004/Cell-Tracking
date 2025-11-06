@@ -7,14 +7,21 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
    
 import pytest
-#delete below?
 from src import tiffclass as tiff
 import matplotlib.pyplot as plt
+import json
 import numpy as np
+from pathlib import Path
+import matplotlib.animation as animation
+from defaults import default_process, default_flow, default_trajectory
+
+
 
 """
 Tests for all functions in saving.py will go here
 """
+
+
 
 def test_save_original_video(sample_tiff, tmp_path):
     """
@@ -30,6 +37,7 @@ def test_save_original_video(sample_tiff, tmp_path):
         tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
 
     Return:
+        None
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
