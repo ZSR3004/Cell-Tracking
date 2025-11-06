@@ -85,7 +85,7 @@ def hi_isolate_channel(sample_tiff):
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
 
-def hi_save_original_video(sample_tiff, tmp_path):
+def test_save_original_video(sample_tiff, tmp_path):
     """
     Tests whether the save_original_video method works correctly.
 
@@ -107,24 +107,23 @@ def hi_save_original_video(sample_tiff, tmp_path):
     #Edit my test cases bc we edited Ziyad's function
 
     #NOW RUN ALL THESE TESTS!
-    #Add to func below: "Note that running these tests will cause x windows to pop up...."
 
     #what to assert: check if exists, check if not empty
     """
-    also do if im, image_stack, ax, fig, T, or fps are None:
-        - case: im, image_stack, ax, fig, T, and fps are all not None
-        - case: im, image_stack, ax, fig, T, and fps are all None
-            - image_stack is (T, H, W)
-        - case: im, image_stack, fig, and fps are None. ax and T are not None.
-        - case: ax and T are None. im, image_stack, fig, and fps are not None.
-            - image_stack is (T, H, W, 3)
+    cases:
+        - T is there
+        - T is not there
+        - fps is there
+        - fps is not there
+        - image_stack is (T, H, W)
+        - image_stack is (T, H, W, 3)
     """
 
     raise NotImplemented
     
-def test_show_image(sample_tiff, tmp_path):
+def hi_show_image(sample_tiff, tmp_path):
     """
-    Tests whether the show_image method works correctly. 
+    Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file:
@@ -161,21 +160,6 @@ def test_show_image(sample_tiff, tmp_path):
 
     image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
     image1_show = img.show_image(image1, "image1_show", (10, 6), None)
-    image2_save = img.show_image(image2, title="image2_save", save_path=image2_save_path)
-    image2_show = img.show_image(image2, title="image2_show")
-    image3_save = img.show_image(image3, title="image3_save", figsize=(18, 16), save_path=image3_save_path)
-    image3_show = img.show_image(image3, title="image3_show", figsize=(7, 9), save_path=None)
-    image4_save = img.show_image(image4, title="image4_save", figsize=(5,7), save_path=image4_save_path)
-    image4_show = img.show_image(image4, title="image4_show")
-    image5_save = img.show_image(image5, title="image5_save", save_path=image5_save_path)
-    image5_show = img.show_image(image5, title="image5_show",figsize=(3,3))
-    image6_save = img.show_image(image6, "image6_save", figsize=(2,10), save_path=image6_save_path)
-    image6_show = img.show_image(image6, title="image6_show", save_path=None)
-
-    """
-    REVERT BACK:
-    image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
-    image1_show = img.show_image(image1, "image1_show", (10, 6), None)
     image2_save = img.show_image(image2, save_path=image2_save_path)
     image2_show = img.show_image(image2)
     image3_save = img.show_image(image3, figsize=(18, 16), save_path=image3_save_path)
@@ -186,7 +170,6 @@ def test_show_image(sample_tiff, tmp_path):
     image5_show = img.show_image(image5, figsize=(3,3))
     image6_save = img.show_image(image6, "image6_save", figsize=(2,10), save_path=image6_save_path)
     image6_show = img.show_image(image6, save_path=None)
-    """
 
     assert image1_save_path.exists()
     assert image2_save_path.exists()
