@@ -8,8 +8,9 @@ if ROOT_DIR not in sys.path:
 import torch
 import pytest
 import numpy as np
-from src import tiffclass as tiff
 from src import raft
+from src import tiffclass as tiff
+from unittest.mock import Mock, patch
 
 TIFF_PATHS = [
     "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
@@ -192,7 +193,7 @@ class TestBatchFrames(TensorHelpers):
         assert batch2[-1] == ten[-1]
 
 
-class TestGetRAFTOpticalFlow(TensorHelpers):
+class TestGetRAFTOpticalFlow:
     def _check_model_size_logic(
         self,
         ten: torch.Tensor,
@@ -203,7 +204,53 @@ class TestGetRAFTOpticalFlow(TensorHelpers):
         Args:
             ten (torch.Tensor): tensor to check.
         """
-        raise NotImplementedError
+        if ten.shape[0] >= 2:
+            batch_1 = ten[:2]
+            batch_2 = ten[:2]
+        else:
+            batch_1 = ten
+            batch_2 = ten
+        batches = (batch_1, batch_2)
+
+        with (
+            patch("src.raft.raft_small") as mock_small,
+            patch("src.raft.raft_large") as mock_large,
+        ):
+
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_small.return_value = mock_model
+            mock_large.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, model_size=raft.ModelSize.SMALL)
+            mock_small.assert_called_once_with(progress=False)
+            mock_large.assert_not_called()
+
+        with (
+            patch("src.raft.raft_small") as mock_small,
+            patch("src.raft.raft_large") as mock_large,
+        ):
+
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_small.return_value = mock_model
+            mock_large.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, model_size=raft.ModelSize.LARGE)
+            mock_large.assert_called_once_with(progress=False)
+            mock_small.assert_not_called()
 
     def _check_if_custom_weights_used(self, ten: torch.Tensor) -> None:
         """
@@ -212,7 +259,45 @@ class TestGetRAFTOpticalFlow(TensorHelpers):
         Args:
             ten (torch.Tensor): tensor to check.
         """
-        raise NotImplementedError
+        if ten.shape[0] >= 2:
+            batch_1 = ten[:2]
+            batch_2 = ten[:2]
+        else:
+            batch_1 = ten
+            batch_2 = ten
+        batches = (batch_1, batch_2)
+
+        custom_weights = {"layer1.weight": torch.randn(10, 10)}
+
+        with patch("src.raft.raft_small") as mock_raft:
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_raft.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, model_weights=custom_weights)
+            mock_model.load_state_dict.assert_called_once_with(
+                custom_weights, strict=False
+            )
+
+        with patch("src.raft.raft_small") as mock_raft:
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_raft.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, model_weights=None)
+            mock_model.load_state_dict.assert_not_called()
 
     def _check_if_gpu_used(self, ten: torch.Tensor) -> None:
         """
@@ -221,13 +306,115 @@ class TestGetRAFTOpticalFlow(TensorHelpers):
         Args:
             ten (torch.Tensor): tensor to check.
         """
-        raise NotImplementedError
+        if ten.shape[0] >= 2:
+            batch_1 = ten[:2]
+            batch_2 = ten[:2]
+        else:
+            batch_1 = ten
+            batch_2 = ten
+        batches = (batch_1, batch_2)
 
-    def test_get_raft_optical_flow(self, init_tiff: tiff.Tiff) -> None:
+        with (
+            patch("src.raft.raft_small") as mock_raft,
+            patch("torch.cuda.is_available", return_value=True),
+        ):
+
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_raft.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, gpu_flag=True)
+
+            call_args = mock_model.to.call_args_list[0][0][0]
+            assert call_args.type == "cuda"
+
+        with patch("src.raft.raft_small") as mock_raft:
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_raft.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, gpu_flag=False)
+
+            call_args = mock_model.to.call_args_list[0][0][0]
+            assert call_args.type == "cpu"
+
+        with (
+            patch("src.raft.raft_small") as mock_raft,
+            patch("torch.cuda.is_available", return_value=False),
+        ):
+
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            flow_output = torch.zeros(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model.return_value = [flow_output]
+            mock_raft.return_value = mock_model
+
+            raft.get_raft_optical_flow(batches, gpu_flag=True)
+
+            call_args = mock_model.to.call_args_list[0][0][0]
+            assert call_args.type == "cpu"
+
+    def test_get_raft_optical_flow(self, init_torch_tensor: torch.Tensor) -> None:
         """
         Tests the get_raft_optical_flow function.
         """
-        raise NotImplementedError
+        ten = init_torch_tensor
+
+        if ten.shape[0] >= 2:
+            batch_1 = ten[:2]
+            batch_2 = ten[:2]
+        else:
+            batch_1 = ten
+            batch_2 = ten
+
+        self._check_model_size_logic(ten)
+        self._check_if_custom_weights_used(ten)
+        self._check_if_gpu_used(ten)
+
+        with patch("src.raft.raft_small") as mock_raft:
+            expected_flow = torch.randn(
+                batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
+            )
+            mock_model = Mock()
+            mock_model.eval = Mock(return_value=None)
+            mock_model.to = Mock(return_value=mock_model)
+            mock_model.load_state_dict = Mock()
+            mock_model.return_value = [expected_flow]
+            mock_raft.return_value = mock_model
+
+            batches = (batch_1, batch_2)
+            result = raft.get_raft_optical_flow(batches)
+
+            assert result.shape == (
+                batch_1.shape[0],
+                2,
+                batch_1.shape[2],
+                batch_1.shape[3],
+            )
+
+            assert mock_model.call_count == 1
+
+            mock_model.eval.assert_called_once()
+
+            assert result.device.type == "cpu"
+
+            assert mock_model.to.call_count >= 1
 
 
 class TestMakeRAFTOutputArray(NdarrayHelpers):
