@@ -13,7 +13,7 @@ import json
 import numpy as np
 from pathlib import Path
 import matplotlib.animation as animation
-from defaults import default_process, default_flow, default_trajectory
+from src.defaults import default_process, default_flow, default_trajectory
 
 @pytest.fixture
 def sample_tiff():
@@ -129,3 +129,7 @@ def test_save_original_video(sample_tiff, tmp_path):
     assert os.path.getsize(stack5_kwargs3_path) > 0
     assert os.path.getsize(stack6_kwargs2_path) > 0
     assert os.path.getsize(stack6_kwargs4_path) > 0
+
+    print("name type", type("stack1_kwargs1"), "\nfile_path type", type(stack1_kwargs1_path), "\nim type", type(im_stack1), "\nimage_stack type", type(stack1), "\nfig type", type(fig), "\nax type", type(ax))
+
+    raise NotImplementedError

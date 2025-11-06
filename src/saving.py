@@ -50,14 +50,14 @@ def save_trajectory(name: str, ftag: str, arr: np.ndarray) -> None:
     """
     return NotImplementedError
 
-def save_original_video(self, name: str, file_path: str, im, image_stack, fig, ax, **kwargs) -> None:
+def save_original_video(self, name: str, file_path: str, im: animation.Figure, image_stack, fig, ax, **kwargs) -> None:
     """
     Saves a video of image frames using matplotlib.
 
     Args:
         name (str): Name of the video file to save.
         file_path (str): The path to save the video file to.
-        im: Matplotlib image display object for the original frames.
+        im (animation.Figure): Matplotlib image display object for the original frames.
         image_stack: Image stack of shape (T, H, W).
         fig: Matplotlib figure object for the plot.
         ax: Matplotlib axes object for the plot.
