@@ -46,6 +46,7 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
     """
     arr = tiff_file.arr.copy()
     arr = arr[:, 0, ...]
+    arr = tiff_file.preprocess_stack(arr, **kwargs)
     arr = arr.astype("float32") / 65535.0
 
     ten = (
