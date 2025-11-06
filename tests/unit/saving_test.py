@@ -21,8 +21,14 @@ def sample_tiff():
     f, c, h, w = 96, 3, 520, 2329
     return path, f, c, h, w
 
+
+
+
 """
 Tests for all functions in saving.py will go here
+Note: Caroline wrote test_save_original_video already. She had written this test function in test_tiffclass.py already, but then moved it because
+it turns out she needed to move the function save_original_video from tiffclass.py to test_tiffclass.py. If you have any questions about the
+test_save_original_video function please ask Caroline <3. Also Caroline did all the imports so you can ask her about those too :)
 """
 
 
