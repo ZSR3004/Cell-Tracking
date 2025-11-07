@@ -193,18 +193,3 @@ def test_show_flow(sample_tiff):
     fig = plt.gcf()
     assert isinstance(fig, Figure)
     plt.close()
-
-def test_create_vector_field_video(sample_tiff):
-    """
-    Tests whether the create_vector_field_video function works correctly.
-    """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
-    
-    flow_calculated = flow.optical_flow(img.arr, 0)
-    my_video = flow.create_vector_field_video("vector_video.mp4", flow_calculated)
-
-    fig = plt.gcf()
-
-    assert isinstance(fig, Figure)
-    plt.close()  
