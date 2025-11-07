@@ -5,6 +5,7 @@ import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
+
 import sys, os, pytest
 from sympy import Idx
 from src import optical_flow as flow
@@ -24,6 +25,17 @@ def sample_tiff():
 def test_combine_flows(sample_tiff):
     """
     Tests whether the combine_flows function works correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file:
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        
+    Returns:
+        None.
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -41,10 +53,20 @@ def test_combine_flows(sample_tiff):
     assert combine_flow_1.shape == (f-1, c, h, w, 2)
     assert combine_flow_2.shape == (f-1, c, h, w, 2)
 
-
 def test_compute_flow_pair(sample_tiff):
     """
     Tests whether the compute_flow_pair function works correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file:
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        
+    Returns:
+        None.
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -76,6 +98,17 @@ def test_compute_flow_pair(sample_tiff):
 def test_optical_flow(sample_tiff):
     """
     Tests whether the optical_flow function works correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file:
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        
+    Returns:
+        None.
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -106,6 +139,17 @@ def test_optical_flow(sample_tiff):
 def test_calculate_optical_flow(sample_tiff):
     """
     Tests whether the calculate_optical_flow function works correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file:
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        
+    Returns:
+        None.
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -124,11 +168,20 @@ def test_calculate_optical_flow(sample_tiff):
     # Test output shape
     assert my_flow.shape == (f-1, c, h, w, 2)
 
-def test_show_flow(sample_tiff, title='Optical Flow', 
-              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
-              pivot : str = 'tail', color : str = 'blue', save_path : str = None):
+def test_show_flow(sample_tiff):
     """
-        Tests the show_flow function.
+    Tests the show_flow function.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file:
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        
+    Returns:
+        None.
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
@@ -140,8 +193,6 @@ def test_show_flow(sample_tiff, title='Optical Flow',
     fig = plt.gcf()
     assert isinstance(fig, Figure)
     plt.close()
-       
-    
 
 def test_create_vector_field_video(sample_tiff):
     """
@@ -157,4 +208,3 @@ def test_create_vector_field_video(sample_tiff):
 
     assert isinstance(fig, Figure)
     plt.close()  
-

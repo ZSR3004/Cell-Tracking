@@ -11,7 +11,7 @@ def combine_flows(flow_list : list) -> np.ndarray:
     Temporary function to combine different channels into one array.
 
     Args:
-        flow_list (list[np.array]): List of numpy arrays to be combined.
+        flow_list (list[np.ndarray]): List of numpy arrays to be combined.
 
     Returns:
         combined: combined stack of summed and original flows.
@@ -53,7 +53,7 @@ def compute_flow_pair(args) -> np.ndarray:
         flow_args['poly_sigma'],
         flow_args['flags'])
 
-def optical_flow(   arr : np.array, channel : int,
+def optical_flow(   arr : np.ndarray, channel : int,
                     pyr_scale : float = 0.5, 
                     levels : int = 3, 
                     winsize : int = 15,
@@ -96,7 +96,7 @@ def optical_flow(   arr : np.array, channel : int,
         flow_list = pool.map(compute_flow_pair, pairs)
     return np.stack(flow_list)
 
-def calculate_optical_flow(arr: np.array, process_args=None, default=False):
+def calculate_optical_flow(arr: np.ndarray, process_args=None, default=False):
         """
         Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
 
@@ -113,7 +113,7 @@ def calculate_optical_flow(arr: np.array, process_args=None, default=False):
         combined = combine_flows([flow_channel0, flow_channel1])
         return combined
 
-def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
+def create_vector_field_video(name : str, arr : np.ndarray, og_arr : np.ndarray=None, 
                     step : int = 20, scale : int = 500, color : str = 'blue', 
                     fps : int = 10, figsize : int | int = (12,8),
                     title : str = None, flag : str = None) -> None:
@@ -176,7 +176,64 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
 
     plt.close(fig)
 
-def show_flow(flow : np.array, title='Optical Flow', 
+    #EDIT THIS FUNCTION SO IT WORKS.
+    #Caroline thinks this doesn't work because it says "og_arr (np.ndarray): Original image frames array of shape (T, H, W, C). Default is None."
+    #However, sample_tiff and other stuff assume the shape is (T, C, H, W). I think we need to make everything everywhere have the shape (T, C, H, W).
+    #Caroline also thinks this doesn't work because it calls save.save_vector_video, and save refers to saving.py, which is currently not implemented.
+    #Caroline also thinks this doesn't work because she doesn't think there's a specified path to save the video to (so where does it save the video to?).
+    #Add to or edit the tests for this function!
+    raise NotImplementedError
+
+def save_optflow_video(name : str, flow : np.ndarray, save_path, idx : int = 0, step : int = 20, 
+                                  scale : int = 500, color : str = 'blue', fps : int = 10, 
+                                  figsize : int | int = (12,8),
+                                  title : str = None, overlay : bool = False):
+    """
+    Saves a video visualizing the optical flow.
+
+    Args:
+        name (str): Name of the video file to save.
+        flow (np.ndarray):
+        save_path ():
+        idx (int):
+        step (int): Step size for downsampling the flow vectors for visualization. Default is 20.
+        scale (int): Scale factor for the quiver arrows. Default is 500.
+        color (str): Color of the arrows. Default is 'blue'.
+        fps (int): Frames per second for the video. Default is 10.
+        figsize (tuple): Figure size in inches (width, height). Default is (12, 8).
+        title (str): Title of the video. Default is None.
+        overlay (bool):
+
+    Returns:
+        None
+    """
+    if overlay:
+        og_arr = tc.Tiff.isolate_channel(idx)
+    else:
+        og_arr = None 
+
+    create_vector_field_video(
+        name, 
+        flow[:, idx, ...], 
+        og_arr, 
+        step=step, 
+        scale=scale,
+        color=color, 
+        fps=fps, 
+        figsize=figsize, 
+        title=title,
+        flag='f'
+    )
+
+    #EDIT THIS FUNCTION SO IT WORKS.
+    #Caroline thinks this doesn't work because it doesn't use save_path (so where does it save it to?). Maybe that means it never saves to anywhere.
+    #Caroline also thinks this doesn't work because it calls create_vector_field_video, which has errors.
+    #Also finish the Args part of the docstring
+    #And add save_path's type to the parameters of the function
+    #Add to or edit the tests for this function!
+    raise NotImplementedError
+
+def show_flow(flow : np.ndarray, title='Optical Flow', 
               step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
               pivot : str = 'tail', color : str = 'blue', save_path : str = None) -> None:
     """
