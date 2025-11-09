@@ -14,7 +14,7 @@ def combine_flows(flow_list : list) -> np.ndarray:
         flow_list (list[np.ndarray]): List of numpy arrays to be combined.
 
     Returns:
-        combined: combined stack of summed and original flows.
+        combined (np.ndarray): Combined stack of summed and original flows.
     """
 
     sum_arr = flow_list[0] + flow_list[1]
@@ -28,16 +28,16 @@ def compute_flow_pair(args) -> np.ndarray:
 
     Args:
         args (tuple): A tuple containing two frames and flow arguments.
-            - f1: First frame (np.ndarray).
-            - f2: Second frame (np.ndarray).
-            - flow_args: Dictionary with parameters for optical flow calculation.
-                - pyr_scale: float, scale factor for pyramid
-                - levels: int, number of pyramid levels
-                - winsize: int, size of the window for averaging
-                - iterations: int, number of iterations at each pyramid level
-                - poly_n: int, size of the pixel neighborhood
-                - poly_sigma: float, standard deviation of the Gaussian used for polynomial expansion
-                - flag: int, operation flags
+            - f1 (np.ndarray): First frame.
+            - f2 (np.ndarray): Second frame.
+            - flow_args (dict): Dictionary with parameters for optical flow calculation.
+                - pyr_scale (float): Scale factor for pyramid.
+                - levels (int): Number of pyramid levels.
+                - winsize (int): Size of the window for averaging.
+                - iterations (int): Number of iterations at each pyramid level.
+                - poly_n (int): Size of the pixel neighborhood.
+                - poly_sigma (float): Standard deviation of the Gaussian used for polynomial expansion.
+                - flag (int): Operation flags
 
     Returns:
         np.ndarray: Optical flow vectors for the pair of frames.
@@ -53,34 +53,38 @@ def compute_flow_pair(args) -> np.ndarray:
         flow_args['poly_sigma'],
         flow_args['flags'])
 
-def optical_flow(   arr : np.ndarray, channel : int,
-                    pyr_scale : float = 0.5, 
-                    levels : int = 3, 
-                    winsize : int = 15,
-                    iterations : int = 3, 
-                    poly_n : int = 5, 
-                    poly_sigma : float = 1.2,
-                    flags : int = 0) -> np.ndarray:
+def optical_flow(arr : np.ndarray, channel : int,
+                 pyr_scale : float = 0.5, 
+                 levels : int = 3, 
+                 winsize : int = 15,
+                 iterations : int = 3, 
+                 poly_n : int = 5, 
+                 poly_sigma : float = 1.2,
+                 flags : int = 0) -> np.ndarray:
     """
     Computes dense optical flow using Farneback method on a preprocessed channel. Allows manual
     changes to the params for optical flow.
 
     Args:
-            - arr: np.arr, stack for optical flow processing
-            - channel: the channel for processing
-            - pyr_scale: float, scale factor for pyramid
-            - levels: int, number of pyramid levels
-            - winsize: int, size of the window for averaging
-            - iterations: int, number of iterations at each pyramid level
-            - poly_n: int, size of the pixel neighborhood
-            - poly_sigma: float, standard deviation of the Gaussian used for polynomial expansion
-            - flags: int, operation flags
-            - **kwargs: dict with keys for preprocessing (see preprocess_frame)
+        - arr (np.ndarray): Stack for optical flow processing.
+        - channel (int): The channel for processing.
+        - pyr_scale (float): Scale factor for pyramid.
+        - levels (int): Number of pyramid levels.
+        - winsize (int): Size of the window for averaging.
+        - iterations (int): Number of iterations at each pyramid level.
+        - poly_n (int): Size of the pixel neighborhood.
+        - poly_sigma (float): Standard deviation of the Gaussian used for polynomial expansion.
+        - flags (int): Operation flags.
+        - kwargs (dict): Keys for preprocessing:
+            - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+            - median (dict): {'ksize': int}
+            - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+            - contrast (dict): {'alpha': float, 'beta': int}
+            - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
                 
     Returns:
         np.ndarray: (N-1, H, W, 2) flow vectors between frames.
     """ 
- 
     flow_args = {
         'pyr_scale': pyr_scale,
         'levels': levels,
@@ -96,22 +100,22 @@ def optical_flow(   arr : np.ndarray, channel : int,
         flow_list = pool.map(compute_flow_pair, pairs)
     return np.stack(flow_list)
 
-def calculate_optical_flow(arr: np.ndarray, process_args=None, default=False):
-        """
-        Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
+def calculate_optical_flow(arr: np.ndarray, process_args=None, default=False) -> np.ndarray:
+    """
+    Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
 
-        Args:
-            process_args (dict): Preprocessing steps and parameters.
-            flow_args (dict): Parameters for optical flow calculation.
-            default (bool): Use default optical flow parameters if True.
+    Args:
+        process_args (dict): Preprocessing steps and parameters.
+        flow_args (dict): Parameters for optical flow calculation.
+        default (bool): Use default optical flow parameters if True.
 
-        Returns:
-            np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
-        """
-        flow_channel0 = optical_flow(arr, 0)
-        flow_channel1 = optical_flow(arr, 1)
-        combined = combine_flows([flow_channel0, flow_channel1])
-        return combined
+    Returns:
+        np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
+    """
+    flow_channel0 = optical_flow(arr, 0)
+    flow_channel1 = optical_flow(arr, 1)
+    combined = combine_flows([flow_channel0, flow_channel1])
+    return combined
 
 def show_flow(flow : np.ndarray, title='Optical Flow', 
               step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
