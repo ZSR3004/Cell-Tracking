@@ -113,7 +113,7 @@ def test_optical_flow(sample_tiff):
 
     #arguments for testing
     flow_args1 = {
-        "pyr_scale": 1.5,
+        "pyr_scale": 0.75,
         "levels": 5,
         "winsize": 17,
         "iterations": 5,
