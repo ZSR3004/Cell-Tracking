@@ -53,20 +53,20 @@ def compute_flow_pair(args) -> np.ndarray:
         flow_args['poly_sigma'],
         flow_args['flags'])
 
-def optical_flow(   arr : np.ndarray, channel : int,
-                    pyr_scale : float = 0.5, 
-                    levels : int = 3, 
-                    winsize : int = 15,
-                    iterations : int = 3, 
-                    poly_n : int = 5, 
-                    poly_sigma : float = 1.2,
-                    flags : int = 0) -> np.ndarray:
+def optical_flow(arr : np.ndarray, channel : int,
+                pyr_scale : float = 0.5, 
+                levels : int = 3, 
+                winsize : int = 15,
+                iterations : int = 3, 
+                poly_n : int = 5, 
+                poly_sigma : float = 1.2,
+                flags : int = 0) -> np.ndarray:
     """
     Computes dense optical flow using Farneback method on a preprocessed channel. Allows manual
     changes to the params for optical flow.
 
     Args:
-        - arr (np.arr): Stack for optical flow processing.
+        - arr (np.ndarray): Stack for optical flow processing.
         - channel (int): The channel for processing.
         - pyr_scale (float): Scale factor for pyramid.
         - levels (int): Number of pyramid levels.
