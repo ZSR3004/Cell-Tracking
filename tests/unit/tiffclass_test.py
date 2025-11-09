@@ -54,7 +54,7 @@ def test_isolate_channel(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+            - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.

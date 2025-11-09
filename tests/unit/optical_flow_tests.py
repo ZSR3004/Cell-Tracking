@@ -28,7 +28,7 @@ def test_combine_flows(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+            - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -48,7 +48,6 @@ def test_combine_flows(sample_tiff):
     combine_flow_1 = flow.combine_flows([flow_1, flow_2])
     combine_flow_2 = flow.combine_flows([flow_0, flow_2])
 
-
     assert combine_flow_0.shape == (f-1, c, h, w, 2)
     assert combine_flow_1.shape == (f-1, c, h, w, 2)
     assert combine_flow_2.shape == (f-1, c, h, w, 2)
@@ -59,7 +58,7 @@ def test_compute_flow_pair(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+            - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -70,7 +69,6 @@ def test_compute_flow_pair(sample_tiff):
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
-
 
     # Grab the first two frames of channel 0
     f1 = img.arr[0, 0]  # shape: (height, width)
@@ -101,7 +99,7 @@ def test_optical_flow(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+            - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -112,7 +110,6 @@ def test_optical_flow(sample_tiff):
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
-
 
     # isolate channel for testing
     channel = img.isolate_channel(0)
@@ -142,7 +139,7 @@ def test_calculate_optical_flow(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+            - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -153,7 +150,6 @@ def test_calculate_optical_flow(sample_tiff):
     """
     path, f, c, h, w = sample_tiff
     img = tiff.Tiff(path)
-
     
     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
     process_args = {
@@ -174,7 +170,7 @@ def test_show_flow(sample_tiff):
 
     Args:
         sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+            - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
