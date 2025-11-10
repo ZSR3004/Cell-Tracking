@@ -1,0 +1,9 @@
+# Core
+.venv/
+.gitignore
+.vscode/
+
+# Machine Code
+**/__pycache__
+**/.DS_Store
+
