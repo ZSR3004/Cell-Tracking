@@ -7,6 +7,44 @@ import matplotlib.animation as animation
 from src.defaults import default_process, default_flow, default_trajectory
 import matplotlib.image, matplotlib.figure, matplotlib.axes
 
+#UPDATE THESE
+main_path = Path.cwd() / "CellFlow" # update this to make it desktop
+inbox_path = main_path / "inbox"
+types_path = main_path / "types.json"
+
+def init_memory() -> None:
+    """
+    Initializes memory for the application.
+
+    This creates a main folder 'OpticalFlow' on the user's Desktop, along with a 'types.json'
+    file if it doesn't already exist.
+
+    You can find a detailed description of this directory's structure under the README on Github.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER! IT MIGHT BE IN CELL_FLOW_TRACKING'S MEMORY.PY. BUT WE MIGHT HAVE TO EDIT IT
+    return NotImplementedError
+
+def get_unique_path(name, file_type, pattern_fn) -> Path:
+    """
+    Generates a unique file path in the given directory based on a naming pattern.
+
+    Args:
+        name (str): Main identifier (e.g., protein name).
+        file_type (str): Subdirectory (e.g., 'flow', 'trajectory').
+        pattern_fn (callable): Function that takes an integer and returns a file name.
+
+    Returns:
+        Path: Unique file path that does not yet exist.
+    """
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER! IT MIGHT BE IN CELL_FLOW_TRACKING'S MEMORY.PY. BUT WE MIGHT HAVE TO EDIT IT
+    return NotImplementedError
+
 def save_arr(name: str, arr: np.ndarray) -> None:
     """
     Saves a numpy array to a file.
@@ -17,12 +55,52 @@ def save_arr(name: str, arr: np.ndarray) -> None:
     Returns:
         None: Just saves the array to a file.
     """
-    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
+    #Caroline
+    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER! IT MIGHT BE IN CELL_FLOW_TRACKING'S MEMORY.PY. BUT WE MIGHT HAVE TO EDIT IT
+    return NotImplementedError
+
+def save_optical_flow_as_xyz() -> None:
+    """
+    Saves the optical flow array as an XYZ array.
+
+    Args:
+        ADD
+    
+    Returns:
+        ADD
+    """
+    #Caroline
+    return NotImplementedError
+
+def save_optical_flow_as_matlab() -> None:
+    """
+    Saves the optical flow array as a MATLAB array.
+
+    Args:
+        ADD
+    
+    Returns:
+        ADD
+    """
+    #Caroline
+    return NotImplementedError
+
+def save_optical_flow_as_numpy() -> None:
+    """
+    Saves the optical flow array as a numpy array.
+
+    Args:
+        ADD
+    
+    Returns:
+        ADD
+    """
+    #Caroline
     return NotImplementedError
 
 def save_flow(name: str, arr: np.ndarray):
     """
-    Saves the optical flow array.
+    Saves the optical flow array as an XYZ array, as a MATLAB array, and as a numpy array.
     
     Args:
         name (str): The name of the file.
@@ -31,28 +109,11 @@ def save_flow(name: str, arr: np.ndarray):
             the flow vectors (dx, dy) or trajectory vectors.
     
     Returns:
-        None: Just saves the array to a file.
+        None: Just saves the array as an XYZ array, as a MATLAB array, and as a numpy array..
     """
-    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
-    return NotImplementedError
-
-def save_trajectory(name: str, ftag: str, arr: np.ndarray) -> None:
-    """
-    Saves the trajectory flow array.
-
-    Args:
-        name (str): The name of the file.
-        arr (np.ndarray): The optical flow or trajectory array to save, expected to be of shape (T, H, W, 2)
-        ftag (str): The tag associated with the optical flow file the trajectory was derived from.
-            - T is the number of frames
-            - H is height
-            - W is width
-            - The last dimension contains the flow vectors (dx, dy) or trajectory vectors.
-    
-    Returns:
-        None: Just saves the array to a file.
-    """
-    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
+    #Caroline
+    #Call XYZ function, MATLAB function, and numpy function
+    #Maybe not: CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER! IT MIGHT BE IN CELL_FLOW_TRACKING'S MEMORY.PY. BUT WE MIGHT HAVE TO EDIT IT
     return NotImplementedError
 
 def save_original_video(name: str, file_path: pathlib.PosixPath, im: matplotlib.image.AxesImage, image_stack: np.ndarray, fig: matplotlib.figure.Figure, ax: matplotlib.axes._axes.Axes, **kwargs) -> None:
@@ -86,45 +147,3 @@ def save_original_video(name: str, file_path: pathlib.PosixPath, im: matplotlib.
     ani = animation.FuncAnimation(fig, update, frames=T, interval=1000/fps, blit=False)
     writer = animation.FFMpegWriter(fps=fps)
     ani.save(file_path, writer=writer)
-
-def save_vector_video(name: str, flag: str, **kwargs) -> None:
-    """
-    Creates a video of optical flow vectors overlaid on the original image frames.
-
-    Args:
-        name (str): Name of the video file to save.
-        flag (str): Flag to determine the type of video being saved.
-        **kwargs: Additional keyword arguments that include:
-            - img_disp: Matplotlib image display object for the original frames.
-            - arr: Optical flow array of shape (T, H, W, 2) where T is the number of frames,
-                   H is height, W is width, and the last dimension contains the flow vectors (dx, dy).
-            - og_arr: Original image frames array of shape (T, H, W, C). Default is None.
-            - step: Step size for downsampling the flow vectors for visualization. Default is 20.
-            - fps: Frames per second for the video. Default is 10.
-            - quiver: Matplotlib quiver object for displaying flow vectors.
-            - ax: Matplotlib axes object for the plot.
-            - fig: Matplotlib figure object for the plot.
-            - T_minus_1: Total number of frames minus one (T-1).
-    Returns:
-        None: Just saves the video to the specified path.
-
-    Invariant:
-        Assumes, that all values are present in kwargs and are of the correct type. The check occurs in the
-        `create_optical_flow_video` function (in TiffVisualize.py) before this function is called.
-    """
-    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
-    return NotImplementedError
-
-def load_params(stacktype: str) -> dict:
-    """
-    Loads parameters from types.json.
-
-    Args:
-        stacktype (str): The type of cell.
-    
-    Returns:
-        params (dict): Dictionary of parameters.
-    """
-    #ALSO ADD THE OPTIONS FOR STACKTYPE. FOR EXAMPLE NUCLEI, CYTOPLASM, ETC. (IDK)
-    #CHECK IF ZIYAD HAS ALREADY WRITTEN THIS FUNCTION IN HIS OTHER REPO HE DID OVER THE SUMMER!
-    return NotImplementedError
