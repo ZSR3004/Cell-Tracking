@@ -9,8 +9,44 @@ from src import optical_flow as of
 from src import raft
 import numpy as np
 
-def calculate_nuclei_optical_flow(arr: np.ndarray) -> np.ndarray:
-    raise NotImplementedError
+def calculate_nuclei_optical_flow(arr: np.ndarray, channel: int) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
 
-def calculate_phase_optical_flow(arr: np.ndarray) -> np.ndarray:
-    raise NotImplementedError
+    Args:
+      arr: The stack from the initialized tiff class
+    
+    Returns:
+      The optical flow array. 
+      """
+    return of.optical_flow(arr, channel)
+
+def calculate_combined_flow(arr: np.ndarray) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
+
+    Args:
+      arr: The stack from the initialized tiff class
+    
+    Returns:
+      The optical flow array from combining the channels. 
+      """
+    return of.calculate_optical_flow(arr)
+
+def calculate_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
+
+    Args:
+      tiff = a Tiff class
+      **kwargs: Dictionary with preprocessing parameters:
+            - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+            - median (dict): {'ksize': int}
+            - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+            - contrast (dict): {'alpha': float, 'beta': int}
+            - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
+    
+    Returns:
+      The preprocessed stack (as a numpy array.)
+      """
+    return raft.calcOpticalFlowRAFT(arr)
