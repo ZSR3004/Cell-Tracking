@@ -1,4 +1,4 @@
-#Will have kymograph, heatmap, tiff video visualization and optical flow visualization (the vector field)
+import numpy as np
 from src import heatmap as hm
 from src import kymograph as kg
 from src import tiffclass as tiff
@@ -42,7 +42,7 @@ def show_kymograph():
      raise NotImplementedError
 
 def show_tiff_image(self, image: np.ndarray, title='Image', figsize=(12, 8), save_path=None) -> None:
-     """
+    """
     Displays or saves an image using matplotlib.
 
     Args:
@@ -57,6 +57,6 @@ def show_tiff_image(self, image: np.ndarray, title='Image', figsize=(12, 8), sav
     Returns:
         None
     """
-     
-
+    raise NotImplementedError
+ 
      
