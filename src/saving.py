@@ -2,7 +2,6 @@ import os
 import json
 import numpy as np
 import pathlib
-from pathlib import Path
 import matplotlib.animation as animation
 from src import tiffclass as tiff
 from src.defaults import default_process, default_flow, default_trajectory
@@ -33,19 +32,19 @@ def get_unique_path(name: str, file_type: str, pattern_fn, main_path: str) -> Pa
             return file_path
         i += 1
 
-def save_arr(name: str, tiff: tiff.Tiff, main_path: str) -> None:
+def save_arr(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
     """
     Saves a numpy array (from the Tiff class) to a file.
     
     Args:
         name (str): Name of the numpy array.
-        tiff (Tiff.tiff): Instance of the Tiff class.
+        tiff_instance (Tiff.tiff): Instance of the Tiff class.
         main_path (str): Main path to the directory.
     
     Returns:
         None: Just saves the array to a file.
     """
-    tiff_arr = tiff.arr
+    tiff_arr = tiff_instance.arr
     np.save(main_path / name / 'arr', tiff_arr)
 
 def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
@@ -96,13 +95,13 @@ def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
     #the numpy array is a numpy array in the ram. you need to save it to the hard drive using np.save()
     return NotImplementedError
 
-def save_original_video(name: str, file_path: pathlib.PosixPath, im: matplotlib.image.AxesImage, image_stack: np.ndarray, fig: matplotlib.figure.Figure, ax: matplotlib.axes._axes.Axes, **kwargs) -> None:
+def save_original_video(name: str, file_path: str, im: matplotlib.image.AxesImage, image_stack: np.ndarray, fig: matplotlib.figure.Figure, ax: matplotlib.axes._axes.Axes, **kwargs) -> None:
     """
     Saves a video of image frames using matplotlib.
 
     Args:
         name (str): Name of the video file to save.
-        file_path (pathlib.PosixPath): The path to save the video file to.
+        file_path (str): The path to save the video file to.
         im (matplotlib.image.AxesImage): Matplotlib image display object for the original frames.
         image_stack (np.ndarray): Image stack of shape (T, H, W).
         fig (matplotlib.figure.Figure): Matplotlib figure object for the plot.
