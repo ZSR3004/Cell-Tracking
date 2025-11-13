@@ -2,6 +2,7 @@ import os
 import json
 import numpy as np
 import pathlib
+from pathlib import Path
 import matplotlib.animation as animation
 from src import tiffclass as tiff
 from src.defaults import default_process, default_flow, default_trajectory
