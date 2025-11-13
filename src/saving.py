@@ -61,6 +61,7 @@ def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
     """
     #Caroline
     #turn optical flow array into xyz array and then save it to the folder
+    #first figure out the shape of the optical flow array
     #you need to save it to the hard drive. Do it using np.save()
     return NotImplementedError
 
@@ -77,6 +78,7 @@ def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
     """
     #Caroline
     #turn optical flow array into matlab array and then save it to the folder
+    #first figure out the shape of the optical flow array
     #you need to save it to the hard drive. Do it using np.save()
     return NotImplementedError
 
@@ -93,6 +95,7 @@ def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
     """
     #Caroline
     #turn optical flow array into numpy array and then save it to the folder
+    #first figure out the shape of the optical flow array
     #the numpy array is a numpy array in the ram. you need to save it to the hard drive using np.save()
     return NotImplementedError
 
