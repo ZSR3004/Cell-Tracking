@@ -4,7 +4,7 @@ from src import kymograph as kg
 from src import tiffclass as tiff
 import optical_flow_cli as ofc
 
-def show_vector_magnitude_heatmaps(flow, normalize=True):
+def show_heatmaps(flow, normalize=True):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
@@ -16,7 +16,7 @@ def show_vector_magnitude_heatmaps(flow, normalize=True):
     Returns:
         None, just visualizes the heatmap
     """
-    my_heatmap = hm.vector_magnitude_heatmaps(flow)
+    my_heatmap = hm.generate_heatmaps(flow)
 
 
 def show_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', origin='upper', label='Kymograph', 
