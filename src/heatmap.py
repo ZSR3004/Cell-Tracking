@@ -1,4 +1,16 @@
-def vector_magnitude_heatmaps(flow, normalize=True):
+def array_to_vid(args, video): 
+    """
+    Args: 
+    Array
+    Returns: 
+    Video 
+
+    Function takes in an array and returns a video 
+    """
+    
+    raise NotImplementedError
+
+def generate_heatmaps(flow, normalize=True):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
