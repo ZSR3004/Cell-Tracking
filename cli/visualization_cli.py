@@ -2,7 +2,7 @@ import numpy as np
 from src import heatmap as hm
 from src import kymograph as kg
 from src import tiffclass as tiff
-
+import optical_flow_cli as ofc
 
 def show_vector_magnitude_heatmaps(flow, normalize=True):
     """
@@ -14,12 +14,13 @@ def show_vector_magnitude_heatmaps(flow, normalize=True):
         normalize (bool): If True, normalizes magnitudes to 0–255 range for visualization.
 
     Returns:
-        heatmaps (np.ndarray): Array of shape (frames, height, width) or (frames, height, width, 3)
-                               depending on apply_colormap.
+        None, just visualizes the heatmap
     """
-    raise NotImplementedError
+    my_heatmap = hm.vector_magnitude_heatmaps(flow)
 
-def show_kymograph():
+
+def show_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', origin='upper', label='Kymograph', 
+                   xlabel='Position along line', ylabel='Time (frame index)', title='Kymograph', show=True, save_path=None):
      """
     Plots a kymograph from a 2D array.
 
@@ -39,9 +40,9 @@ def show_kymograph():
     Returns:
         None: Just displays the kymograph.
     """
-     raise NotImplementedError
+     my_kymograph = kg.plot_kymograph(line)
 
-def show_tiff_image(self, image: np.ndarray, title='Image', figsize=(12, 8), save_path=None) -> None:
+def show_tiff_image(Tiff: tiff.Tiff, image: np.ndarray, title='Image', figsize=(12, 8), save_path=None) -> None:
     """
     Displays or saves an image using matplotlib.
 
@@ -57,6 +58,42 @@ def show_tiff_image(self, image: np.ndarray, title='Image', figsize=(12, 8), sav
     Returns:
         None
     """
+    tiff.Tiff.show_image(image)
+
+def show_nuclei_flow(arr: np.ndarray, channel: int) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
+
+    Args:
+      arr: The stack from the initialized tiff class
+    
+    Returns:
+      The optical flow array. 
+      """
     raise NotImplementedError
- 
+
+def show_combined_flow(arr: np.ndarray) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
+
+    Args:
+      arr: The stack from the initialized tiff class
+    
+    Returns:
+      The optical flow array from combining the channels. 
+      """
+    return NotImplementedError
+
+def show_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
+
+    Args:
+      arr: The stack from the initialized tiff class.
+    
+    Returns:
+      The raft flow for the third channel
+      """
+    return NotImplementedError
+
      
