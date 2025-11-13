@@ -38,15 +38,9 @@ def calculate_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
     This function preprocess the tiff stack with the parameters.
 
     Args:
-      tiff = a Tiff class
-      **kwargs: Dictionary with preprocessing parameters:
-            - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
-            - median (dict): {'ksize': int}
-            - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
-            - contrast (dict): {'alpha': float, 'beta': int}
-            - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
+      arr: The stack from the initialized tiff class.
     
     Returns:
-      The preprocessed stack (as a numpy array.)
+      The raft flow for the third channel
       """
     return raft.calcOpticalFlowRAFT(arr)
