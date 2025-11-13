@@ -60,6 +60,24 @@ def show_tiff_image(Tiff: tiff.Tiff, image: np.ndarray, title='Image', figsize=(
     """
     tiff.Tiff.show_image(image)
 
+def show_original_video(Tiff: tiff.Tiff):
+    """
+    Displays or saves an image using matplotlib.
+
+    Args:
+        image (np.ndarray): Image to display.
+        title (str): Title of the window.
+        figsize (tuple): Figure size in inches (width, height).
+        save_path (str, optional): If provided, saves the image to this path.
+
+    Assumptions:
+        The integers in the 'figsize' tuple are greater than 0.
+
+    Returns:
+        None
+    """
+    return NotImplementedError
+
 def show_nuclei_flow(arr: np.ndarray, channel: int) -> np.ndarray:
     """
     This function preprocess the tiff stack with the parameters.
