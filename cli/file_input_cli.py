@@ -9,7 +9,35 @@ from src import tiffclass as tiff
 import numpy as np
 
 def init_tiff_class(path: str) -> tiff.Tiff:
-    raise NotImplementedError
+    """
+    This function initializes a tiff class from the command line.
 
-def preprocess_tiff(tiff: tiff.Tiff) -> np.ndarray:
-    raise NotImplementedError
+    Args:
+      The path name to a tiff file.
+
+    Assumptions:
+      Assumes input leads to a valid tiff file.
+    
+    Returns:
+      A tiff class.
+    """
+    my_class = tiff.Tiff(path)
+    return my_class
+
+def preprocess_tiff(tiff: tiff.Tiff, **kwargs) -> np.ndarray:
+    """
+    This function preprocess the tiff stack with the parameters.
+
+    Args:
+      tiff = a Tiff class
+      **kwargs: Dictionary with preprocessing parameters:
+            - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+            - median (dict): {'ksize': int}
+            - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+            - contrast (dict): {'alpha': float, 'beta': int}
+            - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
+    
+    Returns:
+      The preprocessed stack (as a numpy array.)
+    """
+    return tiff.preprocess_stack(tiff, kwargs)
