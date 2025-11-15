@@ -29,7 +29,8 @@ parameter does in the `example_conf.yaml` file found in the `docs/cli/` director
 
 The Cell-Tracking CLI takes a few arguments. We've conveniently laid these in a table with their shorthand and a very brief description of what they do. 
 
-|   Command             |   Shorthand   |   Description                                                         |   Default Argument    | 
+|   Command             |   Shorthand   |   Description                                                       |   Default Argument    |
+|  ------------         |  -----------  |   ----------------------------------------------------------------  |    -------------     |
 |   path                |   `p`         |   Specify the path to the tiff file.                                  |   None                | 
 |   type                |   `t`         |   The type of the cells: nuclei labeled or cytoplasm/phase contrast.  |   Nuclei Labeled      | 
 |   out                 |   `o`         |   What visualization to output: a heat-map, a kymograph, or nothing.  |   Nothing             | 
