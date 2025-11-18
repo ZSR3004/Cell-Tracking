@@ -84,7 +84,7 @@ def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
     #use scipy.io.savemat
     #you need to save it to the hard drive. Do it using np.save()
     savemat(save_path, {"optical_flow": opt_flow})
-gi
+
 def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
     """
     Saves the optical flow array as a numpy array. Saves it to the input path (which is the path to a folder).
