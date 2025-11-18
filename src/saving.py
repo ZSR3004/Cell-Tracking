@@ -63,13 +63,13 @@ def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
     #Caroline
     #turn optical flow array into xyz file and then save it to the folder
     #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
-    #the 2 is a (dx, dy) tuple. You use a library called atomic xyz pipeline. CASEY IS TEXTING ABOUT IT
+    #the 2 is a (dx, dy) tuple. You use a library called atomic xyz pipeline (PROBABLY NOT)
     #you need to save it to the hard drive. Do it using np.save()
     return NotImplementedError
 
 def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
     """
-    Saves the optical flow array as a MATLAB array. Saves it to the input path (which is the path to a folder).
+    Saves the optical flow array as a MATLAB array file. Saves it to the input path (which is the path to a folder).
 
     Args:
         opt_flow (np.ndarray): The optical flow array.
@@ -83,8 +83,8 @@ def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
     #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
     #use scipy.io.savemat
     #you need to save it to the hard drive. Do it using np.save()
-    return NotImplementedError
-
+    savemat(save_path, {"optical_flow": opt_flow})
+gi
 def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
     """
     Saves the optical flow array as a numpy array. Saves it to the input path (which is the path to a folder).
