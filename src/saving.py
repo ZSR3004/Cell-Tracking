@@ -4,6 +4,7 @@ import numpy as np
 import pathlib
 from pathlib import Path
 import matplotlib.animation as animation
+import scipy.io 
 from src import tiffclass as tiff
 from src.defaults import default_process, default_flow, default_trajectory
 import matplotlib.image, matplotlib.figure, matplotlib.axes
@@ -50,7 +51,7 @@ def save_arr(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
 
 def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
     """
-    Saves the optical flow array as an XYZ array. Saves it to the input path (which is the path to a folder).
+    Saves the optical flow array as an XYZ file. Saves it to the input path (which is the path to a folder).
 
     Args:
         opt_flow (np.ndarray): The optical flow array.
@@ -60,8 +61,9 @@ def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
         None: Just saves the optical flow array to a file.
     """
     #Caroline
-    #turn optical flow array into xyz array and then save it to the folder
+    #turn optical flow array into xyz file and then save it to the folder
     #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
+    #the 2 is a (dx, dy) tuple. You use a library called atomic xyz pipeline. CASEY IS TEXTING ABOUT IT
     #you need to save it to the hard drive. Do it using np.save()
     return NotImplementedError
 
@@ -79,6 +81,7 @@ def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
     #Caroline
     #turn optical flow array into matlab array and then save it to the folder
     #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
+    #use scipy.io.savemat
     #you need to save it to the hard drive. Do it using np.save()
     return NotImplementedError
 
@@ -93,11 +96,7 @@ def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
     Returns:
         None: Just saves the optical flow array to a file.
     """
-    #Caroline
-    #turn optical flow array into numpy array and then save it to the folder
-    #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
-    #the numpy array is a numpy array in the ram. you need to save it to the hard drive using np.save()
-    return NotImplementedError
+    np.save(save_path, opt_flow)
 
 def save_original_video(name: str, file_path: str, im: matplotlib.image.AxesImage, image_stack: np.ndarray, fig: matplotlib.figure.Figure, ax: matplotlib.axes._axes.Axes, **kwargs) -> None:
     """
