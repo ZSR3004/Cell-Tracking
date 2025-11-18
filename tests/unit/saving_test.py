@@ -31,7 +31,6 @@ test_save_original_video function please ask Caroline <3. Also Caroline did all 
 """
 
 
-
 def test_save_original_video(sample_tiff, tmp_path):
     """
     Tests whether the save_original_video method works correctly.

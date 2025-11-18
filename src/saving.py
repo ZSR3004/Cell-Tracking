@@ -5,6 +5,7 @@ import pathlib
 from pathlib import Path
 import matplotlib.animation as animation
 import scipy.io 
+from scipy.io import savemat
 from src import tiffclass as tiff
 from src.defaults import default_process, default_flow, default_trajectory
 import matplotlib.image, matplotlib.figure, matplotlib.axes
@@ -55,7 +56,7 @@ def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
 
     Args:
         opt_flow (np.ndarray): The optical flow array.
-        save_path (str): The path to the folder where the output (an XYZ array) will be saved.
+        save_path (str): The path to the folder where the output will be saved.
     
     Returns:
         None: Just saves the optical flow array to a file.
@@ -65,6 +66,10 @@ def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
     #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
     #the 2 is a (dx, dy) tuple. You use a library called atomic xyz pipeline (PROBABLY NOT)
     #you need to save it to the hard drive. Do it using np.save()
+    #NOTEEEE: I texted Ziyad asking if save_path is the path to teh folder to save it to or if it's the exact path to save it to. 
+    #DO THE BELOW STEPS TO save_optical_flow_as_xyz, save_optical_flow_as_matlab, AND save_optical_flow_as_numpy.
+        #If it's the folder, then rename the save_path parameter to save_folder. Then write a variable like save_path = save_folder / (etc.). Maybe use the get_unique_path function if Ziyad says so? Then change the docstring to say "Saves it to the folder save_folder." and "save_folder (str): The path to the folder where the output will be saved."
+        #If it's the exact path, then make no changes (i think). But ask Ziyad if get_unique_path still needs to be in this file or if it should be moved.
     return NotImplementedError
 
 def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
@@ -73,16 +78,11 @@ def save_optical_flow_as_matlab(opt_flow: np.ndarray, save_path: str) -> None:
 
     Args:
         opt_flow (np.ndarray): The optical flow array.
-        save_path (str): The path to the folder where the output (an XYZ array) will be saved.
+        save_path (str): The path to the folder where the output will be saved.
     
     Returns:
         None: Just saves the optical flow array to a file.
     """
-    #Caroline
-    #turn optical flow array into matlab array and then save it to the folder
-    #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
-    #use scipy.io.savemat
-    #you need to save it to the hard drive. Do it using np.save()
     savemat(save_path, {"optical_flow": opt_flow})
 
 def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
@@ -91,7 +91,7 @@ def save_optical_flow_as_numpy(opt_flow: np.ndarray, save_path: str) -> None:
 
     Args:
         opt_flow (np.ndarray): The optical flow array.
-        save_path (str): The path to the folder where the output (an XYZ array) will be saved.
+        save_path (str): The path to the folder where the output will be saved.
     
     Returns:
         None: Just saves the optical flow array to a file.
