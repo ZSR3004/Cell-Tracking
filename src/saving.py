@@ -68,6 +68,8 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     #first figure out the shape of the optical flow array. Ziyad says (frames, channel, height, width, 2) 
     #the 2 is a (dx, dy) tuple. You use a library called atomic xyz pipeline (PROBABLY NOT)
     #you need to save it to the hard drive. Do it using np.save()
+    #since (dx, dy) only concerns x and y, we need to deal with z. Probably make z = 0? unless ziyad says not to
+    #probably use/import the library xyz-py. Save using this: xyz_py.save_xyz(f_name: str, labels: _Buffer | _SupportsArray[dtype[Any]] | _NestedSequence[_SupportsArray[dtype[Any]]] | bool | int | float | complex | str | bytes | _NestedSequence[bool | int | float | complex | str | bytes], coords: _Buffer | _SupportsArray[dtype[Any]] | _NestedSequence[_SupportsArray[dtype[Any]]] | bool | int | float | complex | str | bytes | _NestedSequence[bool | int | float | complex | str | bytes], with_numbers: bool = False, verbose: bool = True, mask: list = [], atomic_numbers: bool = False, comment: str = '')→ None
     save_path = get_unique_path(name, 'xyz', lambda i: f"{name}_f{i}.xyz", main_path)
     return NotImplementedError
 
