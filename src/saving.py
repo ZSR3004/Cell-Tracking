@@ -68,7 +68,7 @@ def save_optical_flow_as_xyz(opt_flow: np.ndarray, save_path: str) -> None:
     #you need to save it to the hard drive. Do it using np.save()
     #NOTEEEE: I texted Ziyad asking if save_path is the path to teh folder to save it to or if it's the exact path to save it to. 
     #DO THE BELOW STEPS TO save_optical_flow_as_xyz, save_optical_flow_as_matlab, AND save_optical_flow_as_numpy.
-        #If it's the folder, then rename the save_path parameter to save_folder. Then write a variable like save_path = save_folder / (etc.). Maybe use the get_unique_path function if Ziyad says so? Then change the docstring to say "Saves it to the folder save_folder." and "save_folder (str): The path to the folder where the output will be saved."
+        #If it's the folder, then rename the save_path parameter to save_folder. Then write a variable like save_path = save_folder / (etc.). Also probably have name as a parameter for the function. Maybe use the get_unique_path function if Ziyad says so? Then change the docstring to say "Saves it to the folder save_folder." and "save_folder (str): The path to the folder where the output will be saved."
         #If it's the exact path, then make no changes (i think). But ask Ziyad if get_unique_path still needs to be in this file or if it should be moved.
     return NotImplementedError
 
