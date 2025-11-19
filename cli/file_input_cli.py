@@ -41,4 +41,4 @@ def preprocess_tiff(tiff_obj: tiff.Tiff, **kwargs) -> np.ndarray:
     Returns:
       The preprocessed stack (as a numpy array.)
     """
-    return tiff_obj.preprocess_stack(tiff, kwargs)
+    return tiff_obj.preprocess_stack(tiff_obj.arr, **kwargs)
