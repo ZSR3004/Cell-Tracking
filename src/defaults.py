@@ -11,4 +11,8 @@ default_flow = {'pyr_scale' : 0.5,
                                 'poly_n' : 5,
                                 'poly_sigma' : 1.2,
                                 'flag' : 0}
-default_trajectory = {} # empty until properly implemented
+
+default_yaml_config = {
+    "preprocess_args": default_process,
+    "flow_args": default_flow
+}

@@ -1,6 +1,6 @@
 import os
 import yaml
-from defaults import default_yaml_config
+from .defaults import default_yaml_config
 
 class MemoryManagement:
     def __init__(self, path: str) -> None:
@@ -42,7 +42,7 @@ class MemoryManagement:
         """
         try:
             with open(self.yaml_path, "r") as y:
-                self.config = yaml.safe_load(y)
+                self.config = yaml.load(y, Loader=yaml.FullLoader)
         except:
             print("Failed to read configuration YAML file.")
 
