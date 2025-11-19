@@ -140,34 +140,6 @@ Before you test our software, you must clone and open our GitHub repository. The
      
    - Run ```cd CELL-TRACKING-PATH```
 <br><br>
-### How To Test Our Software
-
-1. Double-check that you are in the "Cell-Tracking" directory.
-   
-    - In the command line, run ```pwd``` (for Mac users) or ```cwd``` (for Windows users).
-      
-    - You should get a file path ending in ```/Cell-Tracking```. For example, you should get something that looks like this: ```/Users/carolinetracy/Desktop/Cell-Tracking```.
-      
-      - If you don't get a file path ending in ```/Cell-Tracking```, you must find the path for the Cell-Tracking folder. Follow the **How To Get Cell-Tracking's Path** steps below. The path you just copied will be referred to as CELL-TRACKING-PATH. Then, run ```cd CELL-TRACKING-PATH```
-        
-2. Run ```python3 -m venv venv```
-   
-   - Note: if you have python (not python3) installed, run ```python -m venv venv``` instead.
-     
-3. For Mac users: run ```source venv/bin/activate```. For Windows users: run ```venv\Scripts\activate```.
-   
-4. Run ```pip install pytest```
-   
-   - Note that this will take a second to install.
-     
-5. Find the file whose tests you want to run. This file will be referred to as TEST_FILE. (Make sure TEST_FILE includes ".py" at the end. For example, TEST_FILE could be tiffclass_test.py).
-   
-6. Figure out which folder TEST_FILE lies in. Note that this folder is a folder within the "tests" folder. This folder will be referred to as TEST_FOLDER. Change the directory so you are in that folder.
-   
-   - You can do this by navigating to the "Cell-Tracking" folder on your computer and looking through the folders that are inside the "tests" folder.
-     
-7. Run ```pytest TEST_FILE```
-<br><br>
 ### How To Get Cell-Tracking's Path
 
 Use your computer's search bar (the one that searches the contents of your computer), and search "Cell-Tracking". Click on the folder called "Cell-Tracking".
