@@ -3,7 +3,16 @@ import click
 import file_input_cli as fic
 import optical_flow_cli as opt
 import visualization_cli as v
-import cv2
+
+import os
+import sys
+
+# Add the project root (Cell-Tracking) to sys.path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+if ROOT_DIR not in sys.path:
+    sys.path.insert(0, ROOT_DIR)
+
+from src.memory import MemoryManagement
 
 def get_video():
     """
@@ -22,27 +31,8 @@ def get_video():
     return path
 
 
-def get_preprocessing_params():
-    """
-    This function gets the preprocessing parameters
-
-    Arguments: None
-
-    Returns: dictionary of the preprocessing parameters
-    """
-    
-
-
-def get_flow_args():
-    """
-    This function gets the flow arguments
-
-    Arguments: None
-
-    Returns: dictionary of the flow arguments
-    """
-
 def main():
+    my_args = MemoryManagement()
     path = get_video()
     my_video = fic.init_tiff_class(path)
     #preprocess = get_preprocessing_params()
