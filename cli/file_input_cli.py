@@ -1,7 +1,8 @@
-import sys
 import os
+import sys
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
+# Add the project root (Cell-Tracking) to sys.path
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
@@ -24,7 +25,7 @@ def init_tiff_class(path: str) -> tiff.Tiff:
     my_class = tiff.Tiff(path)
     return my_class
 
-def preprocess_tiff(tiff: tiff.Tiff, **kwargs) -> np.ndarray:
+def preprocess_tiff(tiff_obj: tiff.Tiff, **kwargs) -> np.ndarray:
     """
     This function preprocess the tiff stack with the parameters.
 
@@ -40,4 +41,4 @@ def preprocess_tiff(tiff: tiff.Tiff, **kwargs) -> np.ndarray:
     Returns:
       The preprocessed stack (as a numpy array.)
     """
-    return tiff.preprocess_stack(tiff, kwargs)
+    return tiff_obj.preprocess_stack(tiff, kwargs)
