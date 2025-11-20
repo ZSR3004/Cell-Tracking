@@ -41,7 +41,7 @@ def save_arr(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
     
     Args:
         name (str): Name of the numpy array.
-        tiff_instance (Tiff.tiff): Instance of the Tiff class.
+        tiff_instance (tiff.Tiff): Instance of the Tiff class.
         main_path (str): Main path to the directory.
     
     Returns:

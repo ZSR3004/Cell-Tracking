@@ -15,18 +15,29 @@ from pathlib import Path
 import matplotlib.animation as animation
 from src.defaults import default_process, default_flow, default_trajectory
 
-@pytest.fixture
-def sample_tiff():
-    path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-    f, c, h, w = 96, 3, 520, 2329
-    return path, f, c, h, w
+TIFF_PATHS = [
+    ("../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif", (96, 3, 520, 2329))
+]
 
-def test_get_unique_path(sample_tiff, tmp_path):
+@pytest.fixture(params=TIFF_PATHS)
+def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+    """
+    Creates a Tiff class instance.
+
+    Args:
+        request (pytest.FixtureRequest): The paths to generate Tiff instances from.
+
+    Returns:
+        (tiff.Tiff): Tiff class instance of the path.
+    """
+    return tiff.Tiff(request.param)
+
+def test_get_unique_path(init_tiff: tiff.Tiff, tmp_path):
     """
     Tests whether the get_unique_path method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
+        init_tiff (tiff.Tiff): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -37,9 +48,9 @@ def test_get_unique_path(sample_tiff, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
 
-    name1 = ""
+    name1 = "flow"
     name2 = "Test_Name"
     name3 = "1Name"
 
@@ -57,12 +68,13 @@ def test_get_unique_path(sample_tiff, tmp_path):
     save_dir2 = tmp_path / name2
     save_dir3 = tmp_path / name3
 
+    assert not save_dir1.exists()
     assert not save_dir2.exists()
     assert not save_dir3.exists()
 
     unique_path_npy_fn_1 = saving.get_unique_path(name1, npy_fn_1, tmp_path)
     assert save_dir1.exists()
-    assert unique_path_npy_fn_1.name == "_flow1.npy"
+    assert unique_path_npy_fn_1.name == "flow_flow1.npy"
     assert unique_path_npy_fn_1.parent == save_dir1
 
     unique_path_xyz_fn_2 = saving.get_unique_path(name2, xyz_fn_2, tmp_path)
@@ -79,7 +91,7 @@ def test_get_unique_path(sample_tiff, tmp_path):
     assert unique_path_mat_fn_3.parent == save_dir3
 
     (save_dir1 / "randomfile1.npy").touch()
-    (save_dir1 / "_flow1.xyz").touch()
+    (save_dir1 / "flow_flow1.xyz").touch()
     (save_dir2 / "Test_Name_flow1.mat").touch()
     (save_dir2 / "randomfile2.xyz").touch()
     (save_dir3 / "randomfile1.mat").touch()
@@ -103,13 +115,13 @@ def test_get_unique_path(sample_tiff, tmp_path):
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
-    assert unique_path_mat_fn_1.name == "_flow1.mat"
+    assert unique_path_mat_fn_1.name == "flow_flow1.mat"
     assert unique_path_mat_fn_1.parent == save_dir1
 
-    (save_dir1 / "_flow1.xyz").touch()
-    (save_dir1 / "_flow2.xyz").touch()
-    (save_dir1 / "_flow3.xyz").touch()
-    (save_dir1 / "_flow4.xyz").touch()
+    (save_dir1 / "flow_flow1.xyz").touch()
+    (save_dir1 / "flow_flow2.xyz").touch()
+    (save_dir1 / "flow_flow3.xyz").touch()
+    (save_dir1 / "flow_flow4.xyz").touch()
     (save_dir2 / "Test_Name_flow1.mat").touch()
     (save_dir2 / "Test_Name_flow2.mat").touch()
     (save_dir2 / "Test_Name_flow3.mat").touch()
@@ -131,7 +143,7 @@ def test_get_unique_path(sample_tiff, tmp_path):
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
-    assert unique_path_xyz_fn_1.name == "_flow5.xyz"
+    assert unique_path_xyz_fn_1.name == "flow_flow5.xyz"
     assert unique_path_xyz_fn_1.parent == save_dir1
 
     unique_path_mat_fn_2 = saving.get_unique_path(name2, mat_fn_2, tmp_path)
@@ -141,8 +153,34 @@ def test_get_unique_path(sample_tiff, tmp_path):
     assert unique_path_mat_fn_2.name == "Test_Name_flow9.mat"
     assert unique_path_mat_fn_2.parent == save_dir2
 
-def test_save_arr():
-    #what's a tiff instance?
+def test_save_arr(init_tiff (tiff.Tiff), tmp_path):
+    """
+    Tests whether the save_arr method works correctly.
+
+    Args:
+        init_tiff (tiff.Tiff): A tuple containing information about the TIFF file:
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    path, f, c, h, w = init_tiff
+
+    name1 = "Test_Name"
+
+    tiff_instance = tiff(path)
+
+    save_dir = tmp_path / name1
+    assert not save_dir.exists()
+
+    save_arr1 = saving.save_arr(name1, tiff_instance,)
+
+
     return NotImplementedError
 
 def test_save_optical_flow_as_xyz():
@@ -159,12 +197,12 @@ def test_save_optical_flow_as_numpy():
 #   PROB NOT THIS BC NUMPY AUTOMATICALLY CONVERTS TUPLES TO LISTS (or instead is it this because they're tuples?) Original: [[[[(1, 2)],[(3, 4)],[(5, 6)]]],[[[(7, 8)],[(9, 10)],[(11, 12)]]]]. After reshaping: [(1, 2),(3, 4),(5, 6),(7, 8),(9, 10),(11, 12)] 
 #ALSO TO TEST save_optical_flow_as_xyz, AFTER RESHAPING YOU SHOULD TEST IF DATATYPES OF ELEMENTS OF THE RESHAPED ARRAY ARE THE SAME DATATYPE AS THE ELEMENTS OF THE NON-RESHAPED ARRAY. LIKE FOR EXAMPLE THEY'RE ALL INTS
 
-def test_save_original_video(sample_tiff, tmp_path):
+def test_save_original_video(init_tiff: tiff.Tiff, tmp_path):
     """
     Tests whether the save_original_video method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
+        init_tiff (tiff.Tiff): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -175,7 +213,7 @@ def test_save_original_video(sample_tiff, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
     img = tiff.Tiff(path)
 
     fig, ax = plt.subplots()
