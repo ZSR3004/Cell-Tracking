@@ -32,12 +32,12 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     """
     return tiff.Tiff(request.param)
 
-def test_get_unique_path(init_tiff: tiff.Tiff, tmp_path):
+def test_get_unique_path(init_tiff: tuple, tmp_path):
     """
     Tests whether the get_unique_path method works correctly.
 
     Args:
-        init_tiff (tiff.Tiff): A tuple containing information about the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -153,12 +153,12 @@ def test_get_unique_path(init_tiff: tiff.Tiff, tmp_path):
     assert unique_path_mat_fn_2.name == "Test_Name_flow9.mat"
     assert unique_path_mat_fn_2.parent == save_dir2
 
-def test_save_arr(init_tiff (tiff.Tiff), tmp_path):
+def test_save_arr(init_tiff: tuple, tmp_path):
     """
     Tests whether the save_arr method works correctly.
 
     Args:
-        init_tiff (tiff.Tiff): A tuple containing information about the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -197,12 +197,12 @@ def test_save_optical_flow_as_numpy():
 #   PROB NOT THIS BC NUMPY AUTOMATICALLY CONVERTS TUPLES TO LISTS (or instead is it this because they're tuples?) Original: [[[[(1, 2)],[(3, 4)],[(5, 6)]]],[[[(7, 8)],[(9, 10)],[(11, 12)]]]]. After reshaping: [(1, 2),(3, 4),(5, 6),(7, 8),(9, 10),(11, 12)] 
 #ALSO TO TEST save_optical_flow_as_xyz, AFTER RESHAPING YOU SHOULD TEST IF DATATYPES OF ELEMENTS OF THE RESHAPED ARRAY ARE THE SAME DATATYPE AS THE ELEMENTS OF THE NON-RESHAPED ARRAY. LIKE FOR EXAMPLE THEY'RE ALL INTS
 
-def test_save_original_video(init_tiff: tiff.Tiff, tmp_path):
+def test_save_original_video(init_tiff: tuple, tmp_path):
     """
     Tests whether the save_original_video method works correctly.
 
     Args:
-        init_tiff (tiff.Tiff): A tuple containing information about the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
