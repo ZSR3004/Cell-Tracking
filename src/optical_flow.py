@@ -75,13 +75,7 @@ def optical_flow(arr : np.ndarray, channel : int,
         - poly_n (int): Size of the pixel neighborhood.
         - poly_sigma (float): Standard deviation of the Gaussian used for polynomial expansion.
         - flags (int): Operation flags.
-        - kwargs (dict): Keys for preprocessing:
-            - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
-            - median (dict): {'ksize': int}
-            - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
-            - contrast (dict): {'alpha': float, 'beta': int}
-            - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
-                
+         
     Returns:
         np.ndarray: (N-1, H, W, 2) flow vectors between frames.
     """ 
@@ -100,13 +94,12 @@ def optical_flow(arr : np.ndarray, channel : int,
         flow_list = pool.map(compute_flow_pair, pairs)
     return np.stack(flow_list)
 
-def calculate_optical_flow(arr: np.ndarray, process_args=None, default=False) -> np.ndarray:
+def calculate_optical_flow(arr: np.ndarray, default=False) -> np.ndarray:
     """
     Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
 
     Args:
-        process_args (dict): Preprocessing steps and parameters.
-        flow_args (dict): Parameters for optical flow calculation.
+        arr: the array to be calculated
         default (bool): Use default optical flow parameters if True.
 
     Returns:
