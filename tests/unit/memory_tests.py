@@ -56,6 +56,35 @@ def test_read_yaml(sample_MemoryManager):
     f.MM.read_yaml()
     assert f.MM.config == default_yaml_config
 
+    f = sample_MemoryManager
+    custom_yaml_config = {
+        'preprocess_args': {
+            'gauss': {'ksize': [7, 7], 'sigmaX': 2.0},
+            'median': {'ksize': 3},
+            'normalize': {'alpha': 0, 'beta': 255},
+            'contrast': {'alpha': 1.5, 'beta': 10.0},
+            'skip': []
+        },
+        'farneback_args': {
+            'levels': 1.0,
+            'winsize': 5,
+            'iterations': 5,
+            'poly_n': 7,
+            'poly_sigma': 1.5,
+            'flags': 1
+        },
+        'raft_args': {
+            'model_size': 2,
+            'model_weights_path': '/tmp/model.pth',
+            'gpu_flag': True
+        }
+    }
+
+    with open(f.MM.yaml_path, "w") as y:
+        yaml.dump(custom_yaml_config, y)
+    f.MM.read_yaml()
+    assert f.MM.config == custom_yaml_config
+
 
 def test_create_tiff_dir(sample_MemoryManager):
     f = sample_MemoryManager
