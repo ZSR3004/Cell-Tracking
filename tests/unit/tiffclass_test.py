@@ -35,7 +35,7 @@ def test_init(init_tiff: tuple):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -44,11 +44,9 @@ def test_init(init_tiff: tuple):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
-    img = tiff.Tiff(path)
 
-    assert img.path == str(path)
     assert isinstance(img.arr, np.ndarray)
     assert hasattr(img, "path")
     assert hasattr(img, "timestamp")
@@ -60,14 +58,13 @@ def test_init(init_tiff: tuple):
     assert img.arr.shape[2] == h  # height
     assert img.arr.shape[3] == w  # width
 
-
 def test_isolate_channel(init_tiff: tuple):
     """
     Tests whether the isolate_channel method works correctly.
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -76,9 +73,8 @@ def test_isolate_channel(init_tiff: tuple):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
-    img = tiff.Tiff(path)
 
     channel_0 = img.isolate_channel(0)
     channel_1 = img.isolate_channel(1)
@@ -106,7 +102,7 @@ def test_show_image(init_tiff: tuple, tmp_path):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -116,9 +112,8 @@ def test_show_image(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
-    img = tiff.Tiff(path)
 
     kwargs1 = {"gauss": {"ksize": (3, 3), "sigmaX": 1.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
     kwargs2 = {"gauss": {"ksize": (7, 7)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
@@ -171,7 +166,7 @@ def test_preprocess_frame(init_tiff: tuple):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -180,9 +175,8 @@ def test_preprocess_frame(init_tiff: tuple):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
-    img = tiff.Tiff(path)
 
     first_frame_channel_0 = img.arr[0, 0, :, :]
     middle_frame_channel_1 = img.arr[(f-1)//2, 1, :, :]
@@ -287,7 +281,7 @@ def test_preprocess_stack(init_tiff: tuple):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -296,9 +290,8 @@ def test_preprocess_stack(init_tiff: tuple):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
-    img = tiff.Tiff(path)
 
     stack1 = np.asarray(img.arr[:, 0, :, :])
     stack2 = np.asarray([img.arr[0, 1, :, :]])
