@@ -10,18 +10,63 @@ import pytest
 import yaml
 from src import memory
 from src.defaults import default_yaml_config
+from dataclasses import dataclass
 
-def test_init(tmp_path):
-    raise NotImplementedError
 
-def test_write_default_yaml(tmp_path):
-    raise NotImplementedError
+@dataclass
+class MMFixture:
+    MM: memory.MemoryManager
+    tmp_path: str
+    main_path: str
+    yaml_path: str
 
-def test_create_main_dir(tmp_path):
-    raise NotImplementedError
 
-def test_read_yaml(tmp_path):
-    raise NotImplementedError
+@pytest.fixture
+def sample_MemoryManager(tmp_path):
+    return MMFixture(
+        MM=memory.MemoryManager(tmp_path),
+        tmp_path=tmp_path,
+        main_path=os.path.join(tmp_path, "Cell-Tracking"),
+        yaml_path=os.path.join(tmp_path, "Cell-Tracking/config.yaml"),
+    )
 
-def create_tiff_dir(tmp_path):
-    raise NotImplementedError
+
+def test_init(sample_MemoryManager):
+    f = sample_MemoryManager
+
+    assert f.MM.path == f.main_path
+    assert f.MM.yaml_path == f.yaml_path
+    assert f.MM.config == default_yaml_config
+
+
+def test_write_default_yaml(sample_MemoryManager):
+    f = sample_MemoryManager
+    with open(f.yaml_path) as y:
+        assert yaml.safe_load(y) == default_yaml_config
+
+
+def test_create_main_dir(sample_MemoryManager):
+    f = sample_MemoryManager
+    assert os.path.exists(f.main_path)
+    assert os.path.exists(f.yaml_path)
+
+
+def test_read_yaml(sample_MemoryManager):
+    f = sample_MemoryManager
+    f.MM.read_yaml()
+    assert f.MM.config == default_yaml_config
+
+
+def test_create_tiff_dir(sample_MemoryManager):
+    f = sample_MemoryManager
+    tiff_name = "tiff1"
+
+    f.MM.create_tiff_dir(tiff_name)
+
+    parent_path = os.path.join(f.main_path, tiff_name)
+    assert os.path.exists(parent_path)
+
+    subdirs = ["raw_data", "optical_flows", "heatmaps", "kymographs"]
+
+    for sub in subdirs:
+        assert os.path.exists(os.path.join(parent_path, sub))
