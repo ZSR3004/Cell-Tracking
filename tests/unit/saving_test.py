@@ -8,10 +8,12 @@ if ROOT_DIR not in sys.path:
    
 import cv2, json, pytest
 from src import tiffclass as tiff
-from src import saving
+from src import saving as save
+from src import optical_flow as flow
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
+from scipy.io import loadmat
 import matplotlib.animation as animation
 from src.defaults import default_process, default_flow, default_trajectory
 
@@ -33,9 +35,9 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     path, info = request.param
     return (tiff.Tiff(path), info)
 
-def get_save_dirs_unique_path(name: str, pattern_fn, main_path: str) -> Path:
+def get_last_saved_pattern_fn_path(name: str, pattern_fn, main_path: str) -> Path:
     """
-    An edited version of saving.get_unique_path that gets the path with pattern_fn that was last saved.
+    An edited version of save.get_unique_path that gets the path with pattern_fn that was last saved.
 
     Args:
         name (str): Main identifier (e.g., protein name).
@@ -99,18 +101,18 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     assert not save_dir2.exists()
     assert not save_dir3.exists()
 
-    unique_path_npy_fn_1 = saving.get_unique_path(name1, npy_fn_1, tmp_path)
+    unique_path_npy_fn_1 = save.get_unique_path(name1, npy_fn_1, tmp_path)
     assert save_dir1.exists()
     assert unique_path_npy_fn_1.name == "flow_flow1.npy"
     assert unique_path_npy_fn_1.parent == save_dir1
 
-    unique_path_xyz_fn_2 = saving.get_unique_path(name2, xyz_fn_2, tmp_path)
+    unique_path_xyz_fn_2 = save.get_unique_path(name2, xyz_fn_2, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert unique_path_xyz_fn_2.name == "Test_Name_flow1.xyz"
     assert unique_path_xyz_fn_2.parent == save_dir2
 
-    unique_path_mat_fn_3 = saving.get_unique_path(name3, mat_fn_3, tmp_path)
+    unique_path_mat_fn_3 = save.get_unique_path(name3, mat_fn_3, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -124,21 +126,21 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     (save_dir3 / "randomfile1.mat").touch()
     (save_dir3 / "Test_Name_flow1.npy").touch()
 
-    unique_path_npy_fn_2 = saving.get_unique_path(name2, npy_fn_2, tmp_path)
+    unique_path_npy_fn_2 = save.get_unique_path(name2, npy_fn_2, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_npy_fn_2.name == "Test_Name_flow1.npy"
     assert unique_path_npy_fn_2.parent == save_dir2
 
-    unique_path_xyz_fn_3 = saving.get_unique_path(name3, xyz_fn_3, tmp_path)
+    unique_path_xyz_fn_3 = save.get_unique_path(name3, xyz_fn_3, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_xyz_fn_3.name == "1Name_flow1.xyz"
     assert unique_path_xyz_fn_3.parent == save_dir3
 
-    unique_path_mat_fn_1 = saving.get_unique_path(name1, mat_fn_1, tmp_path)
+    unique_path_mat_fn_1 = save.get_unique_path(name1, mat_fn_1, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -159,21 +161,21 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     (save_dir2 / "Test_Name_flow8.mat").touch()
     (save_dir3 / "1Name_flow1.npy").touch()
 
-    unique_path_npy_fn_3 = saving.get_unique_path(name3, npy_fn_3, tmp_path)
+    unique_path_npy_fn_3 = save.get_unique_path(name3, npy_fn_3, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_npy_fn_3.name == "1Name_flow2.npy"
     assert unique_path_npy_fn_3.parent == save_dir3
 
-    unique_path_xyz_fn_1 = saving.get_unique_path(name1, xyz_fn_1, tmp_path)
+    unique_path_xyz_fn_1 = save.get_unique_path(name1, xyz_fn_1, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_xyz_fn_1.name == "flow_flow5.xyz"
     assert unique_path_xyz_fn_1.parent == save_dir1
 
-    unique_path_mat_fn_2 = saving.get_unique_path(name2, mat_fn_2, tmp_path)
+    unique_path_mat_fn_2 = save.get_unique_path(name2, mat_fn_2, tmp_path)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -204,13 +206,13 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     save_dir = tmp_path / name1
     assert not save_dir.exists()
 
-    save_arr1 = saving.save_arr(name1, img, tmp_path)
-    save_dirs_unique_path = get_save_dirs_unique_path(name1, lambda i: f"{name1}_flow{i}.npy", tmp_path)
+    save_arr1 = save.save_arr(name1, img, tmp_path)
+    save_arr1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", tmp_path)
 
     assert save_dir.exists()
-    assert save_dirs_unique_path.exists()
+    assert save_arr1_path.exists()
 
-    assert np.array_equal(np.load(save_dirs_unique_path), tiff_arr)
+    assert np.array_equal(np.load(save_arr1_path), tiff_arr)
 
 def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     """
@@ -257,6 +259,31 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
     img, info = init_tiff
     f, c, h, w = info
     tiff_arr = img.arr
+
+    name1 = "Test_Name"
+    save_dir = tmp_path / name1
+    assert not save_dir.exists()
+
+    optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
+    optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
+    optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
+    optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, pyr_scale=0.25, levels=2, winsize=30, iterations=5, poly_n=7, poly_sigma=2.8, flags=1)
+    optical_flow_channel1_custom = flow.optical_flow(arr=tiff_arr, channel=1, pyr_scale=1.0, levels=5, winsize=10, iterations=9, poly_n=11, poly_sigma=3.2, flags=3)    
+    optical_flow_channel2_custom = flow.optical_flow(arr=tiff_arr, channel=2, pyr_scale=0.75, levels=4, winsize=5, iterations=2, poly_n=3, poly_sigma=0.2, flags=2)    
+    calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
+    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr, default=True)
+
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel0, tmp_path)
+    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.matlab", tmp_path)
+    assert optical_flow_channel0_path.exists()
+    optical_flow_channel0_data = loadmat(optical_flow_channel0_path)
+    optical_flow_channel0_arr = optical_flow_channel0_data['optical_flow']
+    assert isinstance(optical_flow_channel0_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel0_arr, optical_flow_channel0)
+
+    #DO THIS FOR EVERY OTHER ONE (optical_flow_channel1, optical_flow_channel2, ETC!)
+
+
 
     return NotImplementedError
 
@@ -321,18 +348,18 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     im_stack5 = ax.imshow(stack5[0], cmap='gray')
     im_stack6 = ax.imshow(stack6[0], cmap='gray')
 
-    save_stack1_kwargs1 = saving.save_original_video("stack1_kwargs1", stack1_kwargs1_path, im_stack1, stack1, fig, ax, **kwargs1)
-    save_stack1_kwargs3 = saving.save_original_video("stack1_kwargs3", stack1_kwargs3_path, im_stack1, stack1, fig, ax, **kwargs3)
-    save_stack2_kwargs4 = saving.save_original_video("stack2_kwargs4", stack2_kwargs4_path, im_stack2, stack2, fig, ax, **kwargs4)
-    save_stack2_kwargs5 = saving.save_original_video("stack2_kwargs2", stack2_kwargs5_path, im_stack2, stack2, fig, ax, **kwargs5)
-    save_stack3_kwargs3 = saving.save_original_video("stack3_kwargs3", stack3_kwargs3_path, im_stack3, stack3, fig, ax, **kwargs3)
-    save_stack3_kwargs5 = saving.save_original_video("stack3_kwargs1", stack3_kwargs5_path, im_stack3, stack3, fig, ax, **kwargs5)
-    save_stack4_kwargs2 = saving.save_original_video("stack4_kwargs2", stack4_kwargs2_path, im_stack4, stack4, fig, ax, **kwargs2)
-    save_stack4_kwargs4 = saving.save_original_video("stack4_kwargs4", stack4_kwargs4_path, im_stack4, stack4, fig, ax, **kwargs4)
-    save_stack5_kwargs1 = saving.save_original_video("stack5_kwargs1", stack5_kwargs1_path, im_stack5, stack5, fig, ax, **kwargs1)
-    save_stack5_kwargs3 = saving.save_original_video("stack5_kwargs3", stack5_kwargs3_path, im_stack5, stack5, fig, ax, **kwargs3)
-    save_stack6_kwargs2 = saving.save_original_video("stack6_kwargs2", stack6_kwargs2_path, im_stack6, stack6, fig, ax, **kwargs2)
-    save_stack6_kwargs4 = saving.save_original_video("stack6_kwargs4", stack6_kwargs4_path, im_stack6, stack6, fig, ax, **kwargs4)
+    save_stack1_kwargs1 = save.save_original_video("stack1_kwargs1", stack1_kwargs1_path, im_stack1, stack1, fig, ax, **kwargs1)
+    save_stack1_kwargs3 = save.save_original_video("stack1_kwargs3", stack1_kwargs3_path, im_stack1, stack1, fig, ax, **kwargs3)
+    save_stack2_kwargs4 = save.save_original_video("stack2_kwargs4", stack2_kwargs4_path, im_stack2, stack2, fig, ax, **kwargs4)
+    save_stack2_kwargs5 = save.save_original_video("stack2_kwargs2", stack2_kwargs5_path, im_stack2, stack2, fig, ax, **kwargs5)
+    save_stack3_kwargs3 = save.save_original_video("stack3_kwargs3", stack3_kwargs3_path, im_stack3, stack3, fig, ax, **kwargs3)
+    save_stack3_kwargs5 = save.save_original_video("stack3_kwargs1", stack3_kwargs5_path, im_stack3, stack3, fig, ax, **kwargs5)
+    save_stack4_kwargs2 = save.save_original_video("stack4_kwargs2", stack4_kwargs2_path, im_stack4, stack4, fig, ax, **kwargs2)
+    save_stack4_kwargs4 = save.save_original_video("stack4_kwargs4", stack4_kwargs4_path, im_stack4, stack4, fig, ax, **kwargs4)
+    save_stack5_kwargs1 = save.save_original_video("stack5_kwargs1", stack5_kwargs1_path, im_stack5, stack5, fig, ax, **kwargs1)
+    save_stack5_kwargs3 = save.save_original_video("stack5_kwargs3", stack5_kwargs3_path, im_stack5, stack5, fig, ax, **kwargs3)
+    save_stack6_kwargs2 = save.save_original_video("stack6_kwargs2", stack6_kwargs2_path, im_stack6, stack6, fig, ax, **kwargs2)
+    save_stack6_kwargs4 = save.save_original_video("stack6_kwargs4", stack6_kwargs4_path, im_stack6, stack6, fig, ax, **kwargs4)
 
     assert stack1_kwargs1_path.exists()
     assert stack1_kwargs3_path.exists()
