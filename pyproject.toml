@@ -1,5 +1,5 @@
 [project]
-name = "mitchel-lab-cell-tracking"
+name = "cell-tracking"
 version = "0.1.0"
 description = "A cell-tracking software for cell microscopy. Orginally developed for the Mitchel Lab at Wesleyan University."
 authors = [
