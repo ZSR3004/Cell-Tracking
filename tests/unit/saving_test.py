@@ -21,17 +21,149 @@ def sample_tiff():
     f, c, h, w = 96, 3, 520, 2329
     return path, f, c, h, w
 
+def test_get_unique_path(sample_tiff, tmp_path):
+    """
+    Tests whether the get_unique_path method works correctly.
+
+    Args:
+        sample_tiff (tuple): A tuple containing information about the TIFF file:
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    path, f, c, h, w = sample_tiff
+
+    name1 = ""
+    name2 = "Test_Name"
+    name3 = "1Name"
+
+    npy_fn_1 = lambda i: f"{name1}_f{i}.npy"
+    npy_fn_2 = lambda i: f"{name2}_f{i}.npy"
+    npy_fn_3 = lambda i: f"{name3}_f{i}.npy"
+    xyz_fn_1 = lambda i: f"{name1}_f{i}.xyz"
+    xyz_fn_2 = lambda i: f"{name2}_f{i}.xyz"
+    xyz_fn_3 = lambda i: f"{name3}_f{i}.xyz"
+    mat_fn_1 = lambda i: f"{name1}_f{i}.mat"
+    mat_fn_2 = lambda i: f"{name2}_f{i}.mat"
+    mat_fn_3 = lambda i: f"{name3}_f{i}.mat"
+
+    save_dir1 = tmp_path / name1
+    save_dir2 = tmp_path / name2
+    save_dir3 = tmp_path / name3
+
+    assert not save_dir1.exists()
+    assert not save_dir2.exists()
+    assert not save_dir3.exists()
+
+    unique_path_npy_fn_1 = saving.get_unique_path(name1, npy_fn_1, tmp_path)
+    assert save_dir1.exists()
+    assert unique_path_npy_fn_1.name == "_1.npy"
+    assert unique_path_npy_fn_1.parent == save_dir1
+
+    unique_path_xyz_fn_2 = saving.get_unique_path(name2, xyz_fn_2, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert unique_path_xyz_fn_2.name == "Test_Name_1.xyz"
+    assert unique_path_xyz_fn_2.parent == save_dir2
+
+    unique_path_mat_fn_3 = saving.get_unique_path(name3, mat_fn_3, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_mat_fn_3.name == "1Name_1.mat"
+    assert unique_path_mat_fn_3.parent == save_dir3
+
+    (save_dir1 / "randomfile1.npy").touch()
+    (save_dir1 / "_1.xyz").touch()
+    (save_dir2 / "Test_Name_1.mat").touch()
+    (save_dir2 / "randomfile2.xyz").touch()
+    (save_dir3 / "randomfile1.mat").touch()
+    (save_dir3 / "Test_Name_1.npy").touch()
+
+    unique_path_npy_fn_2 = saving.get_unique_path(name2, npy_fn_2, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_npy_fn_2.name == "Test_Name_1.npy"
+    assert unique_path_npy_fn_2.parent == save_dir2
+
+    unique_path_xyz_fn_3 = saving.get_unique_path(name3, xyz_fn_3, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_xyz_fn_3.name == "1Name_1.xyz"
+    assert unique_path_xyz_fn_3.parent == save_dir3
+
+    unique_path_mat_fn_1 = saving.get_unique_path(name1, mat_fn_1, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_mat_fn_1.name == "_1.mat"
+    assert unique_path_mat_fn_1.parent == save_dir1
+
+    (save_dir1 / "_1.npy").touch()
+    (save_dir1 / "_2.npy").touch()
+    (save_dir1 / "_3.npy").touch()
+    (save_dir1 / "_4.npy").touch()
+    (save_dir2 / "Test_Name_1.mat").touch()
+    (save_dir2 / "Test_Name_2.mat").touch()
+    (save_dir2 / "Test_Name_3.mat").touch()
+    (save_dir2 / "Test_Name_4.mat").touch()
+    (save_dir2 / "Test_Name_5.mat").touch()
+    (save_dir2 / "Test_Name_6.mat").touch()
+    (save_dir2 / "Test_Name_7.mat").touch()
+    (save_dir2 / "Test_Name_8.mat").touch()
+    (save_dir3 / "1Name_1.npy").touch()
+
+    unique_path_npy_fn_3 = saving.get_unique_path(name3, npy_fn_3, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_npy_fn_3.name == "1Name_2.npy"
+    assert unique_path_npy_fn_3.parent == save_dir3
+
+    unique_path_xyz_fn_1 = saving.get_unique_path(name1, xyz_fn_1, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_xyz_fn_1.name == "_5.npy"
+    assert unique_path_xyz_fn_1.parent == save_dir1
+
+    unique_path_mat_fn_2 = saving.get_unique_path(name2, mat_fn_2, tmp_path)
+    assert save_dir1.exists()
+    assert save_dir2.exists()
+    assert save_dir3.exists()
+    assert unique_path_mat_fn_2.name == "Test_Name_9.mat"
+    assert unique_path_mat_fn_2.parent == save_dir1
 
 
-"""
-Tests for all functions in saving.py will go here
-Note: Caroline wrote test_save_original_video already. She had written this test function in test_tiffclass.py already, but then moved it because
-it turns out she needed to move the function save_original_video from tiffclass.py to test_tiffclass.py. If you have any questions about the
-test_save_original_video function please ask Caroline <3. Also Caroline did all the imports so you can ask her about those too :)
-"""
+    #3rd DONE: test when there are already some (many) files with the same naming convention in tmp_path directory
+    #2nd DONE: test when there are already some (many) files with a different naming convention in tmp_path directory
+    #1st DONE: test when no files are in tmp_path directory
+    #0th DONE: test that beforehand, the directory isn't created. then test that after you run get_unique_path the dictionary is automatically created
+
+
+def test_save_arr():
+    #what's a tiff instance?
+    return NotImplementedError
+
+def test_save_optical_flow_as_xyz():
+    return NotImplementedError
+
+def test_save_optical_flow_as_matlab():
+    return NotImplementedError
+
+def test_save_optical_flow_as_numpy():
+    return NotImplementedError
 
 #IMPORTANT: TO TEST save_optical_flow_as_xyz, TEST IF RESHAPING WORKS!!! FOR EXAMPLE, MAKE SAMPLE ARRAYS AND SEE IF THEY RESHAPE CORRECTLY.
-#AN EXAMPLE OF A CORRECT RESHAPE WOULD BE: Original: [[[[[1, 2]],[[3, 4]],[[5, 6]]]],[[[[7, 8]],[[9, 10]],[[11, 12]]]]]. After reshaping: [[1, 2],[3, 4],[5, 6],[7, 8],[9, 10],[11, 12]] 
+#AN EXAMPLE OF A CORRECT RESHAPE WOULD BE (NOTE BOTH OF THEM ARE NUMPY ARRAYS): Original: [[[[[1, 2]],[[3, 4]],[[5, 6]]]],[[[[7, 8]],[[9, 10]],[[11, 12]]]]]. After reshaping: [[1, 2],[3, 4],[5, 6],[7, 8],[9, 10],[11, 12]] 
 #   PROB NOT THIS BC NUMPY AUTOMATICALLY CONVERTS TUPLES TO LISTS (or instead is it this because they're tuples?) Original: [[[[(1, 2)],[(3, 4)],[(5, 6)]]],[[[(7, 8)],[(9, 10)],[(11, 12)]]]]. After reshaping: [(1, 2),(3, 4),(5, 6),(7, 8),(9, 10),(11, 12)] 
 #ALSO TO TEST save_optical_flow_as_xyz, AFTER RESHAPING YOU SHOULD TEST IF DATATYPES OF ELEMENTS OF THE RESHAPED ARRAY ARE THE SAME DATATYPE AS THE ELEMENTS OF THE NON-RESHAPED ARRAY. LIKE FOR EXAMPLE THEY'RE ALL INTS
 
