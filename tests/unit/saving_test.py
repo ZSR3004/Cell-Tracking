@@ -39,7 +39,7 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -49,7 +49,7 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
 
     name1 = "flow"
@@ -161,7 +161,7 @@ def test_save_arr(init_tiff: tuple, tmp_path):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -171,17 +171,16 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
 
-    tiff_instance = tiff(path)
-    tiff_arr = tiff_instance.arr
+    tiff_arr = img.arr
 
     name1 = "Test_Name"
     save_dir = tmp_path / name1
     assert not save_dir.exists()
 
-    save_arr1 = saving.save_arr(name1, tiff_instance, tmp_path)
+    save_arr1 = saving.save_arr(name1, img, tmp_path)
     unique_saved_path = saving.get_unique_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir)
 
     assert save_dir.exists()
@@ -209,7 +208,7 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -219,9 +218,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, info = init_tiff
+    img, info = init_tiff
     f, c, h, w = info
-    img = tiff.Tiff(path)
 
     fig, ax = plt.subplots()
 
