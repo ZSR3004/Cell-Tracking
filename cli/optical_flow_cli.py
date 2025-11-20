@@ -7,6 +7,7 @@ if ROOT_DIR not in sys.path:
 
 from src import optical_flow as of
 from src import raft
+from src import tiffclass
 import numpy as np
 
 def calculate_nuclei_optical_flow(arr: np.ndarray, channel: int) -> np.ndarray:
@@ -33,7 +34,7 @@ def calculate_combined_flow(arr: np.ndarray) -> np.ndarray:
       """
     return of.calculate_optical_flow(arr)
 
-def calculate_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
+def calculate_raft_optical_flow(Tiff: tiffclass.Tiff) -> np.ndarray:
     """
     This function preprocess the tiff stack with the parameters.
 
@@ -43,4 +44,4 @@ def calculate_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
     Returns:
       The raft flow for the third channel
       """
-    return raft.calcOpticalFlowRAFT(arr)
+    return raft.calcOpticalFlowRAFT(Tiff)

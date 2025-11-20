@@ -3,9 +3,9 @@ import click
 import file_input_cli as fic
 import optical_flow_cli as opt
 import visualization_cli as v
+import saving_cli as s
 import questionary
 
-import yaml
 import os
 import sys
 
@@ -68,6 +68,19 @@ def desired_outputs() -> tuple:
     
     return outputs
 
+def get_video_type() -> str:
+    """
+    Asks user what type of video they input
+
+    Args: None
+
+    Returns: string of their answer
+    """
+
+    my_video = click.prompt("Type in the type of video  you input (n for nuclei dyed, p for phase contrast)", type=str)
+
+    return my_video
+
 def main():
     #Checks to see if they've created the CellTracking folder yet. Relies on the user knowing this information.
     if not is_created():
@@ -103,6 +116,8 @@ def main():
     full_path = get_video()
     tiff_name = os.path.basename(full_path)
     my_video = fic.init_tiff_class(full_path)
+    #s.save_original_video_cli(tiff_name, os.getcwd())
+
     if not os.path.exists(os.getcwd() + "/" + tiff_name):
         my_folders.create_tiff_dir(tiff_name)
     else:
@@ -121,8 +136,51 @@ def main():
 
     #Ask user what kind of video they input, do optical flow calculation
     if "Optical Flow" in outputs:
-        pass
+        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/optical_flows")
+        vid_type = get_video_type()
+        
+        if vid_type == 'n':
+            flow_channel_0 = opt.calculate_nuclei_optical_flow(my_video.arr, 0)
+            flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
+            answer = click.prompt("Do you want to calculate the combined flows of channels 1 and 2? [y/n]", 
+                         type=click.Choice(['y', 'n'], case_sensitive=False))
+            
+            if answer.lower() == 'y':
+                combined_flow = opt.calculate_combined_flow(my_video.arr)
+                s.save_flow_cli(combined_flow)
 
+            s.save_flow_cli(flow_channel_0)
+            s.save_flow_cli(flow_channel_1)
+            #call save_vector_video here?
+
+        elif vid_type == 'p':
+            raft_flow = opt.calculate_raft_optical_flow(my_video)
+            s.save_flow_cli(raft_flow)
+            #call save vector video here?
+    
+    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
+
+    #Generates the heatmaps, saves to heatmap folder
+    if "Heatmap" in outputs:
+        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/heatmaps")
+        #v.show_heatmaps()
+        #save the heatmaps, maybe nest this in optical flow if it requires the optical flow arrays
+
+    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
+    #Generates the kymographs, save to kymograph folders
+    if "Kymograph" in outputs:
+        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/kymographs")
+        #v.show_kymograph()
+        #again, nest this if it requires the optical flow arrays
+
+    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
+
+    #Saves the raw data to the raw data folders
+    if "Raw Data" in outputs:
+        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/raw_data")
+        #save all the raw data (xyz files, arrays, etc, here)
+    
+    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
 
 if __name__ == "__main__":
     main()
