@@ -30,7 +30,8 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     Returns:
         (tiff.Tiff): Tiff class instance of the path.
     """
-    return tiff.Tiff(request.param)
+    path, info = request.param
+    return (tiff.Tiff(path), info)
 
 def test_get_unique_path(init_tiff: tuple, tmp_path):
     """
@@ -48,7 +49,8 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
 
     name1 = "flow"
     name2 = "Test_Name"
@@ -169,19 +171,23 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
-
-    name1 = "Test_Name"
+    path, info = init_tiff
+    f, c, h, w = info
 
     tiff_instance = tiff(path)
+    tiff_arr = tiff_instance.arr
 
+    name1 = "Test_Name"
     save_dir = tmp_path / name1
     assert not save_dir.exists()
 
-    save_arr1 = saving.save_arr(name1, tiff_instance,)
+    save_arr1 = saving.save_arr(name1, tiff_instance, tmp_path)
+    unique_saved_path = saving.get_unique_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir)
 
+    assert save_dir.exists()
+    assert unique_saved_path.exists()
 
-    return NotImplementedError
+    assert np.array_equal(np.load(unique_saved_path), tiff_arr)
 
 def test_save_optical_flow_as_xyz():
     return NotImplementedError
@@ -213,7 +219,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
     img = tiff.Tiff(path)
 
     fig, ax = plt.subplots()
