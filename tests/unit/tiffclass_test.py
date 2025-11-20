@@ -11,18 +11,29 @@ from src import tiffclass as tiff
 import matplotlib.pyplot as plt
 import numpy as np
 
-@pytest.fixture
-def sample_tiff():
-    path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-    f, c, h, w = 96, 3, 520, 2329
-    return path, f, c, h, w
+TIFF_PATHS = [
+    ("../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif", (96, 3, 520, 2329))
+]
 
-def test_init(sample_tiff):
+@pytest.fixture(params=TIFF_PATHS)
+def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+    """
+    Creates a Tiff class instance.
+
+    Args:
+        request (pytest.FixtureRequest): The paths to generate Tiff instances from.
+
+    Returns:
+        (tiff.Tiff): Tiff class instance of the path.
+    """
+    return tiff.Tiff(request.param)
+
+def test_init(init_tiff: tuple):
     """
     Tests whether the Tiff class initializes correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -32,7 +43,7 @@ def test_init(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
     img = tiff.Tiff(path)
 
     assert img.path == str(path)
@@ -48,12 +59,12 @@ def test_init(sample_tiff):
     assert img.arr.shape[3] == w  # width
 
 
-def test_isolate_channel(sample_tiff):
+def test_isolate_channel(init_tiff: tuple):
     """
     Tests whether the isolate_channel method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -63,7 +74,7 @@ def test_isolate_channel(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
     img = tiff.Tiff(path)
 
     channel_0 = img.isolate_channel(0)
@@ -86,12 +97,12 @@ def test_isolate_channel(sample_tiff):
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
     
-def test_show_image(sample_tiff, tmp_path):
+def test_show_image(init_tiff: tuple, tmp_path):
     """
     Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -102,7 +113,7 @@ def test_show_image(sample_tiff, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
     img = tiff.Tiff(path)
 
     kwargs1 = {"gauss": {"ksize": (3, 3), "sigmaX": 1.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
@@ -150,12 +161,12 @@ def test_show_image(sample_tiff, tmp_path):
     assert os.path.getsize(image5_save_path) > 0
     assert os.path.getsize(image6_save_path) > 0
 
-def test_preprocess_frame(sample_tiff):
+def test_preprocess_frame(init_tiff: tuple):
     """
     Tests whether the preprocess_frame method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -165,7 +176,7 @@ def test_preprocess_frame(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
     img = tiff.Tiff(path)
 
     first_frame_channel_0 = img.arr[0, 0, :, :]
@@ -265,12 +276,12 @@ def test_preprocess_frame(sample_tiff):
     assert kwargs5_preprocess_middle_frame.shape == middle_frame_channel_1.shape
     assert kwargs5_preprocess_last_frame.shape == last_frame_channel_2.shape
 
-def test_preprocess_stack(sample_tiff):
+def test_preprocess_stack(init_tiff: tuple):
     """
     Tests whether the preprocess_stack method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -280,7 +291,7 @@ def test_preprocess_stack(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
+    path, f, c, h, w = init_tiff
     img = tiff.Tiff(path)
 
     stack1 = np.asarray(img.arr[:, 0, :, :])
