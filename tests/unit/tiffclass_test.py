@@ -26,7 +26,8 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     Returns:
         (tiff.Tiff): Tiff class instance of the path.
     """
-    return tiff.Tiff(request.param)
+    path, info = request.param
+    return (tiff.Tiff(path), info)
 
 def test_init(init_tiff: tuple):
     """
@@ -43,7 +44,8 @@ def test_init(init_tiff: tuple):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
     img = tiff.Tiff(path)
 
     assert img.path == str(path)
@@ -74,7 +76,8 @@ def test_isolate_channel(init_tiff: tuple):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
     img = tiff.Tiff(path)
 
     channel_0 = img.isolate_channel(0)
@@ -113,7 +116,8 @@ def test_show_image(init_tiff: tuple, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
     img = tiff.Tiff(path)
 
     kwargs1 = {"gauss": {"ksize": (3, 3), "sigmaX": 1.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
@@ -176,7 +180,8 @@ def test_preprocess_frame(init_tiff: tuple):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
     img = tiff.Tiff(path)
 
     first_frame_channel_0 = img.arr[0, 0, :, :]
@@ -291,7 +296,8 @@ def test_preprocess_stack(init_tiff: tuple):
     Return:
         None
     """
-    path, f, c, h, w = init_tiff
+    path, info = init_tiff
+    f, c, h, w = info
     img = tiff.Tiff(path)
 
     stack1 = np.asarray(img.arr[:, 0, :, :])
