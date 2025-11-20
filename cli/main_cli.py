@@ -3,6 +3,7 @@ import click
 import file_input_cli as fic
 import optical_flow_cli as opt
 import visualization_cli as v
+import questionary
 
 import yaml
 import os
@@ -14,6 +15,13 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 from src.memory import MemoryManagement
+
+OUTPUT_OPTIONS = [
+    "Optical Flow",
+    "Heatmap",
+    "Kymograph",
+    "Raw Data"
+]
 
 def get_video():
     """
@@ -44,7 +52,24 @@ def is_created() -> bool:
 
     return answer.lower() == 'y'
 
+def desired_outputs() -> tuple:
+    """
+    Asks user what outputs they want
+
+    Args: None
+
+    Returns: tuple of their answers
+    """
+
+    outputs = questionary.checkbox(
+            "Select output items to generate:",
+            choices=OUTPUT_OPTIONS
+        ).ask()
+    
+    return outputs
+
 def main():
+    #Checks to see if they've created the CellTracking folder yet. Relies on the user knowing this information.
     if not is_created():
         my_path = click.prompt("Type the folder you want to save your CellTracking folder to (type ~/folder_name or folder_name)", type=str)
 
@@ -85,13 +110,18 @@ def main():
         while os.path.exists(os.path.join(os.getcwd(), f"{tiff_name} ({i})")):
             i += 1
         my_folders.create_tiff_dir(f"{tiff_name} ({i})")
-    print("MemoryManagement path:", my_folders.path)
-    print("Looking for YAML at:", my_folders.yaml_path)
-    print("Exists?", os.path.exists(my_folders.yaml_path))
+
+    #Creates a Tiff class instance and preprocesses based on the yaml config file.
     my_folders.read_yaml()
     preprocess_args = my_folders.config["preprocess_args"]
     fic.preprocess_tiff(my_video, **preprocess_args)
 
+    #Get the outputs they want via questionary
+    outputs = desired_outputs()
+
+    #Ask user what kind of video they input, do optical flow calculation
+    if "Optical Flow" in outputs:
+        pass
 
 
 if __name__ == "__main__":
