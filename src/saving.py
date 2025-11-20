@@ -71,9 +71,13 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     #probably use/import the library xyz-py. Save using this: xyz_py.save_xyz(f_name: str, labels: _Buffer | _SupportsArray[dtype[Any]] | _NestedSequence[_SupportsArray[dtype[Any]]] | bool | int | float | complex | str | bytes | _NestedSequence[bool | int | float | complex | str | bytes], coords: _Buffer | _SupportsArray[dtype[Any]] | _NestedSequence[_SupportsArray[dtype[Any]]] | bool | int | float | complex | str | bytes | _NestedSequence[bool | int | float | complex | str | bytes], with_numbers: bool = False, verbose: bool = True, mask: list = [], atomic_numbers: bool = False, comment: str = '')→ None
     save_path = get_unique_path(name, lambda i: f"{name}_f{i}.xyz", main_path)
 
-    xyz_array = ADD
-    #getting text answers about if we actually want an xyz file bc it needs comments on every line (the comments can just be empty strings)
-    #also depending on the lbirary is xyz_array np.ndarray or jsut a regular array
+    dx_dy_arr = opt_flow.reshape(-1, 2)
+    zeros = np.zeros((len(dx_dy_arr), 1), dtype=dx_dy_arr[0][0].dtype)
+    
+    xyz_arr = np.hstack((dx_dy_arr, zeros))
+    comments_arr = ADD
+    #for saving, the XYZ array is in this form (according to the documentation): [[X1, Y1, Z1], [X2, Y2, Z2], [X3, Y3, Z3], [X4, Y4, Z4]]
+    #check if the xyz saving function can take numpy arrays! if so make comments_arr be a numpy array
 
     return NotImplementedError
 

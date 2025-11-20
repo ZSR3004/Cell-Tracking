@@ -30,6 +30,10 @@ it turns out she needed to move the function save_original_video from tiffclass.
 test_save_original_video function please ask Caroline <3. Also Caroline did all the imports so you can ask her about those too :)
 """
 
+#IMPORTANT: TO TEST save_optical_flow_as_xyz, TEST IF RESHAPING WORKS!!! FOR EXAMPLE, MAKE SAMPLE ARRAYS AND SEE IF THEY RESHAPE CORRECTLY.
+#AN EXAMPLE OF A CORRECT RESHAPE WOULD BE: Original: [[[[[1, 2]],[[3, 4]],[[5, 6]]]],[[[[7, 8]],[[9, 10]],[[11, 12]]]]]. After reshaping: [[1, 2],[3, 4],[5, 6],[7, 8],[9, 10],[11, 12]] 
+#   PROB NOT THIS BC NUMPY AUTOMATICALLY CONVERTS TUPLES TO LISTS (or instead is it this because they're tuples?) Original: [[[[(1, 2)],[(3, 4)],[(5, 6)]]],[[[(7, 8)],[(9, 10)],[(11, 12)]]]]. After reshaping: [(1, 2),(3, 4),(5, 6),(7, 8),(9, 10),(11, 12)] 
+#ALSO TO TEST save_optical_flow_as_xyz, AFTER RESHAPING YOU SHOULD TEST IF DATATYPES OF ELEMENTS OF THE RESHAPED ARRAY ARE THE SAME DATATYPE AS THE ELEMENTS OF THE NON-RESHAPED ARRAY. LIKE FOR EXAMPLE THEY'RE ALL INTS
 
 def test_save_original_video(sample_tiff, tmp_path):
     """
