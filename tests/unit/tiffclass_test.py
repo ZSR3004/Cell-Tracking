@@ -28,7 +28,7 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     """
     return tiff.Tiff(request.param)
 
-def test_init(init_tiff (tiff.Tiff)):
+def test_init(init_tiff: tiff.Tiff):
     """
     Tests whether the Tiff class initializes correctly.
 
@@ -59,7 +59,7 @@ def test_init(init_tiff (tiff.Tiff)):
     assert img.arr.shape[3] == w  # width
 
 
-def test_isolate_channel(init_tiff (tiff.Tiff)):
+def test_isolate_channel(init_tiff: tiff.Tiff):
     """
     Tests whether the isolate_channel method works correctly.
 
@@ -97,7 +97,7 @@ def test_isolate_channel(init_tiff (tiff.Tiff)):
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
     
-def test_show_image(init_tiff (tiff.Tiff), tmp_path):
+def test_show_image(init_tiff: tiff.Tiff, tmp_path):
     """
     Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
 
@@ -161,7 +161,7 @@ def test_show_image(init_tiff (tiff.Tiff), tmp_path):
     assert os.path.getsize(image5_save_path) > 0
     assert os.path.getsize(image6_save_path) > 0
 
-def test_preprocess_frame(init_tiff (tiff.Tiff)):
+def test_preprocess_frame(init_tiff: tiff.Tiff):
     """
     Tests whether the preprocess_frame method works correctly.
 
@@ -276,7 +276,7 @@ def test_preprocess_frame(init_tiff (tiff.Tiff)):
     assert kwargs5_preprocess_middle_frame.shape == middle_frame_channel_1.shape
     assert kwargs5_preprocess_last_frame.shape == last_frame_channel_2.shape
 
-def test_preprocess_stack(init_tiff (tiff.Tiff)):
+def test_preprocess_stack(init_tiff: tiff.Tiff):
     """
     Tests whether the preprocess_stack method works correctly.
 
