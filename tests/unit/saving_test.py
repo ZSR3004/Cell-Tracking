@@ -33,6 +33,31 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     path, info = request.param
     return (tiff.Tiff(path), info)
 
+def get_save_dirs_unique_path(name: str, pattern_fn, main_path: str) -> Path:
+    """
+    An edited version of saving.get_unique_path that gets the path with pattern_fn that was last saved.
+
+    Args:
+        name (str): Main identifier (e.g., protein name).
+        pattern_fn (callable): Function that takes an integer and returns a file name.
+        main_path (str): Main path to the directory.
+
+    Returns:
+        Path: Unique file path that does not yet exist.
+    """
+    save_dir = main_path / name
+    save_dir.mkdir(parents=True, exist_ok=True)
+
+    i = 1
+    while True:
+        file_name1 = pattern_fn(i)
+        file_path1 = save_dir / file_name1
+        if not file_path1.exists():
+            file_name = pattern_fn(i-1)
+            file_path = save_dir / file_name
+            return file_path
+        i += 1
+
 def test_get_unique_path(init_tiff: tuple, tmp_path):
     """
     Tests whether the get_unique_path method works correctly.
@@ -173,7 +198,6 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     """
     img, info = init_tiff
     f, c, h, w = info
-
     tiff_arr = img.arr
 
     name1 = "Test_Name"
@@ -181,26 +205,63 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     assert not save_dir.exists()
 
     save_arr1 = saving.save_arr(name1, img, tmp_path)
-    unique_saved_path = saving.get_unique_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir)
+    save_dirs_unique_path = get_save_dirs_unique_path(name1, lambda i: f"{name1}_flow{i}.npy", tmp_path)
 
     assert save_dir.exists()
-    assert unique_saved_path.exists()
+    assert save_dirs_unique_path.exists()
 
-    assert np.array_equal(np.load(unique_saved_path), tiff_arr)
+    assert np.array_equal(np.load(save_dirs_unique_path), tiff_arr)
 
-def test_save_optical_flow_as_xyz():
+def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the save_optical_flow_as_xyz method works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    #IMPORTANT: TO TEST save_optical_flow_as_xyz, TEST IF RESHAPING WORKS!!! FOR EXAMPLE, MAKE SAMPLE ARRAYS AND SEE IF THEY RESHAPE CORRECTLY.
+    #AN EXAMPLE OF A CORRECT RESHAPE WOULD BE (NOTE BOTH OF THEM ARE NUMPY ARRAYS): Original: [[[[[1, 2]],[[3, 4]],[[5, 6]]]],[[[[7, 8]],[[9, 10]],[[11, 12]]]]]. After reshaping: [[1, 2],[3, 4],[5, 6],[7, 8],[9, 10],[11, 12]] 
+    #   PROB NOT THIS BC NUMPY AUTOMATICALLY CONVERTS TUPLES TO LISTS (or instead is it this because they're tuples?) Original: [[[[(1, 2)],[(3, 4)],[(5, 6)]]],[[[(7, 8)],[(9, 10)],[(11, 12)]]]]. After reshaping: [(1, 2),(3, 4),(5, 6),(7, 8),(9, 10),(11, 12)] 
+    #ALSO TO TEST save_optical_flow_as_xyz, AFTER RESHAPING YOU SHOULD TEST IF DATATYPES OF ELEMENTS OF THE RESHAPED ARRAY ARE THE SAME DATATYPE AS THE ELEMENTS OF THE NON-RESHAPED ARRAY. LIKE FOR EXAMPLE THEY'RE ALL INTS
     return NotImplementedError
 
-def test_save_optical_flow_as_matlab():
+def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the save_optical_flow_as_matlab method works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
     return NotImplementedError
 
 def test_save_optical_flow_as_numpy():
     return NotImplementedError
-
-#IMPORTANT: TO TEST save_optical_flow_as_xyz, TEST IF RESHAPING WORKS!!! FOR EXAMPLE, MAKE SAMPLE ARRAYS AND SEE IF THEY RESHAPE CORRECTLY.
-#AN EXAMPLE OF A CORRECT RESHAPE WOULD BE (NOTE BOTH OF THEM ARE NUMPY ARRAYS): Original: [[[[[1, 2]],[[3, 4]],[[5, 6]]]],[[[[7, 8]],[[9, 10]],[[11, 12]]]]]. After reshaping: [[1, 2],[3, 4],[5, 6],[7, 8],[9, 10],[11, 12]] 
-#   PROB NOT THIS BC NUMPY AUTOMATICALLY CONVERTS TUPLES TO LISTS (or instead is it this because they're tuples?) Original: [[[[(1, 2)],[(3, 4)],[(5, 6)]]],[[[(7, 8)],[(9, 10)],[(11, 12)]]]]. After reshaping: [(1, 2),(3, 4),(5, 6),(7, 8),(9, 10),(11, 12)] 
-#ALSO TO TEST save_optical_flow_as_xyz, AFTER RESHAPING YOU SHOULD TEST IF DATATYPES OF ELEMENTS OF THE RESHAPED ARRAY ARE THE SAME DATATYPE AS THE ELEMENTS OF THE NON-RESHAPED ARRAY. LIKE FOR EXAMPLE THEY'RE ALL INTS
 
 def test_save_original_video(init_tiff: tuple, tmp_path):
     """
