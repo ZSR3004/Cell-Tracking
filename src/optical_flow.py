@@ -112,9 +112,9 @@ def calculate_optical_flow(arr: np.ndarray, process_args=None, default=False) ->
     Returns:
         np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
     """
-    flow_channel0 = optical_flow(arr, 0)
     flow_channel1 = optical_flow(arr, 1)
-    combined = combine_flows([flow_channel0, flow_channel1])
+    flow_channel2 = optical_flow(arr, 2)
+    combined = combine_flows([flow_channel1, flow_channel2])
     return combined
 
 def show_flow(flow : np.ndarray, title='Optical Flow', 
