@@ -48,7 +48,7 @@ def save_arr(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
         None: Just saves the array to a file.
     """
     tiff_arr = tiff_instance.arr
-    save_path = get_unique_path(name, lambda i: f"{name}_f{i}.npy", main_path)
+    save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.npy", main_path)
     np.save(save_path, tiff_arr)
 
 def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) -> None:
@@ -63,7 +63,7 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     Returns:
         None: Just saves the optical flow array to a file.
     """
-    save_path = get_unique_path(name, lambda i: f"{name}_f{i}.xyz", main_path)
+    save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.xyz", main_path)
 
     dx_dy_arr = opt_flow.reshape(-1, 2)
     zeros = np.zeros((len(dx_dy_arr), 1), dtype=dx_dy_arr[0][0].dtype)
@@ -85,7 +85,7 @@ def save_optical_flow_as_matlab(name: str, opt_flow: np.ndarray, main_path: str)
     Returns:
         None: Just saves the optical flow array to a file.
     """
-    save_path = get_unique_path(name, lambda i: f"{name}_f{i}.mat", main_path)
+    save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.mat", main_path)
     savemat(save_path, {"optical_flow": opt_flow})
 
 def save_optical_flow_as_numpy(name: str, opt_flow: np.ndarray, main_path: str) -> None:
@@ -100,7 +100,7 @@ def save_optical_flow_as_numpy(name: str, opt_flow: np.ndarray, main_path: str) 
     Returns:
         None: Just saves the optical flow array to a file.
     """
-    save_path = get_unique_path(name, lambda i: f"{name}_f{i}.npy", main_path)
+    save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.npy", main_path)
     np.save(save_path, opt_flow)
 
 def save_original_video(name: str, file_path: str, im: matplotlib.image.AxesImage, image_stack: np.ndarray, fig: matplotlib.figure.Figure, ax: matplotlib.axes._axes.Axes, **kwargs) -> None:
