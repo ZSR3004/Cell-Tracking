@@ -189,3 +189,5 @@ Note: Depending on the file size and selections, processing may take several min
 
 Once complete, your files that you chose will be available on your folder. 
 
+Note: An error will pop up at the end right now after it starts calculating the optical flow because it is not fully implemented. The only steps that should fully work will be entering the selections for what you want the output to be.
+
