@@ -94,7 +94,7 @@ Press "Enter" or "Return" on your keyboard after typing your response
 
 ### Entering Folder and File Paths
 
-1. Enter the parent folder where your TIFF file exists. 
+Enter the parent folder where your TIFF file exists. 
 
 You will see: 
 ```bash
@@ -125,9 +125,9 @@ Note: If the file does not exist, you will see:
 Error: File 'FILE_PATH' does not exist. 
 ```
 At this point, double check: 
-    * File name (letterings)
-    * File ends in .tif or .tiff
-    * File is in the correct folder
+  - File name (letterings)
+  -  File ends in .tif or .tiff
+  -  File is in the correct folder
 
 Re-try the path until the program is able to run. 
 
@@ -165,7 +165,7 @@ Type:
     2. p for phase-contrast or cytoplasm labeled videos 
     3. Once you have typed your response, press Enter or Return on your keyboard
 
-    * This step determines which preprocessing and optical flow model will be used
+  - This step determines which preprocessing and optical flow model will be used
 
 ### Combined Flow Option 
 
