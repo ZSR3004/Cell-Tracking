@@ -452,8 +452,119 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
     gc.collect()
     shutil.rmtree(save_dir6)
 
-def test_save_optical_flow_as_numpy():
-    return NotImplementedError
+def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the save_optical_flow_as_numpy method works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    name1 = "Test_Name"
+
+    kwargs1 = {'pyr_scale': 0.25, 'levels': 2, 'winsize': 30, 'iterations': 5, 'poly_n': 7, 'poly_sigma': 2.8, 'flags': 1}
+
+    optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
+    save_dir1 = tmp_path / "save_dir1"
+    assert not save_dir1.exists()
+    save.save_optical_flow_as_numpy(name1, optical_flow_channel0, save_dir1)
+    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir1)
+    assert save_dir1.exists()
+    assert optical_flow_channel0_path.exists()
+    optical_flow_channel0_arr = np.load(optical_flow_channel0_path)
+    assert isinstance(optical_flow_channel0_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel0_arr, optical_flow_channel0)
+    assert optical_flow_channel0_arr.shape == optical_flow_channel0.shape
+    del optical_flow_channel0, optical_flow_channel0_arr
+    gc.collect()
+    shutil.rmtree(save_dir1)
+
+    optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
+    save_dir2 = tmp_path / "save_dir2"
+    assert not save_dir2.exists()
+    save.save_optical_flow_as_numpy(name1, optical_flow_channel1, save_dir2)
+    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir2)
+    assert save_dir2.exists()
+    assert optical_flow_channel1_path.exists()
+    optical_flow_channel1_arr = np.load(optical_flow_channel1_path)
+    assert isinstance(optical_flow_channel1_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1)
+    assert optical_flow_channel1_arr.shape == optical_flow_channel1.shape
+    del optical_flow_channel1, optical_flow_channel1_arr
+    gc.collect()
+    shutil.rmtree(save_dir2)
+
+    optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
+    save_dir3 = tmp_path / "save_dir3"
+    assert not save_dir3.exists()
+    save.save_optical_flow_as_numpy(name1, optical_flow_channel2, save_dir3)
+    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir3)
+    assert save_dir3.exists()
+    assert optical_flow_channel2_path.exists()
+    optical_flow_channel2_arr = np.load(optical_flow_channel2_path)
+    assert isinstance(optical_flow_channel2_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2)
+    assert optical_flow_channel2_arr.shape == optical_flow_channel2.shape
+    del optical_flow_channel2, optical_flow_channel2_arr
+    gc.collect()
+    shutil.rmtree(save_dir3)
+
+    optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
+    save_dir4 = tmp_path / "save_dir4"
+    assert not save_dir4.exists()
+    save.save_optical_flow_as_numpy(name1, optical_flow_channel0_custom, save_dir4)
+    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir4)
+    assert save_dir4.exists()
+    assert optical_flow_channel0_custom_path.exists()
+    optical_flow_channel0_custom_arr = np.load(optical_flow_channel0_custom_path)
+    assert isinstance(optical_flow_channel0_custom_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel0_custom_arr, optical_flow_channel0_custom)
+    assert optical_flow_channel0_custom_arr.shape == optical_flow_channel0_custom.shape
+    del optical_flow_channel0_custom, optical_flow_channel0_custom_arr
+    gc.collect()
+    shutil.rmtree(save_dir4)
+
+    calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
+    save_dir5 = tmp_path / "save_dir5"
+    assert not save_dir5.exists()
+    save.save_optical_flow_as_numpy(name1, calculate_optical_flow, save_dir5)
+    calculate_optical_flow_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir5)
+    assert save_dir5.exists()
+    assert calculate_optical_flow_path.exists()
+    calculate_optical_flow_arr = np.load(calculate_optical_flow_path)
+    assert isinstance(calculate_optical_flow_arr, np.ndarray)
+    assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow)
+    assert calculate_optical_flow_arr.shape == calculate_optical_flow.shape
+    del calculate_optical_flow, calculate_optical_flow_arr
+    gc.collect()
+    shutil.rmtree(save_dir5)
+
+    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr)
+    save_dir6 = tmp_path / "save_dir6"
+    assert not save_dir6.exists()
+    save.save_optical_flow_as_numpy(name1, calculate_optical_flow_default_true, save_dir6)
+    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir6)
+    assert save_dir6.exists()
+    assert calculate_optical_flow_default_true_path.exists()
+    calculate_optical_flow_default_true_arr = np.load(calculate_optical_flow_default_true_path)
+    assert isinstance(calculate_optical_flow_default_true_arr, np.ndarray)
+    assert np.array_equal(calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true)
+    assert calculate_optical_flow_default_true_arr.shape == calculate_optical_flow_default_true.shape
+    del calculate_optical_flow_default_true, calculate_optical_flow_default_true_arr
+    gc.collect()
+    shutil.rmtree(save_dir6)
 
 def test_save_original_video(init_tiff: tuple, tmp_path):
     """
