@@ -50,6 +50,12 @@ After that, you can install our Cell-Tracking package by using the following com
 pip install git+https://github.com/ZSR3004/Cell-Tracking.git
 ```
 
+We highly recommend also installing supplementary packages like `numpy` to manipulate arrays and `matplotlib` to create your own visualization.
+
+```bash
+pip install matplotlib numpy
+```
+
 That's it! You're up and running.
 
 ## Code Documentation
