@@ -10,7 +10,7 @@ import cv2, json, pytest, gc, shutil, xyz_py
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
-from unittest.mock import patch, Mock
+from unittest.mock import patch, Mock, MagicMock
 import numpy as np
 from pathlib import Path
 from scipy.io import savemat
@@ -387,7 +387,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     img, info = init_tiff
     f, c, h, w = info
 
-    fig, ax = plt.subplots()
+    fig = MagicMock()
+    ax = MagicMock()
+    im = MagicMock()
 
     preprocess_kwargs5 = {
         "gauss": {"ksize": (3, 3), "sigmaX": 1.5},
@@ -439,18 +441,16 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs2_path = tmp_path / "stack6_kwargs2.mp4"
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
-    im1 = ax.imshow(image_stack1[0], cmap="gray")
-    im2 = ax.imshow(image_stack2[0], cmap="gray")
-    im3 = ax.imshow(image_stack3[0], cmap="gray")
-    im4 = ax.imshow(image_stack4[0], cmap="gray")
-    im5 = ax.imshow(image_stack5[0], cmap="gray")
-    im6 = ax.imshow(image_stack6[0], cmap="gray")
-
     with patch("matplotlib.animation.FFMpegWriter") as mock_FFMpegWriter, \
          patch("matplotlib.animation.FuncAnimation") as mock_FuncAnimation, \
          patch("matplotlib.animation.save") as mock_save:
+        mock_anim_instance = MagicMock()
+        mock_FuncAnimation.return_value = mock_anim_instance
+        mock_writer_instance = MagicMock()
+        mock_FFMpegWriter.return_value = mock_writer_instance
+
         save_stack1_kwargs1 = save.save_original_video(
-            "stack1_kwargs1", stack1_kwargs1_path, im1, image_stack1, fig, ax, **kwargs1
+            "stack1_kwargs1", stack1_kwargs1_path, im, image_stack1, fig, ax, **kwargs1
         )
 
         T = kwargs1.get("T", image_stack1.shape[0])
@@ -515,5 +515,12 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             "stack6_kwargs4", stack6_kwargs4_path, im6, image_stack6, fig, ax, **kwargs4
         )
 """
+#fig, ax = plt.subplots()
+"""im1 = ax.imshow(image_stack1[0], cmap="gray")
+    im2 = ax.imshow(image_stack2[0], cmap="gray")
+    im3 = ax.imshow(image_stack3[0], cmap="gray")
+    im4 = ax.imshow(image_stack4[0], cmap="gray")
+    im5 = ax.imshow(image_stack5[0], cmap="gray")
+    im6 = ax.imshow(image_stack6[0], cmap="gray")"""
 
         #REWRITE test_show_image USING PATCH AND MOCK AND test_save_original_video!
