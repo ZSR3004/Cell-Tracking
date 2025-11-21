@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
    
-import cv2, json, pytest
+import cv2, json, pytest, gc
 from src import tiffclass as tiff
 from src import saving as save
 from src import optical_flow as flow
@@ -269,21 +269,61 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
     kwargs3 = {'pyr_scale': 0.3, 'levels': 4, 'winsize': 5, 'iterations': 8, 'poly_n': 3, 'poly_sigma': 0.2, 'flags': 2}
 
     optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
-    optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
-    optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
-    optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
-    optical_flow_channel1_custom = flow.optical_flow(arr=tiff_arr, channel=1, **kwargs2)    
-    optical_flow_channel2_custom = flow.optical_flow(arr=tiff_arr, channel=2, **kwargs3)    
-    calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
-    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr, default=True)
-
     save.save_optical_flow_as_matlab(name1, optical_flow_channel0, tmp_path)
-    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.matlab", tmp_path)
+    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
     assert optical_flow_channel0_path.exists()
     optical_flow_channel0_data = loadmat(optical_flow_channel0_path)
     optical_flow_channel0_arr = optical_flow_channel0_data['optical_flow']
     assert isinstance(optical_flow_channel0_arr, np.ndarray)
     assert np.array_equal(optical_flow_channel0_arr, optical_flow_channel0)
+    del optical_flow_channel0
+    gc.collect()
+    os.remove(optical_flow_channel0_path)
+
+    optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel1, tmp_path)
+    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    assert optical_flow_channel1_path.exists()
+    optical_flow_channel1_data = loadmat(optical_flow_channel1_path)
+    optical_flow_channel1_arr = optical_flow_channel1_data['optical_flow']
+    assert isinstance(optical_flow_channel1_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1)
+    del optical_flow_channel1
+    gc.collect()
+    os.remove(optical_flow_channel1_path)
+
+    optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel2, tmp_path)
+    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    assert optical_flow_channel2_path.exists()
+    optical_flow_channel2_data = loadmat(optical_flow_channel2_path)
+    optical_flow_channel2_arr = optical_flow_channel2_data['optical_flow']
+    assert isinstance(optical_flow_channel2_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2)
+    del optical_flow_channel2
+    gc.collect()
+    os.remove(optical_flow_channel2_path)
+
+    optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel0_custom, tmp_path)
+    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    assert optical_flow_channel0_custom_path.exists()
+    optical_flow_channel0_custom_data = loadmat(optical_flow_channel0_custom_path)
+    optical_flow_channel0_custom_arr = optical_flow_channel0_custom_data['optical_flow']
+    assert isinstance(optical_flow_channel0_custom_arr, np.ndarray)
+    assert np.array_equal(optical_flow_channel0_custom_arr, optical_flow_channel0_custom)
+    del optical_flow_channel0_custom
+    gc.collect()
+    os.remove(optical_flow_channel0_custom_path)
+    
+    
+
+    """
+    delete? optical_flow_channel1_custom = flow.optical_flow(arr=tiff_arr, channel=1, **kwargs2)    
+    delete? optical_flow_channel2_custom = flow.optical_flow(arr=tiff_arr, channel=2, **kwargs3)    
+    calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
+    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr, default=True)
+    """
 
     #DO THIS FOR EVERY OTHER ONE (optical_flow_channel1, optical_flow_channel2, ETC!)
 
