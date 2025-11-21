@@ -198,7 +198,7 @@ def test_calculate_optical_flow(sample_tiff):
     "normalize": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
     "gauss": {"ksize": (5, 5), "sigmaX": 1.5}}
 
-    my_flow = flow.calculate_optical_flow(img.arr, process_args)
+    my_flow = flow.calculate_optical_flow(img.arr, **process_args)
 
     # Test output type
     assert isinstance(my_flow, np.ndarray)
