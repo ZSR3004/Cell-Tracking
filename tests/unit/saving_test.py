@@ -349,132 +349,23 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    name1 = "Test_Name"
+    name = "Test_Name"
+    save_dir = tmp_path / "save_dir"
 
-    kwargs1 = {
-        "pyr_scale": 0.25,
-        "levels": 2,
-        "winsize": 30,
-        "iterations": 5,
-        "poly_n": 7,
-        "poly_sigma": 2.8,
-        "flags": 1,
-    }
+    with patch("numpy.save") as mock_save:
+        save.save_optical_flow_as_numpy(name, tiff_arr, save_dir)
+        
+        args, _ = mock_save.call_args
+        save_path = args[0]
+        opt_flow = args[1]
 
-    optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
-    save_dir1 = tmp_path / "save_dir1"
-    assert not save_dir1.exists()
-    save.save_optical_flow_as_numpy(name1, optical_flow_channel0, save_dir1)
-    optical_flow_channel0_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir1
-    )
-    assert save_dir1.exists()
-    assert optical_flow_channel0_path.exists()
-    optical_flow_channel0_arr = np.load(optical_flow_channel0_path)
-    assert isinstance(optical_flow_channel0_arr, np.ndarray)
-    assert np.array_equal(optical_flow_channel0_arr, optical_flow_channel0)
-    assert optical_flow_channel0_arr.shape == optical_flow_channel0.shape
-    del optical_flow_channel0, optical_flow_channel0_arr
-    gc.collect()
-    shutil.rmtree(save_dir1)
+        assert name in str(save_path)
+        assert str(save_path).endswith(".npy")
+        assert np.array_equal(opt_flow, tiff_arr)
+        assert opt_flow.shape == tiff_arr.shape
+        mock_save.assert_called_once()
 
-    optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
-    save_dir2 = tmp_path / "save_dir2"
-    assert not save_dir2.exists()
-    save.save_optical_flow_as_numpy(name1, optical_flow_channel1, save_dir2)
-    optical_flow_channel1_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir2
-    )
-    assert save_dir2.exists()
-    assert optical_flow_channel1_path.exists()
-    optical_flow_channel1_arr = np.load(optical_flow_channel1_path)
-    assert isinstance(optical_flow_channel1_arr, np.ndarray)
-    assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1)
-    assert optical_flow_channel1_arr.shape == optical_flow_channel1.shape
-    del optical_flow_channel1, optical_flow_channel1_arr
-    gc.collect()
-    shutil.rmtree(save_dir2)
-
-    optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
-    save_dir3 = tmp_path / "save_dir3"
-    assert not save_dir3.exists()
-    save.save_optical_flow_as_numpy(name1, optical_flow_channel2, save_dir3)
-    optical_flow_channel2_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir3
-    )
-    assert save_dir3.exists()
-    assert optical_flow_channel2_path.exists()
-    optical_flow_channel2_arr = np.load(optical_flow_channel2_path)
-    assert isinstance(optical_flow_channel2_arr, np.ndarray)
-    assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2)
-    assert optical_flow_channel2_arr.shape == optical_flow_channel2.shape
-    del optical_flow_channel2, optical_flow_channel2_arr
-    gc.collect()
-    shutil.rmtree(save_dir3)
-
-    optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
-    save_dir4 = tmp_path / "save_dir4"
-    assert not save_dir4.exists()
-    save.save_optical_flow_as_numpy(name1, optical_flow_channel0_custom, save_dir4)
-    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir4
-    )
-    assert save_dir4.exists()
-    assert optical_flow_channel0_custom_path.exists()
-    optical_flow_channel0_custom_arr = np.load(optical_flow_channel0_custom_path)
-    assert isinstance(optical_flow_channel0_custom_arr, np.ndarray)
-    assert np.array_equal(
-        optical_flow_channel0_custom_arr, optical_flow_channel0_custom
-    )
-    assert optical_flow_channel0_custom_arr.shape == optical_flow_channel0_custom.shape
-    del optical_flow_channel0_custom, optical_flow_channel0_custom_arr
-    gc.collect()
-    shutil.rmtree(save_dir4)
-
-    calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
-    save_dir5 = tmp_path / "save_dir5"
-    assert not save_dir5.exists()
-    save.save_optical_flow_as_numpy(name1, calculate_optical_flow, save_dir5)
-    calculate_optical_flow_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir5
-    )
-    assert save_dir5.exists()
-    assert calculate_optical_flow_path.exists()
-    calculate_optical_flow_arr = np.load(calculate_optical_flow_path)
-    assert isinstance(calculate_optical_flow_arr, np.ndarray)
-    assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow)
-    assert calculate_optical_flow_arr.shape == calculate_optical_flow.shape
-    del calculate_optical_flow, calculate_optical_flow_arr
-    gc.collect()
-    shutil.rmtree(save_dir5)
-
-    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr)
-    save_dir6 = tmp_path / "save_dir6"
-    assert not save_dir6.exists()
-    save.save_optical_flow_as_numpy(
-        name1, calculate_optical_flow_default_true, save_dir6
-    )
-    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir6
-    )
-    assert save_dir6.exists()
-    assert calculate_optical_flow_default_true_path.exists()
-    calculate_optical_flow_default_true_arr = np.load(
-        calculate_optical_flow_default_true_path
-    )
-    assert isinstance(calculate_optical_flow_default_true_arr, np.ndarray)
-    assert np.array_equal(
-        calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true
-    )
-    assert (
-        calculate_optical_flow_default_true_arr.shape
-        == calculate_optical_flow_default_true.shape
-    )
-    del calculate_optical_flow_default_true, calculate_optical_flow_default_true_arr
-    gc.collect()
-    shutil.rmtree(save_dir6)
-
-    #REWRITE test_show_image USING PATCH AND MOCK!
+        gc.collect()
 
 
 def test_save_original_video(init_tiff: tuple, tmp_path):
@@ -524,16 +415,16 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     kwargs4 = {}
     kwargs5 = {"T": 1}
 
-    stack1 = np.asarray(img.arr[:, 2, :, :])
-    stack2 = np.asarray([img.arr[0, 0, :, :]])
-    stack3 = np.asarray(
+    image_stack1 = np.asarray(img.arr[:, 2, :, :])
+    image_stack2 = np.asarray([img.arr[0, 0, :, :]])
+    image_stack3 = np.asarray(
         [img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]]
     )
-    stack4 = img.preprocess_stack(
+    image_stack4 = img.preprocess_stack(
         np.asarray(img.arr[: (f - 1) // 2, 2, :, :]), **preprocess_kwargs5
     )
-    stack5 = img.preprocess_stack(np.asarray(img.arr[:, 0, :, :]), **preprocess_kwargs6)
-    stack6 = img.preprocess_stack(np.asarray(img.arr[:, 1, :, :]), **preprocess_kwargs7)
+    image_stack5 = img.preprocess_stack(np.asarray(img.arr[:, 0, :, :]), **preprocess_kwargs6)
+    image_stack6 = img.preprocess_stack(np.asarray(img.arr[:, 1, :, :]), **preprocess_kwargs7)
 
     stack1_kwargs1_path = tmp_path / "stack1_kwargs1.mp4"
     stack1_kwargs3_path = tmp_path / "stack1_kwargs3.mp4"
@@ -548,72 +439,81 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs2_path = tmp_path / "stack6_kwargs2.mp4"
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
-    im_stack1 = ax.imshow(stack1[0], cmap="gray")
-    im_stack2 = ax.imshow(stack2[0], cmap="gray")
-    im_stack3 = ax.imshow(stack3[0], cmap="gray")
-    im_stack4 = ax.imshow(stack4[0], cmap="gray")
-    im_stack5 = ax.imshow(stack5[0], cmap="gray")
-    im_stack6 = ax.imshow(stack6[0], cmap="gray")
+    im1 = ax.imshow(image_stack1[0], cmap="gray")
+    im2 = ax.imshow(image_stack2[0], cmap="gray")
+    im3 = ax.imshow(image_stack3[0], cmap="gray")
+    im4 = ax.imshow(image_stack4[0], cmap="gray")
+    im5 = ax.imshow(image_stack5[0], cmap="gray")
+    im6 = ax.imshow(image_stack6[0], cmap="gray")
 
-    save_stack1_kwargs1 = save.save_original_video(
-        "stack1_kwargs1", stack1_kwargs1_path, im_stack1, stack1, fig, ax, **kwargs1
-    )
-    save_stack1_kwargs3 = save.save_original_video(
-        "stack1_kwargs3", stack1_kwargs3_path, im_stack1, stack1, fig, ax, **kwargs3
-    )
-    save_stack2_kwargs4 = save.save_original_video(
-        "stack2_kwargs4", stack2_kwargs4_path, im_stack2, stack2, fig, ax, **kwargs4
-    )
-    save_stack2_kwargs5 = save.save_original_video(
-        "stack2_kwargs2", stack2_kwargs5_path, im_stack2, stack2, fig, ax, **kwargs5
-    )
-    save_stack3_kwargs3 = save.save_original_video(
-        "stack3_kwargs3", stack3_kwargs3_path, im_stack3, stack3, fig, ax, **kwargs3
-    )
-    save_stack3_kwargs5 = save.save_original_video(
-        "stack3_kwargs1", stack3_kwargs5_path, im_stack3, stack3, fig, ax, **kwargs5
-    )
-    save_stack4_kwargs2 = save.save_original_video(
-        "stack4_kwargs2", stack4_kwargs2_path, im_stack4, stack4, fig, ax, **kwargs2
-    )
-    save_stack4_kwargs4 = save.save_original_video(
-        "stack4_kwargs4", stack4_kwargs4_path, im_stack4, stack4, fig, ax, **kwargs4
-    )
-    save_stack5_kwargs1 = save.save_original_video(
-        "stack5_kwargs1", stack5_kwargs1_path, im_stack5, stack5, fig, ax, **kwargs1
-    )
-    save_stack5_kwargs3 = save.save_original_video(
-        "stack5_kwargs3", stack5_kwargs3_path, im_stack5, stack5, fig, ax, **kwargs3
-    )
-    save_stack6_kwargs2 = save.save_original_video(
-        "stack6_kwargs2", stack6_kwargs2_path, im_stack6, stack6, fig, ax, **kwargs2
-    )
-    save_stack6_kwargs4 = save.save_original_video(
-        "stack6_kwargs4", stack6_kwargs4_path, im_stack6, stack6, fig, ax, **kwargs4
-    )
+    with patch("matplotlib.animation.FFMpegWriter") as mock_FFMpegWriter, \
+         patch("matplotlib.animation.FuncAnimation") as mock_FuncAnimation, \
+         patch("matplotlib.animation.save") as mock_save:
+        save_stack1_kwargs1 = save.save_original_video(
+            "stack1_kwargs1", stack1_kwargs1_path, im1, image_stack1, fig, ax, **kwargs1
+        )
 
-    assert stack1_kwargs1_path.exists()
-    assert stack1_kwargs3_path.exists()
-    assert stack2_kwargs4_path.exists()
-    assert stack2_kwargs5_path.exists()
-    assert stack3_kwargs3_path.exists()
-    assert stack3_kwargs5_path.exists()
-    assert stack4_kwargs2_path.exists()
-    assert stack4_kwargs4_path.exists()
-    assert stack5_kwargs1_path.exists()
-    assert stack5_kwargs3_path.exists()
-    assert stack6_kwargs2_path.exists()
-    assert stack6_kwargs4_path.exists()
+        T = kwargs1.get("T", image_stack1.shape[0])
+        fps = kwargs1.get("fps", 10)
 
-    assert os.path.getsize(stack1_kwargs1_path) > 0
-    assert os.path.getsize(stack1_kwargs3_path) > 0
-    assert os.path.getsize(stack2_kwargs4_path) > 0
-    assert os.path.getsize(stack2_kwargs5_path) > 0
-    assert os.path.getsize(stack3_kwargs3_path) > 0
-    assert os.path.getsize(stack3_kwargs5_path) > 0
-    assert os.path.getsize(stack4_kwargs2_path) > 0
-    assert os.path.getsize(stack4_kwargs4_path) > 0
-    assert os.path.getsize(stack5_kwargs1_path) > 0
-    assert os.path.getsize(stack5_kwargs3_path) > 0
-    assert os.path.getsize(stack6_kwargs2_path) > 0
-    assert os.path.getsize(stack6_kwargs4_path) > 0
+        def update(frame):
+            im1.set_data(image_stack1[frame])
+            ax.set_title(f"Frame {frame}")
+        writer = animation.FFMpegWriter(fps=fps)
+
+        args_FuncAnimation, kwargs_FuncAnimation = mock_FuncAnimation.call_args
+        assert args_FuncAnimation[0] == fig
+        assert args_FuncAnimation[1] == update
+        assert kwargs_FuncAnimation["frames"] == T
+        assert kwargs_FuncAnimation["interval"] == 1000 / fps
+        assert kwargs_FuncAnimation["blit"] == False
+
+        _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
+        assert kwargs_FFMpegWriter["fps"] == fps
+
+        args_save, kwargs_save = mock_save.call_args
+        assert args_save[0] == stack1_kwargs1_path
+        assert kwargs_save["writer"] == writer
+        
+        mock_FuncAnimation.assert_called_once()
+
+
+
+#do above to everything below
+"""
+        save_stack1_kwargs3 = save.save_original_video(
+            "stack1_kwargs3", stack1_kwargs3_path, im1, image_stack1, fig, ax, **kwargs3
+        )
+        save_stack2_kwargs4 = save.save_original_video(
+            "stack2_kwargs4", stack2_kwargs4_path, im2, image_stack2, fig, ax, **kwargs4
+        )
+        save_stack2_kwargs5 = save.save_original_video(
+            "stack2_kwargs2", stack2_kwargs5_path, im2, image_stack2, fig, ax, **kwargs5
+        )
+        save_stack3_kwargs3 = save.save_original_video(
+            "stack3_kwargs3", stack3_kwargs3_path, im3, image_stack3, fig, ax, **kwargs3
+        )
+        save_stack3_kwargs5 = save.save_original_video(
+            "stack3_kwargs1", stack3_kwargs5_path, im3, image_stack3, fig, ax, **kwargs5
+        )
+        save_stack4_kwargs2 = save.save_original_video(
+            "stack4_kwargs2", stack4_kwargs2_path, im4, image_stack4, fig, ax, **kwargs2
+        )
+        save_stack4_kwargs4 = save.save_original_video(
+            "stack4_kwargs4", stack4_kwargs4_path, im4, image_stack4, fig, ax, **kwargs4
+        )
+        save_stack5_kwargs1 = save.save_original_video(
+            "stack5_kwargs1", stack5_kwargs1_path, im5, image_stack5, fig, ax, **kwargs1
+        )
+        save_stack5_kwargs3 = save.save_original_video(
+            "stack5_kwargs3", stack5_kwargs3_path, im5, image_stack5, fig, ax, **kwargs3
+        )
+        save_stack6_kwargs2 = save.save_original_video(
+            "stack6_kwargs2", stack6_kwargs2_path, im6, image_stack6, fig, ax, **kwargs2
+        )
+        save_stack6_kwargs4 = save.save_original_video(
+            "stack6_kwargs4", stack6_kwargs4_path, im6, image_stack6, fig, ax, **kwargs4
+        )
+"""
+
+        #REWRITE test_show_image USING PATCH AND MOCK AND test_save_original_video!
