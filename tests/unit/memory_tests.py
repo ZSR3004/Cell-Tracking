@@ -8,8 +8,8 @@ if ROOT_DIR not in sys.path:
 
 import pytest
 import yaml
-from src import memory
-from src.defaults import default_yaml_config
+from cell_tracking import memory
+from cell_tracking.defaults import default_yaml_config
 from dataclasses import dataclass
 
 

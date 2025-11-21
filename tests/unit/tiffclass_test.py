@@ -7,12 +7,12 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
    
 import cv2, pytest
-from src import tiffclass as tiff
+from cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 import numpy as np
 
 TIFF_PATHS = [
-    ("../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif", (96, 3, 520, 2329))
+    ("datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif", (96, 3, 520, 2329))
 ]
 
 @pytest.fixture(params=TIFF_PATHS)

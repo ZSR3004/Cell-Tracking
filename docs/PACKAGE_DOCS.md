@@ -320,6 +320,9 @@ flow_custom = calcOpticalFlowRAFT(
 
 ## Complete Example Script
 
+**Note:** This example may take a while to run. If you're using this to test if this package works, we recommend putting
+a print statement after each function just to see that it is running!
+
 ```python
 from cell_tracking import Tiff, calculate_optical_flow, calcOpticalFlowRAFT, ModelSize
 

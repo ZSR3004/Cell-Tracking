@@ -7,16 +7,16 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
    
 import cv2, json, pytest
-from src import tiffclass as tiff
-from src import saving
+from cell_tracking import tiffclass as tiff
+from cell_tracking import saving
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 import matplotlib.animation as animation
-from src.defaults import default_process, default_flow, default_trajectory
+from cell_tracking.defaults import default_process, default_flow
 
 TIFF_PATHS = [
-    ("../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif", (96, 3, 520, 2329))
+    ("datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif", (96, 3, 520, 2329))
 ]
 
 @pytest.fixture(params=TIFF_PATHS)
