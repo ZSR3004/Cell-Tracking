@@ -265,8 +265,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     }
 
     optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
-    zeros1 = np.zeros((len(optical_flow_channel0), 1), dtype=optical_flow_channel0[0][0].dtype)
-    optical_flow_channel0_xyz = np.hstack((optical_flow_channel0, zeros1))
+    dx_dy_arr1 = optical_flow_channel0.reshape(-1, 2)
+    zeros1 = np.zeros((len(dx_dy_arr1), 1), dtype=dx_dy_arr1[0][0].dtype)
+    optical_flow_channel0_xyz = np.hstack((dx_dy_arr1, zeros1))
     save_dir1 = tmp_path / "save_dir1"
     assert not save_dir1.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel0, save_dir1)
@@ -279,8 +280,6 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel0_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    print(coords)
-    print(optical_flow_channel0)
     assert np.array_equal(coords, optical_flow_channel0_xyz)
     assert coords.shape == optical_flow_channel0.shape
     assert labels.shape == len(optical_flow_channel0)
@@ -289,8 +288,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir1)
 
     optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
-    zeros2 = np.zeros((len(optical_flow_channel1), 1), dtype=optical_flow_channel1[0][0].dtype)
-    optical_flow_channel1_xyz = np.hstack((optical_flow_channel1, zeros2))
+    dx_dy_arr2 = optical_flow_channel1.reshape(-1, 2)
+    zeros2 = np.zeros((len(dx_dy_arr2), 1), dtype=dx_dy_arr2[0][0].dtype)
+    optical_flow_channel1_xyz = np.hstack((dx_dy_arr2, zeros2))
     save_dir2 = tmp_path / "save_dir2"
     assert not save_dir2.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel1, save_dir2)
@@ -311,8 +311,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir2)
 
     optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
-    zeros3 = np.zeros((len(optical_flow_channel2), 1), dtype=optical_flow_channel2[0][0].dtype)
-    optical_flow_channel2_xyz = np.hstack((optical_flow_channel2, zeros3))
+    dx_dy_arr3 = optical_flow_channel2.reshape(-1, 2)
+    zeros3 = np.zeros((len(dx_dy_arr3), 1), dtype=dx_dy_arr3[0][0].dtype)
+    optical_flow_channel2_xyz = np.hstack((dx_dy_arr3, zeros3))
     save_dir3 = tmp_path / "save_dir3"
     assert not save_dir3.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel2, save_dir3)
@@ -333,8 +334,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir3)
 
     optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
-    zeros4 = np.zeros((len(optical_flow_channel0_custom), 1), dtype=optical_flow_channel0_custom[0][0].dtype)
-    optical_flow_channel0_custom_xyz = np.hstack((optical_flow_channel0_custom, zeros4))
+    dx_dy_arr4 = optical_flow_channel0_custom.reshape(-1, 2)
+    zeros4 = np.zeros((len(dx_dy_arr4), 1), dtype=dx_dy_arr4[0][0].dtype)
+    optical_flow_channel0_custom_xyz = np.hstack((dx_dy_arr4, zeros4))
     save_dir4 = tmp_path / "save_dir4"
     assert not save_dir4.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel0_custom, save_dir4)
@@ -359,8 +361,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir4)
 
     calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
-    zeros5 = np.zeros((len(calculate_optical_flow), 1), dtype=calculate_optical_flow[0][0].dtype)
-    calculate_optical_flow_xyz = np.hstack((calculate_optical_flow, zeros5))
+    dx_dy_arr5 = calculate_optical_flow.reshape(-1, 2)
+    zeros5 = np.zeros((len(dx_dy_arr5), 1), dtype=dx_dy_arr5[0][0].dtype)
+    calculate_optical_flow_xyz = np.hstack((dx_dy_arr5, zeros5))
     save_dir5 = tmp_path / "save_dir5"
     assert not save_dir5.exists()
     save.save_optical_flow_as_xyz(name1, calculate_optical_flow, save_dir5)
@@ -381,8 +384,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir5)
 
     calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr)
-    zeros6 = np.zeros((len(calculate_optical_flow_default_true), 1), dtype=calculate_optical_flow_default_true[0][0].dtype)
-    calculate_optical_flow_default_true_xyz = np.hstack((calculate_optical_flow_default_true, zeros6))
+    dx_dy_arr6 = calculate_optical_flow_default_true.reshape(-1, 2)
+    zeros6 = np.zeros((len(dx_dy_arr6), 1), dtype=dx_dy_arr6[0][0].dtype)
+    calculate_optical_flow_default_true_xyz = np.hstack((dx_dy_arr6, zeros6))
     save_dir6 = tmp_path / "save_dir6"
     assert not save_dir6.exists()
     save.save_optical_flow_as_xyz(name1, calculate_optical_flow_default_true, save_dir6)
