@@ -76,7 +76,7 @@ cd Users/shitaloli/Documents/Cell-Tracking
 
 3. Once inside the directory, run the CLI tool: 
 ```bash
-python3 cti/main_cti.py
+python3 cli/main_cli.py
 ```
 When you run this command inside the Cell-Tracking repository, it launches the main CLI scrip tthat controls the dull user-interactive workflow. 
 
