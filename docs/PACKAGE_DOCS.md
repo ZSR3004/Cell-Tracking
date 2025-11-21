@@ -5,6 +5,26 @@ the basic kymograph and heatmaps that we offer. This file serves as a general gu
 
 ## Table of Contents
 
+1. [Installation](#installation) \
+   1.1 [Prerequisites](#prerequisites) \
+   1.2 [Main Installation Steps](#main-installation-steps)
+
+2. [Code Documentation](#code-documentation) \
+   2.1 [The Tiff Class](#the-tiff-class) \
+      2.1.1 [Attributes](#attributes) \
+      2.1.2 [Methods](#methods)
+    - [show_image](#show_image)
+    - [preprocess_stack](#preprocess_stack)
+
+   2.2 [Optical Flow](#optical-flow) \
+      2.2.1 [calculate_optical_flow (Nuclei-Labeled)](#calculate_optical_flow-nuclei-labeled) \
+      2.2.2 [calcOpticalFlowRAFT (Cytoplasm-Labeled and Phase Contrast)](#calcopticalflowraft-cytoplasm-labeled-and-phase-contrast)
+
+3. [Complete Script Example](#complete-example-script)
+
+4. [What's Next?](#whats-next)
+
+
 ## Installation
 
 ### Prerequisites
@@ -164,17 +184,29 @@ Takes any of the values "gauss", "median", "normalize", or "contrast" and does n
 **Example:**
 
 ```python
-params = {
+from cell_tracking import Tiff
 
+tiff_stack = Tiff("example_stack.tif")
+
+# Define preprocessing parameters
+params = {
+    "gauss": {"ksize": (5, 5), "sigmaX": 1.2},
+    "median": {"ksize": 3},
+    "normalize": {"alpha": 0, "beta": 255, "norm_type": None},  # OpenCV NORM_MINMAX by default
+    "contrast": {"alpha": 1.5, "beta": 10},
+    "skip": [median]  # skipped the median blur
 }
+
+# Apply preprocessing
+processed_stack = tiff_stack.preprocess_stack(tiff_stack.arr[:, 0, :, :], **params)
 ```
 
-### Optical Flow 
+## Optical Flow 
 
 Optical flow is the primary data analysis objective for this package. There are two types of optical flow algorithms provided. The first uses the Farneback algorithm
 as a backend. The second uses the RAFT model.
 
-#### calculate_optical_flow (Nuclei-Labeled)
+### calculate_optical_flow (Nuclei-Labeled)
 
 This calculates the optical flow of a tiff stack using the Farneback algorithm. We assume that channel 1 shows two cell sheets moving, channel 2 shows one of them moving,
 and channel 2 shows only the other side moving.
@@ -183,7 +215,7 @@ creates a "pseudo" first channel by adding the two channels together (cells on o
 
 The Farneback algorithm is the one used by the OpenCV project and the documentation can be found [here](https://docs.opencv.org/3.4/d4/dee/tutorial_optical_flow.html).
 
-##### **Parameters:**
+#### **Parameters:**
 
 | Name       | Type         | Description                                                                            |
 | ---------- | ------------ | -------------------------------------------------------------------------------------- |
@@ -197,16 +229,37 @@ The Farneback algorithm is the one used by the OpenCV project and the documentat
 |            | `poly_sigma` | Standard deviation of the Gaussian used in the polynomial expansion. Default is `1.2`. |
 |            | `flags`      | Operation flags. Default is `0`.                                                       |
 
-##### **Return:**
+#### **Return:**
 
 | Type         | Description                                                                      |
 | ------------ | -------------------------------------------------------------------------------- |
 | `np.ndarray` | Combined flow vectors of shape `(n_frames - 1, n_channels, height, width, 2)` representing motion between consecutive frames. |
 
 
-##### **Example:**
+#### **Example:**
 
-#### calcOpticalFlowRAFT (Cytoplasm-Labeled and Phase Contrast)
+```python
+from cell_tracking import Tiff, calculate_optical_flow
+
+tiff_stack = Tiff("example_stack.tif")
+
+# Compute optical flow with default Farneback parameters
+flow_default = calculate_optical_flow(tiff_stack.arr)
+
+# Compute optical flow with custom Farneback parameters
+flow_custom = calculate_optical_flow(
+    tiff_stack.arr,
+    pyr_scale=0.7,
+    levels=4,
+    winsize=21,
+    iterations=5,
+    poly_n=7,
+    poly_sigma=1.5,
+    flags=0
+)
+```
+
+### calcOpticalFlowRAFT (Cytoplasm-Labeled and Phase Contrast)
 
 This calculates the optical flow of a tiff stack using the RAFT algorithm. The backend for this function is a little more complicated than the Farneback-backed one,
 so to simplify the process, instead of passing an array as a parameter, you'll pass a Tiff class instance. This function will only return the optical flow for the
@@ -224,7 +277,10 @@ backend for this function)
 | `model_size`    | `ModelSize`      | Which RAFT variant to use. Options are `SMALL` or `LARGE`. Default is `SMALL`.                                        |
 | `model_weights` | `dict` or `None` | A loaded state_dict for the model, or `None` to use default pretrained weights.                                       |
 | `gpu_flag`      | `bool`           | If `True`, use CUDA when available; otherwise use CPU. Default is `False`.                                            |
-| `**kwargs`      | `dict`           | Additional keyword arguments passed to `preprocess_tensor` (see `preprocess_frame` in `tiffclass.py`).                |
+| `**kwargs`      | `dict`           | Additional keyword arguments. See [preprocess_stack](#preprocess_stack)                                                               |
+
+
+
 
 ##### **Return:**
 
@@ -234,6 +290,90 @@ backend for this function)
 
 
 ##### **Example:**
+
+```python
+from cell_tracking import Tiff, calcOpticalFlowRAFT, ModelSize
+
+tiff_file = Tiff("example_stack.tif")
+
+# Compute RAFT optical flow with default SMALL model and default preprocessing
+flow_default = calcOpticalFlowRAFT(tiff_file)
+
+# Compute RAFT optical flow with a LARGE model, GPU, and custom preprocessing
+flow_custom = calcOpticalFlowRAFT(
+    tiff_file,
+    model_size=ModelSize.LARGE,
+    gpu_flag=True,
+    gauss={"ksize": (5, 5), "sigmaX": 1.2},
+    median={"ksize": 3},
+    normalize={"alpha": 0, "beta": 255},
+    contrast={"alpha": 1.5, "beta": 10},
+    skip=[]
+)
+```
+
+## Complete Example Script
+
+```python
+from cell_tracking import Tiff, calculate_optical_flow, calcOpticalFlowRAFT, ModelSize
+
+# Step 1: Load your TIFF file
+tiff_file = Tiff("example_stack.tif")
+
+# Step 2: Inspect the first frame
+first_frame = tiff_file.arr[0, 0]  # first frame of first channel
+tiff_file.show_image(first_frame, title="First Frame")
+
+# Step 3: Preprocess the TIFF stack
+preprocess_params = {
+    "gauss": {"ksize": (5, 5), "sigmaX": 1.2},
+    "median": {"ksize": 3},
+    "normalize": {"alpha": 0, "beta": 255, "norm_type": None},  # default NORM_MINMAX
+    "contrast": {"alpha": 1.5, "beta": 10},
+    "skip": []  # list of steps to skip, e.g., ["median"]
+}
+
+# Preprocess a single channels
+processed_stack1 = tiff_file.preprocess_stack(tiff_file.arr[:, 0, :, :], **preprocess_params)
+processed_stack2 = tiff_file.preprocess_stack(tiff_file.arr[:, 1, :, :], **preprocess_params)
+processed_stack3 = tiff_file.preprocess_stack(tiff_file.arr[:, 2, :, :], **preprocess_params)
+processed_stacks = np.stack((processed_stack1, processed_stack2, processed_stack3), axis=0) # make them into one big array again
+
+# Step 4: Compute optical flow using Farneback (nuclei-labeled example)
+flow_farneback = calculate_optical_flow(
+    processed_stacks,
+    pyr_scale=0.5,
+    levels=3,
+    winsize=15,
+    iterations=3,
+    poly_n=5,
+    poly_sigma=1.2,
+    flags=0
+)
+
+# Step 5: Compute optical flow using RAFT (cytoplasm-labeled / phase contrast example)
+flow_raft = calcOpticalFlowRAFT(
+    tiff_file,
+    model_size=ModelSize.SMALL,
+    gpu_flag=False,
+    **preprocess_params  # optional preprocessing applied before RAFT; this is actually preprocessing the image twice
+)
+
+# Step 6: Inspect results
+
+# Show first frame of Farneback optical flow (visualization example)
+import matplotlib.pyplot as plt
+plt.imshow(flow_farneback[0, 0, :, :, 0], cmap='viridis')  # x-direction flow
+plt.title("Farneback Optical Flow - First Frame (X)")
+plt.colorbar()
+plt.show()
+
+# Show first frame of RAFT optical flow
+plt.imshow(flow_raft[0, :, :, 0], cmap='viridis')  # x-direction flow
+plt.title("RAFT Optical Flow - First Frame (X)")
+plt.colorbar()
+plt.show()
+```
 
 ## What's Next?
 We plan to implement features that allow you to make heatmap and kymograph visualizations of the optical flow. We have not implemented these features yet.
