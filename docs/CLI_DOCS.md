@@ -174,8 +174,8 @@ If your TIFF file contains multiple channels, the CLI will ask:
 Do you want to calculate the combined flows of channels one and two? [y/n]
 ```
 Type: 
-    * y if you want the software to compute optcial flow across both channels simultaneously 
-    * n if you only want flow from one channel
+  - y if you want the software to compute optcial flow across both channels simultaneously 
+  - n if you only want flow from one channel
 
 ### Processing and Input 
 
