@@ -86,8 +86,9 @@ The program will first ask:
 ```bash
 Have you intialized your Cell-Tracking? [y/n]:
 ```
-    * Type "y" if you have run this program before and already created the ouput directory 
-    * Type "n" if this is your first time. (The software will automatically create new folders for saving your outputs.)
+  - Type "y" if you have run this program before and already created the ouput directory 
+  
+  - Type "n" if this is your first time. (The software will automatically create new folders for saving your outputs.)
 
 Press "Enter" or "Return" on your keyboard after typing your response 
 
@@ -99,14 +100,14 @@ You will see:
 ```bash
 Type the directory where your folder is saved "(type ~/folder_name or folder_name)":
 ```
-    Examples: 
 
-    * Documents 
-    * Downloads 
-    * Desktop 
-    * Custom Folder 
+Examples:
+- Documents 
+- Downloads 
+- Desktop 
+- Custom Folder 
 
-2. Enter the full path to your TIFF file when it prompts for your file name 
+1. Enter the full path to your TIFF file when it prompts for your file name 
 
 ```bash
 Enter your file path name:
