@@ -114,7 +114,7 @@ Enter your file path name:
 ```
    Paste the full path to your TIFF file here (Make sure that you TIFF file is on the folder that you are working with).
 
-    Example: 
+Example: 
 
 ```bash
 Enter your file path name:/Users/shitaloli/Downloads/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif
