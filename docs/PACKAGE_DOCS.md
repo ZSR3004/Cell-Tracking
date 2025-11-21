@@ -50,7 +50,8 @@ After that, you can install our Cell-Tracking package by using the following com
 pip install git+https://github.com/ZSR3004/Cell-Tracking.git
 ```
 
-We highly recommend also installing supplementary packages like `numpy` to manipulate arrays and `matplotlib` to create your own visualization.
+This may take a while. We highly recommend also installing supplementary packages like `numpy` to manipulate arrays and `matplotlib` to create your 
+own visualization.
 
 ```bash
 pip install matplotlib numpy
@@ -320,8 +321,17 @@ flow_custom = calcOpticalFlowRAFT(
 
 ## Complete Example Script
 
+**Note:** This example may take a while to run. If you're using this to test if this package works, we recommend putting
+a print statement after each function just to see that it is running!
+
+Feel free to use the example TIFF image we have supplied. Navigate to the [example tiff file](https://github.com/ZSR3004/Cell-Tracking/blob/main/datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif). Then, download the file using the download button
+in the top right corner. Next, replace the file path of that file with "example_stack.tiff" below. The easiest way to do this is by using your 
+file-explorer and copying the absolute path.
+
 ```python
 from cell_tracking import Tiff, calculate_optical_flow, calcOpticalFlowRAFT, ModelSize
+import numpy as np
+import matplotlib.pyplot as plt
 
 # Step 1: Load your TIFF file
 tiff_file = Tiff("example_stack.tif")
@@ -358,6 +368,15 @@ flow_farneback = calculate_optical_flow(
 )
 
 # Step 5: Compute optical flow using RAFT (cytoplasm-labeled / phase contrast example)
+
+# Scale-down the TIFF if you're using the example image
+h, w = tiff_file.arr.shape[-2:]
+crop_h = h // 4
+crop_w = w // 4
+if crop_h == 0 or crop_w == 0:
+    raise ValueError("Image too small to crop by 1/4 on each side.")
+tiff_file.arr = tiff_file.arr[..., crop_h : h - crop_h, crop_w : w - crop_w]
+
 flow_raft = calcOpticalFlowRAFT(
     tiff_file,
     model_size=ModelSize.SMALL,
@@ -368,7 +387,6 @@ flow_raft = calcOpticalFlowRAFT(
 # Step 6: Inspect results
 
 # Show first frame of Farneback optical flow (visualization example)
-import matplotlib.pyplot as plt
 plt.imshow(flow_farneback[0, 0, :, :, 0], cmap='viridis')  # x-direction flow
 plt.title("Farneback Optical Flow - First Frame (X)")
 plt.colorbar()
