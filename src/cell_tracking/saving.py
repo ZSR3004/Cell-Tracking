@@ -7,8 +7,8 @@ import matplotlib.animation as animation
 import xyz_py
 import scipy.io
 from scipy.io import savemat
-from cell_tracking import tiffclass as tiff
-from cell_tracking.defaults import default_process, default_flow
+from . import tiffclass as tiff
+from .defaults import default_process, default_flow
 import matplotlib.image, matplotlib.figure, matplotlib.axes
 
 
@@ -71,10 +71,10 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     zeros = np.zeros((len(dx_dy_arr), 1), dtype=dx_dy_arr[0][0].dtype)
 
     xyz_arr = np.hstack((dx_dy_arr, zeros))
-    labels_arr = [""] * len(dx_dy_arr)
+    labels_arr = ["I"] * len(dx_dy_arr)
 
     xyz_py.save_xyz(
-        f_name="Optical_Flow", labels=labels_arr, coords=xyz_arr, comment=None
+        f_name=str(save_path), labels=labels_arr, coords=xyz_arr, comment=None
     )
 
 

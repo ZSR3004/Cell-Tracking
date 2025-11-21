@@ -7,15 +7,15 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 import cv2, json, pytest, gc, shutil, xyz_py
-from cell_tracking import tiffclass as tiff
-from cell_tracking import saving as save
-from cell_tracking import optical_flow as flow
+from src.cell_tracking import tiffclass as tiff
+from src.cell_tracking import saving as save
+from src.cell_tracking import optical_flow as flow
 import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 from scipy.io import loadmat
 import matplotlib.animation as animation
-from cell_tracking.defaults import default_process, default_flow
+from src.cell_tracking.defaults import default_process, default_flow
 
 TIFF_PATHS = [
     (
@@ -274,9 +274,12 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     assert save_dir1.exists()
     assert optical_flow_channel0_path.exists()
     optical_flow_channel0_arr = xyz_py.load_xyz(optical_flow_channel0_path)
-    assert isinstance(optical_flow_channel0_arr, np.ndarray)
-    assert np.array_equal(optical_flow_channel0_arr, optical_flow_channel0)
-    assert optical_flow_channel0_arr.shape == optical_flow_channel0.shape
+    labels, coords = optical_flow_channel0_arr
+    assert isinstance(labels, list)
+    assert isinstance(coords, np.ndarray)
+    assert np.array_equal(coords, optical_flow_channel0)
+    assert coords.shape == optical_flow_channel0.shape
+    assert labels.shape == len(optical_flow_channel0)
     del optical_flow_channel0, optical_flow_channel0_arr
     gc.collect()
     shutil.rmtree(save_dir1)
@@ -291,9 +294,12 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     assert save_dir2.exists()
     assert optical_flow_channel1_path.exists()
     optical_flow_channel1_arr = xyz_py.load_xyz(optical_flow_channel1_path)
-    assert isinstance(optical_flow_channel1_arr, np.ndarray)
+    labels, coords = optical_flow_channel1_arr
+    assert isinstance(labels, list)
+    assert isinstance(coords, np.ndarray)
     assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1)
-    assert optical_flow_channel1_arr.shape == optical_flow_channel1.shape
+    assert coords.shape == optical_flow_channel1.shape
+    assert labels.shape == len(optical_flow_channel1)
     del optical_flow_channel1, optical_flow_channel1_arr
     gc.collect()
     shutil.rmtree(save_dir2)
@@ -308,9 +314,12 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     assert save_dir3.exists()
     assert optical_flow_channel2_path.exists()
     optical_flow_channel2_arr = xyz_py.load_xyz(optical_flow_channel2_path)
-    assert isinstance(optical_flow_channel2_arr, np.ndarray)
+    labels, coords = optical_flow_channel2_arr
+    assert isinstance(labels, list)
+    assert isinstance(coords, np.ndarray)
     assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2)
-    assert optical_flow_channel2_arr.shape == optical_flow_channel2.shape
+    assert coords.shape == optical_flow_channel2.shape
+    assert labels.shape == len(optical_flow_channel2)
     del optical_flow_channel2, optical_flow_channel2_arr
     gc.collect()
     shutil.rmtree(save_dir3)
@@ -327,11 +336,14 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     optical_flow_channel0_custom_arr = xyz_py.load_xyz(
         optical_flow_channel0_custom_path
     )
-    assert isinstance(optical_flow_channel0_custom_arr, np.ndarray)
+    labels, coords = optical_flow_channel0_custom_arr
+    assert isinstance(labels, list)
+    assert isinstance(coords, np.ndarray)
     assert np.array_equal(
         optical_flow_channel0_custom_arr, optical_flow_channel0_custom
     )
-    assert optical_flow_channel0_custom_arr.shape == optical_flow_channel0_custom.shape
+    assert coords.shape == optical_flow_channel0_custom.shape
+    assert labels.shape == len(optical_flow_channel0_custom)
     del optical_flow_channel0_custom, optical_flow_channel0_custom_arr
     gc.collect()
     shutil.rmtree(save_dir4)
@@ -346,9 +358,12 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     assert save_dir5.exists()
     assert calculate_optical_flow_path.exists()
     calculate_optical_flow_arr = xyz_py.load_xyz(calculate_optical_flow_path)
-    assert isinstance(calculate_optical_flow_arr, np.ndarray)
+    labels, coords = calculate_optical_flow_arr
+    assert isinstance(labels, list)
+    assert isinstance(coords, np.ndarray)
     assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow)
-    assert calculate_optical_flow_arr.shape == calculate_optical_flow.shape
+    assert coords.shape == calculate_optical_flow.shape
+    assert labels.shape == len(calculate_optical_flow)
     del calculate_optical_flow, calculate_optical_flow_arr
     gc.collect()
     shutil.rmtree(save_dir5)
@@ -365,14 +380,14 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     calculate_optical_flow_default_true_arr = xyz_py.load_xyz(
         calculate_optical_flow_default_true_path
     )
-    assert isinstance(calculate_optical_flow_default_true_arr, np.ndarray)
+    labels, coords = calculate_optical_flow_default_true_arr
+    assert isinstance(labels, list)
+    assert isinstance(coords, np.ndarray)
     assert np.array_equal(
         calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true
     )
-    assert (
-        calculate_optical_flow_default_true_arr.shape
-        == calculate_optical_flow_default_true.shape
-    )
+    assert coords.shape == calculate_optical_flow_default_true.shape
+    assert labels.shape == len(calculate_optical_flow_default_true)
     del calculate_optical_flow_default_true, calculate_optical_flow_default_true_arr
     gc.collect()
     shutil.rmtree(save_dir6)
