@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
    
-import cv2, json, pytest, gc
+import cv2, json, pytest, gc, shutil
 from src import tiffclass as tiff
 from src import saving as save
 from src import optical_flow as flow
@@ -261,73 +261,98 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
     tiff_arr = img.arr
 
     name1 = "Test_Name"
-    save_dir = tmp_path / name1
-    assert not save_dir.exists()
 
     kwargs1 = {'pyr_scale': 0.25, 'levels': 2, 'winsize': 30, 'iterations': 5, 'poly_n': 7, 'poly_sigma': 2.8, 'flags': 1}
-    kwargs2 = {'pyr_scale': 0.45, 'levels': 5, 'winsize': 10, 'iterations': 9, 'poly_n': 11, 'poly_sigma': 3.2, 'flags': 3}
-    kwargs3 = {'pyr_scale': 0.3, 'levels': 4, 'winsize': 5, 'iterations': 8, 'poly_n': 3, 'poly_sigma': 0.2, 'flags': 2}
 
     optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
-    save.save_optical_flow_as_matlab(name1, optical_flow_channel0, tmp_path)
-    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    save_dir1 = tmp_path / "save_dir1"
+    assert not save_dir1.exists()
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel0, save_dir1)
+    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir1)
+    assert save_dir1.exists()
     assert optical_flow_channel0_path.exists()
     optical_flow_channel0_data = loadmat(optical_flow_channel0_path)
     optical_flow_channel0_arr = optical_flow_channel0_data['optical_flow']
     assert isinstance(optical_flow_channel0_arr, np.ndarray)
     assert np.array_equal(optical_flow_channel0_arr, optical_flow_channel0)
-    del optical_flow_channel0
+    del optical_flow_channel0, optical_flow_channel0_data, optical_flow_channel0_arr
     gc.collect()
-    os.remove(optical_flow_channel0_path)
+    shutil.rmtree(save_dir1)
 
     optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
-    save.save_optical_flow_as_matlab(name1, optical_flow_channel1, tmp_path)
-    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    save_dir2 = tmp_path / "save_dir2"
+    assert not save_dir2.exists()
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel1, save_dir2)
+    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir2)
+    assert save_dir2.exists()
     assert optical_flow_channel1_path.exists()
     optical_flow_channel1_data = loadmat(optical_flow_channel1_path)
     optical_flow_channel1_arr = optical_flow_channel1_data['optical_flow']
     assert isinstance(optical_flow_channel1_arr, np.ndarray)
     assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1)
-    del optical_flow_channel1
+    del optical_flow_channel1, optical_flow_channel1_data, optical_flow_channel1_arr
     gc.collect()
-    os.remove(optical_flow_channel1_path)
+    shutil.rmtree(save_dir2)
 
     optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
-    save.save_optical_flow_as_matlab(name1, optical_flow_channel2, tmp_path)
-    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    save_dir3 = tmp_path / "save_dir3"
+    assert not save_dir3.exists()
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel2, save_dir3)
+    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir3)
+    assert save_dir3.exists()
     assert optical_flow_channel2_path.exists()
     optical_flow_channel2_data = loadmat(optical_flow_channel2_path)
     optical_flow_channel2_arr = optical_flow_channel2_data['optical_flow']
     assert isinstance(optical_flow_channel2_arr, np.ndarray)
     assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2)
-    del optical_flow_channel2
+    del optical_flow_channel2, optical_flow_channel2_data, optical_flow_channel2_arr
     gc.collect()
-    os.remove(optical_flow_channel2_path)
+    shutil.rmtree(save_dir3)
 
     optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
-    save.save_optical_flow_as_matlab(name1, optical_flow_channel0_custom, tmp_path)
-    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", tmp_path)
+    save_dir4 = tmp_path / "save_dir4"
+    assert not save_dir4.exists()
+    save.save_optical_flow_as_matlab(name1, optical_flow_channel0_custom, save_dir4)
+    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir4)
+    assert save_dir4.exists()
     assert optical_flow_channel0_custom_path.exists()
     optical_flow_channel0_custom_data = loadmat(optical_flow_channel0_custom_path)
     optical_flow_channel0_custom_arr = optical_flow_channel0_custom_data['optical_flow']
     assert isinstance(optical_flow_channel0_custom_arr, np.ndarray)
     assert np.array_equal(optical_flow_channel0_custom_arr, optical_flow_channel0_custom)
-    del optical_flow_channel0_custom
+    del optical_flow_channel0_custom, optical_flow_channel0_custom_data, optical_flow_channel0_custom_arr
     gc.collect()
-    os.remove(optical_flow_channel0_custom_path)
-    
-    
+    shutil.rmtree(save_dir4)
 
-    """
-    delete? optical_flow_channel1_custom = flow.optical_flow(arr=tiff_arr, channel=1, **kwargs2)    
-    delete? optical_flow_channel2_custom = flow.optical_flow(arr=tiff_arr, channel=2, **kwargs3)    
     calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
-    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr, default=True)
-    """
+    save_dir5 = tmp_path / "save_dir5"
+    assert not save_dir5.exists()
+    save.save_optical_flow_as_matlab(name1, calculate_optical_flow, save_dir5)
+    calculate_optical_flow_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir5)
+    assert save_dir5.exists()
+    assert calculate_optical_flow_path.exists()
+    calculate_optical_flow_data = loadmat(calculate_optical_flow_path)
+    calculate_optical_flow_arr = calculate_optical_flow_data['optical_flow']
+    assert isinstance(calculate_optical_flow_arr, np.ndarray)
+    assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow)
+    del calculate_optical_flow, calculate_optical_flow_data, calculate_optical_flow_arr
+    gc.collect()
+    shutil.rmtree(save_dir5)
 
-    #DO THIS FOR EVERY OTHER ONE (optical_flow_channel1, optical_flow_channel2, ETC!)
-
-
+    calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr)
+    save_dir6 = tmp_path / "save_dir6"
+    assert not save_dir6.exists()
+    save.save_optical_flow_as_matlab(name1, calculate_optical_flow_default_true, save_dir6)
+    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir6)
+    assert save_dir6.exists()
+    assert calculate_optical_flow_default_true_path.exists()
+    calculate_optical_flow_default_true_data = loadmat(calculate_optical_flow_default_true_path)
+    calculate_optical_flow_default_true_arr = calculate_optical_flow_default_true_data['optical_flow']
+    assert isinstance(calculate_optical_flow_default_true_arr, np.ndarray)
+    assert np.array_equal(calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true)
+    del calculate_optical_flow_default_true, calculate_optical_flow_default_true_data, calculate_optical_flow_default_true_arr
+    gc.collect()
+    shutil.rmtree(save_dir6)
 
     #return NotImplementedError
 
