@@ -15,6 +15,10 @@ from dataclasses import dataclass
 
 @dataclass
 class MMFixture:
+    """
+    Dataclass to hold MemoryManager fixture data.
+    """
+
     MM: memory.MemoryManager
     tmp_path: str
     main_path: str
@@ -23,6 +27,15 @@ class MMFixture:
 
 @pytest.fixture
 def sample_MemoryManager(tmp_path):
+    """
+    Fixture to provide a sample MemoryManager instance for testing.
+
+    Args:
+        tmp_path (str): Temporary path provided by pytest.
+
+    Returns:
+        MMFixture: A dataclass containing the MemoryManager instance and related paths.
+    """
     return MMFixture(
         MM=memory.MemoryManager(tmp_path),
         tmp_path=tmp_path,
@@ -32,6 +45,15 @@ def sample_MemoryManager(tmp_path):
 
 
 def test_init(sample_MemoryManager):
+    """
+    Tests the initialization of the MemoryManager class.
+
+    Args:
+        sample_MemoryManager (MMFixture): A dataclass containing the MemoryManager instance and related paths.
+
+    Returns:
+        None.
+    """
     f = sample_MemoryManager
 
     assert f.MM.path == f.main_path
@@ -40,18 +62,45 @@ def test_init(sample_MemoryManager):
 
 
 def test_write_default_yaml(sample_MemoryManager):
+    """
+    Tests whether the default YAML configuration is written correctly.
+
+    Args:
+        sample_MemoryManager (MMFixture): A dataclass containing the MemoryManager instance and related paths.
+
+    Returns:
+        None.
+    """
     f = sample_MemoryManager
     with open(f.yaml_path) as y:
         assert yaml.safe_load(y) == default_yaml_config
 
 
 def test_create_main_dir(sample_MemoryManager):
+    """
+    Tests whether the main directory and YAML file are created correctly.
+
+    Args:
+        sample_MemoryManager (MMFixture): A dataclass containing the MemoryManager instance and related paths.
+
+    Returns:
+        None.
+    """
     f = sample_MemoryManager
     assert os.path.exists(f.main_path)
     assert os.path.exists(f.yaml_path)
 
 
 def test_read_yaml(sample_MemoryManager):
+    """
+    Tests the reading of the YAML configuration file.
+
+    Args:
+        sample_MemoryManager (MMFixture): A dataclass containing the MemoryManager instance and related paths.
+
+    Returns:
+        None.
+    """
     f = sample_MemoryManager
     f.MM.read_yaml()
     assert f.MM.config == default_yaml_config
@@ -87,6 +136,15 @@ def test_read_yaml(sample_MemoryManager):
 
 
 def test_create_tiff_dir(sample_MemoryManager):
+    """
+    Tests whether the TIFF directory and its subdirectories are created correctly.
+
+    Args:
+        sample_MemoryManager (MMFixture): A dataclass containing the MemoryManager instance and related paths.
+
+    Returns:
+        None.
+    """
     f = sample_MemoryManager
     tiff_name = "tiff1"
 
