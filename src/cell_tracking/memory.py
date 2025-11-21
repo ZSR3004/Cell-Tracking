@@ -1,6 +1,6 @@
 import os
 import yaml
-from defaults import default_yaml_config
+from .defaults import default_yaml_config
 
 
 class MemoryManager:

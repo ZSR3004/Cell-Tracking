@@ -3,7 +3,7 @@ import json
 import numpy as np
 from pathlib import Path
 import matplotlib.animation as animation
-from src import defaults
+from . import defaults
 
 def save_arr(name : str, arr : np.array) -> None:
     """
