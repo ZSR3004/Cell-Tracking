@@ -102,7 +102,7 @@ that every new function has tests and that it works cohesively with what already
 
 ## Testing the Software
 
-1. Double-check that you are in the "Cell-Tracking" directory.
+1. Clone our repository using `Git`. Double-check that you are in the "Cell-Tracking" directory.
    
     - In the command line, run ```pwd``` (for Mac users) or ```cwd``` (for Windows users).
       
@@ -116,18 +116,31 @@ that every new function has tests and that it works cohesively with what already
      
 3. For Mac users: run ```source venv/bin/activate```. For Windows users: run ```venv\Scripts\activate```.
    
-4. Run ```pip install pytest```
+4. Run ```pip install poetry``` then ```poetry install```.
    
    - Note that this will take a second to install.
      
 5. Find the file whose tests you want to run. This file will be referred to as TEST_FILE. (Make sure TEST_FILE includes ".py" at the end. For example, TEST_FILE could be tiffclass_test.py).
    
-6. Figure out which folder TEST_FILE lies in. Note that this folder is a folder within the "tests" folder. This folder will be referred to as TEST_FOLDER. Change the directory so you are in that folder.
-   
-   - You can do this by navigating to the "Cell-Tracking" folder on your computer and looking through the folders that are inside the "tests" folder.
+6. Figure out which folder TEST_FILE lies in. Note that this folder is a folder within the "tests" folder. This folder will be referred to as TEST_FOLDER. Make sure you are
+   running the test from the main directory.
      
-7. Run ```pytest TEST_FILE```
+8. Run ```pytest TEST_FILE```
 <br><br>
+
+Here's an example work flow. We'll assume you're starting from scratch because you just want to check the tests.
+```python
+git clone https://github.com/ZSR3004/Cell-Tracking.git     # clone our repository
+cd Cell-Tracking                                           # go into it
+python3 -m venv .venv                                      # create a virtual environment
+source .venv/bin/activate                                  # activate it. this may be different on Windows computers
+pip install poetry                                         # install poetry
+poetry install                                             # have poetry install all the packages
+pytest                                                     # run all tests
+```
+
+If you're planning on contributing, we ask that you skim the [pytest documentation](https://docs.pytest.org/en/stable/index.html) so you know how to 
+create tests and run them. If you're just interesetd in running the tests, there are plenty of tutorials online that may be easier to understand.
 
 ### How To Get Cell-Tracking's Path
 
