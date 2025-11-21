@@ -116,3 +116,11 @@ that every new function has tests and that it works cohesively with what already
 7. Run ```pytest TEST_FILE```
 <br><br>
 
+### How To Get Cell-Tracking's Path
+
+Use your computer's search bar (the one that searches the contents of your computer), and search "Cell-Tracking". Click on the folder called "Cell-Tracking".
+
+   - For Mac users: A window should have opened, and at the bottom of this window there should be a folder icon that says "Cell-Tracking". Right-click this folder icon. Then, click the button that says "Copy Cell-Tracking as Pathname".
+     
+   - For Windows users: Click the address bar (it should turn into Cell-Tracking's full path). Type CTRL+C to copy this path.
+<br><br>
