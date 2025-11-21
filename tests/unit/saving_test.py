@@ -246,7 +246,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     save_dir1 = tmp_path / "save_dir1"
     assert not save_dir1.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel0, save_dir1)
-    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir1)
+    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir1)
     assert save_dir1.exists()
     assert optical_flow_channel0_path.exists()
     optical_flow_channel0_arr = xyz_py.load_xyz(optical_flow_channel0_path)
@@ -261,7 +261,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     save_dir2 = tmp_path / "save_dir2"
     assert not save_dir2.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel1, save_dir2)
-    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir2)
+    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir2)
     assert save_dir2.exists()
     assert optical_flow_channel1_path.exists()
     optical_flow_channel1_arr = xyz_py.load_xyz(optical_flow_channel1_path)
@@ -276,7 +276,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     save_dir3 = tmp_path / "save_dir3"
     assert not save_dir3.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel2, save_dir3)
-    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir3)
+    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir3)
     assert save_dir3.exists()
     assert optical_flow_channel2_path.exists()
     optical_flow_channel2_arr = xyz_py.load_xyz(optical_flow_channel2_path)
@@ -291,7 +291,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     save_dir4 = tmp_path / "save_dir4"
     assert not save_dir4.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel0_custom, save_dir4)
-    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir4)
+    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir4)
     assert save_dir4.exists()
     assert optical_flow_channel0_custom_path.exists()
     optical_flow_channel0_custom_arr = xyz_py.load_xyz(optical_flow_channel0_custom_path)
@@ -306,7 +306,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     save_dir5 = tmp_path / "save_dir5"
     assert not save_dir5.exists()
     save.save_optical_flow_as_xyz(name1, calculate_optical_flow, save_dir5)
-    calculate_optical_flow_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir5)
+    calculate_optical_flow_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir5)
     assert save_dir5.exists()
     assert calculate_optical_flow_path.exists()
     calculate_optical_flow_arr = xyz_py.load_xyz(calculate_optical_flow_path)
@@ -321,7 +321,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     save_dir6 = tmp_path / "save_dir6"
     assert not save_dir6.exists()
     save.save_optical_flow_as_xyz(name1, calculate_optical_flow_default_true, save_dir6)
-    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir6)
+    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir6)
     assert save_dir6.exists()
     assert calculate_optical_flow_default_true_path.exists()
     calculate_optical_flow_default_true_arr = xyz_py.load_xyz(calculate_optical_flow_default_true_path)
@@ -480,7 +480,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     save_dir1 = tmp_path / "save_dir1"
     assert not save_dir1.exists()
     save.save_optical_flow_as_numpy(name1, optical_flow_channel0, save_dir1)
-    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir1)
+    optical_flow_channel0_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir1)
     assert save_dir1.exists()
     assert optical_flow_channel0_path.exists()
     optical_flow_channel0_arr = np.load(optical_flow_channel0_path)
@@ -495,7 +495,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     save_dir2 = tmp_path / "save_dir2"
     assert not save_dir2.exists()
     save.save_optical_flow_as_numpy(name1, optical_flow_channel1, save_dir2)
-    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir2)
+    optical_flow_channel1_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir2)
     assert save_dir2.exists()
     assert optical_flow_channel1_path.exists()
     optical_flow_channel1_arr = np.load(optical_flow_channel1_path)
@@ -510,7 +510,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     save_dir3 = tmp_path / "save_dir3"
     assert not save_dir3.exists()
     save.save_optical_flow_as_numpy(name1, optical_flow_channel2, save_dir3)
-    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir3)
+    optical_flow_channel2_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir3)
     assert save_dir3.exists()
     assert optical_flow_channel2_path.exists()
     optical_flow_channel2_arr = np.load(optical_flow_channel2_path)
@@ -525,7 +525,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     save_dir4 = tmp_path / "save_dir4"
     assert not save_dir4.exists()
     save.save_optical_flow_as_numpy(name1, optical_flow_channel0_custom, save_dir4)
-    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir4)
+    optical_flow_channel0_custom_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir4)
     assert save_dir4.exists()
     assert optical_flow_channel0_custom_path.exists()
     optical_flow_channel0_custom_arr = np.load(optical_flow_channel0_custom_path)
@@ -540,7 +540,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     save_dir5 = tmp_path / "save_dir5"
     assert not save_dir5.exists()
     save.save_optical_flow_as_numpy(name1, calculate_optical_flow, save_dir5)
-    calculate_optical_flow_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir5)
+    calculate_optical_flow_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir5)
     assert save_dir5.exists()
     assert calculate_optical_flow_path.exists()
     calculate_optical_flow_arr = np.load(calculate_optical_flow_path)
@@ -555,7 +555,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     save_dir6 = tmp_path / "save_dir6"
     assert not save_dir6.exists()
     save.save_optical_flow_as_numpy(name1, calculate_optical_flow_default_true, save_dir6)
-    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.mat", save_dir6)
+    calculate_optical_flow_default_true_path = get_last_saved_pattern_fn_path(name1, lambda i: f"{name1}_flow{i}.npy", save_dir6)
     assert save_dir6.exists()
     assert calculate_optical_flow_default_true_path.exists()
     calculate_optical_flow_default_true_arr = np.load(calculate_optical_flow_default_true_path)
