@@ -189,6 +189,9 @@ def test_show_image(init_tiff: tuple, tmp_path):
     assert os.path.getsize(image5_save_path) > 0
     assert os.path.getsize(image6_save_path) > 0
 
+    #REWRITE!! BC IT OPENS IMAGES IN GUI
+    return NotImplementedError
+
 
 def test_preprocess_frame(init_tiff: tuple):
     """
