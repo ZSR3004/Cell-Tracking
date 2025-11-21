@@ -9,8 +9,10 @@ from src import optical_flow as of
 from src import raft
 import numpy as np
 
+
 def calculate_nuclei_optical_flow(arr: np.ndarray) -> np.ndarray:
     raise NotImplementedError
+
 
 def calculate_phase_optical_flow(arr: np.ndarray) -> np.ndarray:
     raise NotImplementedError

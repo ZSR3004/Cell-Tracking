@@ -12,9 +12,7 @@ from cell_tracking import raft
 from cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = [
-    "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-]
+TIFF_PATHS = ["datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)

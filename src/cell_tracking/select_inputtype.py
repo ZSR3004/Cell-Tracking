@@ -6,10 +6,10 @@ Nothing is dyed
 
 """
 
-def get_video_type(args):
 
+def get_video_type(args):
     """
-    Prints to the user the options for the type of video for input: 
+    Prints to the user the options for the type of video for input:
     1. Nucleus is dyed
     2. Cytoplasm is dyed
     3. Nothing is dyed
@@ -21,9 +21,8 @@ def get_video_type(args):
 
 
 def direct_video_type(args):
-
     """
-    After the video type is received, perform actions/direct towards the 
+    After the video type is received, perform actions/direct towards the
     action for the video
     """
 
