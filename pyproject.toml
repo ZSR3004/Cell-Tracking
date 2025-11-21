@@ -7,7 +7,6 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.13,<3.14" 
-package-mode = false
 dependencies = [
     "matplotlib (>=3.10.6,<4.0.0)",
     "tifffile (>=2025.10.4,<2026.0.0)",
@@ -19,7 +18,9 @@ dependencies = [
     "pytest (>=9.0.1,<10.0.0)"
 ]
 
-[tool.poetry]
+packages = [
+    { include = "cell_tracking", from = "src" }
+]
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.9.0"

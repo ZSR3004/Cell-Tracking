@@ -8,9 +8,9 @@ if ROOT_DIR not in sys.path:
 
 import sys, os, pytest
 from sympy import Idx
-from src import optical_flow as flow
+from cell_tracking import optical_flow as flow
 import numpy as np
-from src import tiffclass as tiff
+from cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
@@ -18,7 +18,7 @@ import cv2
 
 @pytest.fixture
 def sample_tiff():
-    path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
+    path = "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
     f, c, h, w = 96, 3, 520, 2329
     return path, f, c, h, w
 
