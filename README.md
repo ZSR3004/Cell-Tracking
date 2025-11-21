@@ -1,9 +1,40 @@
 # Cell-Tracking
+Optical-flow analysis for cell-imagining.
 
 ## Table of Contents
+1. [What is Cell-Tracking?](#what-is-cell-tracking)
+2. [Versions & Status](#versions--status)
+3. [Contributing](#contributing-or-running-our-tests)
+4. [Style Guide](#style-guide)
+5. [Additional Resources & Creators](#additional-resources-and-creators)
 
-1. [Creators](#creators)
-2. [Style Guide](#style-guide)
+
+## What is Cell-Tracking?
+
+`Cell-Tracking` is three things.
+
+1. A package.
+2. A command line interface.
+3. A web app.
+
+But all of these do the exact same thing (just in different ways)!
+
+`Cell-Tracking` is a platform designed to enable optical-flow analysis of moving cells. In other words, it takes your TIFF files
+and turns them into analyzable data using optical-flow algorithms.
+
+We haven't yet implemented all three of these version. Below, is the status of each, including where you can find the 
+documentation which has the installation and usage instructions (if they exist).
+
+| Version   |   Status      | Documentation | 
+| --------  | ------------  | ------------  | 
+| Package       | Up!               | [Package Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/PACKAGE_DOCS.md) |
+| Command Line | In Development!    | [Command Line Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/CLI_DOCS.md) |
+| Graphical |   Development hasn't started just quite yet! | [GUI Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/GUI_DOCS.md) | 
+
+### Contributing or Running our Tests
+If you're interested in running our tests or contributing, refer to the 
+[contribution guide](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/CONTRIBUTION.md) which also contains our 
+instructions to run tests.
 
 ## Style Guide
 
