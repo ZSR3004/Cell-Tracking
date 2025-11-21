@@ -86,7 +86,8 @@ def save_optical_flow_as_matlab(name: str, opt_flow: np.ndarray, main_path: str)
         None: Just saves the optical flow array to a file.
     """
     save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.mat", main_path)
-    savemat(save_path, {"optical_flow": opt_flow})
+    opt_flow_fortran = np.asfortranarray(opt_flow)
+    savemat(save_path, {"optical_flow": opt_flow_fortran}, do_compression=False)
 
 def save_optical_flow_as_numpy(name: str, opt_flow: np.ndarray, main_path: str) -> None:
     """
