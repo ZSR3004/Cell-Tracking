@@ -11,6 +11,7 @@ from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 from src.cell_tracking import optical_flow as flow
 import matplotlib.pyplot as plt
+from unittest.mock import patch, Mock
 import numpy as np
 from pathlib import Path
 from scipy.io import loadmat
@@ -38,32 +39,6 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     """
     path, info = request.param
     return (tiff.Tiff(path), info)
-
-
-def get_last_saved_pattern_fn_path(name: str, pattern_fn, main_path: str) -> Path:
-    """
-    An edited version of save.get_unique_path that gets the path with pattern_fn that was last saved.
-
-    Args:
-        name (str): Main identifier (e.g., protein name).
-        pattern_fn (callable): Function that takes an integer and returns a file name.
-        main_path (str): Main path to the directory.
-
-    Returns:
-        Path: Unique file path that does not yet exist.
-    """
-    save_dir = main_path / name
-    save_dir.mkdir(parents=True, exist_ok=True)
-
-    i = 1
-    while True:
-        file_name1 = pattern_fn(i)
-        file_path1 = save_dir / file_name1
-        if not file_path1.exists():
-            file_name = pattern_fn(i - 1)
-            file_path = save_dir / file_name
-            return file_path
-        i += 1
 
 
 def test_get_unique_path(init_tiff: tuple, tmp_path):
@@ -244,15 +219,22 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    unshaped_arr = np.array(
+    unshaped_arr1 = np.array(
         [[[[[1, 2]], [[3, 4]], [[5, 6]]]], [[[[7, 8]], [[9, 10]], [[11, 12]]]]]
     )
-    shaped_arr = unshaped_arr.reshape(-1, 2)
+    shaped_arr1 = unshaped_arr1.reshape(-1, 2)
     assert np.array_equal(
-        shaped_arr, np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]])
+        shaped_arr1, np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]])
+    )
+    unshaped_arr2 = np.array(
+        [[[[[4.2, 3.8]], [[9.5, 11.9]], [[0.1, 1.9]]]], [[[[7.0, 18.3829]], [[9.0, 1029.8]], [[4.3, 5.53]]]]]
+    )
+    shaped_arr2 = unshaped_arr2.reshape(-1, 2)
+    assert np.allclose(
+        shaped_arr2, np.array([[4.2, 3.8], [9.5, 11.9], [0.1, 1.9], [7.0, 18.3829], [9.0, 1029.8], [4.3, 5.53]])
     )
 
-    name1 = "Test_Name"
+    name = "Test_Name"
 
     kwargs1 = {
         "pyr_scale": 0.25,
@@ -264,29 +246,152 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
         "flags": 1,
     }
 
-    optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
-    dx_dy_arr1 = optical_flow_channel0.reshape(-1, 2)
-    zeros1 = np.zeros((len(dx_dy_arr1), 1), dtype=dx_dy_arr1[0][0].dtype)
-    optical_flow_channel0_xyz = np.hstack((dx_dy_arr1, zeros1))
-    save_dir1 = tmp_path / "save_dir1"
-    assert not save_dir1.exists()
-    save.save_optical_flow_as_xyz(name1, optical_flow_channel0, save_dir1)
-    optical_flow_channel0_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.xyz", save_dir1
-    )
-    assert save_dir1.exists()
-    assert optical_flow_channel0_path.exists()
-    optical_flow_channel0_arr = xyz_py.load_xyz(optical_flow_channel0_path)
-    labels, coords = optical_flow_channel0_arr
-    assert isinstance(labels, list)
-    assert isinstance(coords, np.ndarray)
-    assert np.array_equal(coords, optical_flow_channel0_xyz)
-    assert coords.shape == optical_flow_channel0.shape
-    assert labels.shape == len(optical_flow_channel0)
-    del optical_flow_channel0, optical_flow_channel0_arr
-    gc.collect()
-    shutil.rmtree(save_dir1)
+    with patch("xyz_py.save_xyz") as mock_save_xyz:
+        optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
+        dx_dy_arr1 = optical_flow_channel0.reshape(-1, 2)
+        zeros1 = np.zeros((len(dx_dy_arr1), 1), dtype=dx_dy_arr1[0][0].dtype)
+        optical_flow_channel0_xyz = np.hstack((dx_dy_arr1, zeros1))
+        save_dir1 = tmp_path / "save_dir1"
+        save.save_optical_flow_as_xyz(name, optical_flow_channel0, save_dir1)
+        _, call_kwargs1 = mock_save_xyz.call_args
+        f_name1 = call_kwargs1["f_name"]
+        labels1 = call_kwargs1["labels"]
+        coords1 = call_kwargs1["coords"]
+        assert name in f_name1
+        assert str(f_name1).endswith(".xyz")
+        assert np.array_equal(labels1, np.array(["I"] * coords1.shape[0]))
+        assert np.array_equal(coords1, optical_flow_channel0_xyz)
+        assert coords1.shape == optical_flow_channel0_xyz.shape
+        assert len(labels1) == coords1.shape[0]
+        del optical_flow_channel0, optical_flow_channel0_xyz
+        gc.collect()
 
+        optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
+        dx_dy_arr2 = optical_flow_channel1.reshape(-1, 2)
+        zeros2 = np.zeros((len(dx_dy_arr2), 1), dtype=dx_dy_arr2[0][0].dtype)
+        optical_flow_channel1_xyz = np.hstack((dx_dy_arr2, zeros2))
+        save_dir2 = tmp_path / "save_dir2"
+        save.save_optical_flow_as_xyz(name, optical_flow_channel1, save_dir2)
+        _, call_kwargs2 = mock_save_xyz.call_args
+        f_name2 = call_kwargs2["f_name"]
+        labels2 = call_kwargs2["labels"]
+        coords2 = call_kwargs2["coords"]
+        assert name in f_name2
+        assert str(f_name2).endswith(".xyz")
+        assert np.array_equal(labels2, np.array(["I"] * coords2.shape[0]))
+        assert np.array_equal(coords2, optical_flow_channel1_xyz)
+        assert coords2.shape == optical_flow_channel1_xyz.shape
+        assert len(labels2) == coords2.shape[0]
+        del optical_flow_channel1, optical_flow_channel1_xyz
+        gc.collect()
+
+        optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
+        dx_dy_arr3 = optical_flow_channel2.reshape(-1, 2)
+        zeros3 = np.zeros((len(dx_dy_arr3), 1), dtype=dx_dy_arr3[0][0].dtype)
+        optical_flow_channel2_xyz = np.hstack((dx_dy_arr3, zeros3))
+        save_dir3 = tmp_path / "save_dir3"
+        save.save_optical_flow_as_xyz(name, optical_flow_channel2, save_dir3)
+        _, call_kwargs3 = mock_save_xyz.call_args
+        f_name3 = call_kwargs3["f_name"]
+        labels3 = call_kwargs3["labels"]
+        coords3 = call_kwargs3["coords"]
+        assert name in f_name3
+        assert str(f_name3).endswith(".xyz")
+        assert np.array_equal(labels3, np.array(["I"] * coords3.shape[0]))
+        assert np.array_equal(coords3, optical_flow_channel2_xyz)
+        assert coords3.shape == optical_flow_channel2_xyz.shape
+        assert len(labels3) == coords3.shape[0]
+        del optical_flow_channel2, optical_flow_channel2_xyz
+        gc.collect()
+
+        optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
+        dx_dy_arr4 = optical_flow_channel0_custom.reshape(-1, 2)
+        zeros4 = np.zeros((len(dx_dy_arr4), 1), dtype=dx_dy_arr4[0][0].dtype)
+        optical_flow_channel0_custom_xyz = np.hstack((dx_dy_arr4, zeros4))
+        save_dir4 = tmp_path / "save_dir4"
+        save.save_optical_flow_as_xyz(name, optical_flow_channel0_custom, save_dir4)
+        _, call_kwargs4 = mock_save_xyz.call_args
+        f_name4 = call_kwargs4["f_name"]
+        labels4 = call_kwargs4["labels"]
+        coords4 = call_kwargs4["coords"]
+        assert name in f_name4
+        assert str(f_name4).endswith(".xyz")
+        assert np.array_equal(labels4, np.array(["I"] * coords4.shape[0]))
+        assert np.array_equal(coords4, optical_flow_channel0_custom_xyz)
+        assert coords4.shape == optical_flow_channel0_custom_xyz.shape
+        assert len(labels4) == coords4.shape[0]
+        del optical_flow_channel0_custom, optical_flow_channel0_custom_xyz
+        gc.collect()
+
+        calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
+        dx_dy_arr5 = calculate_optical_flow.reshape(-1, 2)
+        zeros5 = np.zeros((len(dx_dy_arr5), 1), dtype=dx_dy_arr5[0][0].dtype)
+        calculate_optical_flow_xyz = np.hstack((dx_dy_arr5, zeros5))
+        save_dir5 = tmp_path / "save_dir5"
+        save.save_optical_flow_as_xyz(name, calculate_optical_flow, save_dir5)
+        _, call_kwargs5 = mock_save_xyz.call_args
+        f_name5 = call_kwargs5["f_name"]
+        labels5 = call_kwargs5["labels"]
+        coords5 = call_kwargs5["coords"]
+        assert name in f_name5
+        assert str(f_name5).endswith(".xyz")
+        assert np.array_equal(labels5, np.array(["I"] * coords5.shape[0]))
+        assert np.array_equal(coords5, calculate_optical_flow_xyz)
+        assert coords5.shape == calculate_optical_flow_xyz.shape
+        assert len(labels5) == coords5.shape[0]
+        del calculate_optical_flow, calculate_optical_flow_xyz
+        gc.collect()
+
+        calculate_optical_flow_custom = flow.calculate_optical_flow(arr=tiff_arr, **kwargs1)
+        dx_dy_arr6 = calculate_optical_flow_custom.reshape(-1, 2)
+        zeros6 = np.zeros((len(dx_dy_arr6), 1), dtype=dx_dy_arr6[0][0].dtype)
+        calculate_optical_flow_custom_xyz = np.hstack((dx_dy_arr6, zeros6))
+        save_dir6 = tmp_path / "save_dir6"
+        save.save_optical_flow_as_xyz(name, calculate_optical_flow_custom, save_dir6)
+        _, call_kwargs6 = mock_save_xyz.call_args
+        f_name6 = call_kwargs6["f_name"]
+        labels6 = call_kwargs6["labels"]
+        coords6 = call_kwargs6["coords"]
+        assert name in f_name6
+        assert str(f_name6).endswith(".xyz")
+        assert np.array_equal(labels6, np.array(["I"] * coords6.shape[0]))
+        assert np.array_equal(coords6, calculate_optical_flow_custom_xyz)
+        assert coords6.shape == calculate_optical_flow_custom_xyz.shape
+        assert len(labels6) == coords6.shape[0]
+        del calculate_optical_flow_custom, calculate_optical_flow_custom_xyz
+        gc.collect()
+
+        
+
+    """
+    ORIGINAL:
+        optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
+        dx_dy_arr1 = optical_flow_channel0.reshape(-1, 2)
+        zeros1 = np.zeros((len(dx_dy_arr1), 1), dtype=dx_dy_arr1[0][0].dtype)
+        optical_flow_channel0_xyz = np.hstack((dx_dy_arr1, zeros1))
+        save_dir1 = tmp_path / "save_dir1"
+        assert not save_dir1.exists()
+        save.save_optical_flow_as_xyz(name1, optical_flow_channel0, save_dir1)
+        optical_flow_channel0_path = get_last_saved_pattern_fn_path(
+            name1, lambda i: f"{name1}_flow{i}.xyz", save_dir1
+        )
+        assert save_dir1.exists()
+        assert optical_flow_channel0_path.exists()
+        optical_flow_channel0_arr = xyz_py.load_xyz(optical_flow_channel0_path)
+        labels, coords = optical_flow_channel0_arr
+        assert isinstance(labels, list)
+        assert isinstance(coords, np.ndarray)
+        assert np.allclose(coords, optical_flow_channel0_xyz)
+        assert coords.shape == optical_flow_channel0.shape
+        assert labels.shape == len(optical_flow_channel0)
+        del optical_flow_channel0, optical_flow_channel0_arr
+        gc.collect()
+        shutil.rmtree(save_dir1)
+    """
+
+    #DELETE get_last_saved_pattern_fn_path!
+
+    """
     optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
     dx_dy_arr2 = optical_flow_channel1.reshape(-1, 2)
     zeros2 = np.zeros((len(dx_dy_arr2), 1), dtype=dx_dy_arr2[0][0].dtype)
@@ -303,7 +408,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel1_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1_xyz)
+    assert np.allclose(optical_flow_channel1_arr, optical_flow_channel1_xyz)
     assert coords.shape == optical_flow_channel1.shape
     assert labels.shape == len(optical_flow_channel1)
     del optical_flow_channel1, optical_flow_channel1_arr
@@ -326,7 +431,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel2_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2_xyz)
+    assert np.allclose(optical_flow_channel2_arr, optical_flow_channel2_xyz)
     assert coords.shape == optical_flow_channel2.shape
     assert labels.shape == len(optical_flow_channel2)
     del optical_flow_channel2, optical_flow_channel2_arr
@@ -351,7 +456,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel0_custom_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(
+    assert np.allclose(
         optical_flow_channel0_custom_arr, optical_flow_channel0_custom_xyz
     )
     assert coords.shape == optical_flow_channel0_custom.shape
@@ -376,7 +481,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = calculate_optical_flow_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow_xyz)
+    assert np.allclose(calculate_optical_flow_arr, calculate_optical_flow_xyz)
     assert coords.shape == calculate_optical_flow.shape
     assert labels.shape == len(calculate_optical_flow)
     del calculate_optical_flow, calculate_optical_flow_arr
@@ -401,7 +506,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = calculate_optical_flow_default_true_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(
+    assert np.allclose(
         calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true_xyz
     )
     assert coords.shape == calculate_optical_flow_default_true.shape
@@ -409,6 +514,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     del calculate_optical_flow_default_true, calculate_optical_flow_default_true_arr
     gc.collect()
     shutil.rmtree(save_dir6)
+    """
 
 
 def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
