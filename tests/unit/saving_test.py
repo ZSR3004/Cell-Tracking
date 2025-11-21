@@ -265,6 +265,8 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     }
 
     optical_flow_channel0 = flow.optical_flow(arr=tiff_arr, channel=0)
+    zeros1 = np.zeros((len(optical_flow_channel0), 1), dtype=optical_flow_channel0[0][0].dtype)
+    optical_flow_channel0_xyz = np.hstack((optical_flow_channel0, zeros1))
     save_dir1 = tmp_path / "save_dir1"
     assert not save_dir1.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel0, save_dir1)
@@ -277,7 +279,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel0_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(coords, optical_flow_channel0)
+    print(coords)
+    print(optical_flow_channel0)
+    assert np.array_equal(coords, optical_flow_channel0_xyz)
     assert coords.shape == optical_flow_channel0.shape
     assert labels.shape == len(optical_flow_channel0)
     del optical_flow_channel0, optical_flow_channel0_arr
@@ -285,6 +289,8 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir1)
 
     optical_flow_channel1 = flow.optical_flow(arr=tiff_arr, channel=1)
+    zeros2 = np.zeros((len(optical_flow_channel1), 1), dtype=optical_flow_channel1[0][0].dtype)
+    optical_flow_channel1_xyz = np.hstack((optical_flow_channel1, zeros2))
     save_dir2 = tmp_path / "save_dir2"
     assert not save_dir2.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel1, save_dir2)
@@ -297,7 +303,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel1_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1)
+    assert np.array_equal(optical_flow_channel1_arr, optical_flow_channel1_xyz)
     assert coords.shape == optical_flow_channel1.shape
     assert labels.shape == len(optical_flow_channel1)
     del optical_flow_channel1, optical_flow_channel1_arr
@@ -305,6 +311,8 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir2)
 
     optical_flow_channel2 = flow.optical_flow(arr=tiff_arr, channel=2)
+    zeros3 = np.zeros((len(optical_flow_channel2), 1), dtype=optical_flow_channel2[0][0].dtype)
+    optical_flow_channel2_xyz = np.hstack((optical_flow_channel2, zeros3))
     save_dir3 = tmp_path / "save_dir3"
     assert not save_dir3.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel2, save_dir3)
@@ -317,7 +325,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = optical_flow_channel2_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2)
+    assert np.array_equal(optical_flow_channel2_arr, optical_flow_channel2_xyz)
     assert coords.shape == optical_flow_channel2.shape
     assert labels.shape == len(optical_flow_channel2)
     del optical_flow_channel2, optical_flow_channel2_arr
@@ -325,6 +333,8 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir3)
 
     optical_flow_channel0_custom = flow.optical_flow(arr=tiff_arr, channel=0, **kwargs1)
+    zeros4 = np.zeros((len(optical_flow_channel0_custom), 1), dtype=optical_flow_channel0_custom[0][0].dtype)
+    optical_flow_channel0_custom_xyz = np.hstack((optical_flow_channel0_custom, zeros4))
     save_dir4 = tmp_path / "save_dir4"
     assert not save_dir4.exists()
     save.save_optical_flow_as_xyz(name1, optical_flow_channel0_custom, save_dir4)
@@ -340,7 +350,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
     assert np.array_equal(
-        optical_flow_channel0_custom_arr, optical_flow_channel0_custom
+        optical_flow_channel0_custom_arr, optical_flow_channel0_custom_xyz
     )
     assert coords.shape == optical_flow_channel0_custom.shape
     assert labels.shape == len(optical_flow_channel0_custom)
@@ -349,6 +359,8 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir4)
 
     calculate_optical_flow = flow.calculate_optical_flow(arr=tiff_arr)
+    zeros5 = np.zeros((len(calculate_optical_flow), 1), dtype=calculate_optical_flow[0][0].dtype)
+    calculate_optical_flow_xyz = np.hstack((calculate_optical_flow, zeros5))
     save_dir5 = tmp_path / "save_dir5"
     assert not save_dir5.exists()
     save.save_optical_flow_as_xyz(name1, calculate_optical_flow, save_dir5)
@@ -361,7 +373,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     labels, coords = calculate_optical_flow_arr
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
-    assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow)
+    assert np.array_equal(calculate_optical_flow_arr, calculate_optical_flow_xyz)
     assert coords.shape == calculate_optical_flow.shape
     assert labels.shape == len(calculate_optical_flow)
     del calculate_optical_flow, calculate_optical_flow_arr
@@ -369,6 +381,8 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     shutil.rmtree(save_dir5)
 
     calculate_optical_flow_default_true = flow.calculate_optical_flow(arr=tiff_arr)
+    zeros6 = np.zeros((len(calculate_optical_flow_default_true), 1), dtype=calculate_optical_flow_default_true[0][0].dtype)
+    calculate_optical_flow_default_true_xyz = np.hstack((calculate_optical_flow_default_true, zeros6))
     save_dir6 = tmp_path / "save_dir6"
     assert not save_dir6.exists()
     save.save_optical_flow_as_xyz(name1, calculate_optical_flow_default_true, save_dir6)
@@ -384,7 +398,7 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     assert isinstance(labels, list)
     assert isinstance(coords, np.ndarray)
     assert np.array_equal(
-        calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true
+        calculate_optical_flow_default_true_arr, calculate_optical_flow_default_true_xyz
     )
     assert coords.shape == calculate_optical_flow_default_true.shape
     assert labels.shape == len(calculate_optical_flow_default_true)
