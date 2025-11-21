@@ -6,7 +6,8 @@ import matplotlib.pyplot as plt
 from src import tiffclass as tc
 from src import saving as save
 
-def combine_flows(flow_list : list) -> np.ndarray:
+
+def combine_flows(flow_list: list) -> np.ndarray:
     """
     Temporary function to combine different channels into one array.
 
@@ -44,75 +45,98 @@ def compute_flow_pair(args) -> np.ndarray:
     """
     f1, f2, flow_args = args
     return cv2.calcOpticalFlowFarneback(
-        f1, f2, None,
-        flow_args['pyr_scale'],
-        flow_args['levels'],
-        flow_args['winsize'],
-        flow_args['iterations'],
-        flow_args['poly_n'],
-        flow_args['poly_sigma'],
-        flow_args['flags'])
+        f1,
+        f2,
+        None,
+        flow_args["pyr_scale"],
+        flow_args["levels"],
+        flow_args["winsize"],
+        flow_args["iterations"],
+        flow_args["poly_n"],
+        flow_args["poly_sigma"],
+        flow_args["flags"],
+    )
 
-def optical_flow(arr : np.ndarray, channel : int,
-                 pyr_scale : float = 0.5, 
-                 levels : int = 3, 
-                 winsize : int = 15,
-                 iterations : int = 3, 
-                 poly_n : int = 5, 
-                 poly_sigma : float = 1.2,
-                 flags : int = 0) -> np.ndarray:
+
+def optical_flow(arr: np.ndarray, channel: int, **kwargs) -> np.ndarray:
     """
-    Computes dense optical flow using Farneback method on a preprocessed channel. Allows manual
-    changes to the params for optical flow.
+    Computes dense optical flow using Farneback method on a preprocessed channel.
+    Accepts all Farneback parameters as keyword arguments.
 
     Args:
-        - arr (np.ndarray): Stack for optical flow processing.
-        - channel (int): The channel for processing.
-        - pyr_scale (float): Scale factor for pyramid.
-        - levels (int): Number of pyramid levels.
-        - winsize (int): Size of the window for averaging.
-        - iterations (int): Number of iterations at each pyramid level.
-        - poly_n (int): Size of the pixel neighborhood.
-        - poly_sigma (float): Standard deviation of the Gaussian used for polynomial expansion.
-        - flags (int): Operation flags.
-         
+        arr (np.ndarray): Stack for optical flow processing.
+        channel (int): The channel to process.
+        **kwargs: Additional keyword arguments passed to cv2.calcOpticalFlowFarneback:
+            - pyr_scale (float): Scale factor for pyramid. Default 0.5
+            - levels (int): Number of pyramid levels. Default 3
+            - winsize (int): Window size for averaging. Default 15
+            - iterations (int): Number of iterations per pyramid level. Default 3
+            - poly_n (int): Size of pixel neighborhood. Default 5
+            - poly_sigma (float): Gaussian std for polynomial expansion. Default 1.2
+            - flags (int): Operation flags. Default 0
+
     Returns:
-        np.ndarray: (N-1, H, W, 2) flow vectors between frames.
-    """ 
+        np.ndarray: Flow vectors of shape (N-1, H, W, 2) between frames.
+    """
     flow_args = {
-        'pyr_scale': pyr_scale,
-        'levels': levels,
-        'winsize': winsize,
-        'iterations': iterations,
-        'poly_n': poly_n,
-        'poly_sigma': poly_sigma,
-        'flags': flags
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0,
     }
+
+    flow_args.update(kwargs)
+
     arr_channel = arr[:, channel, :, :]
-    pairs = [(arr_channel[i], arr_channel[i+1], flow_args) for i in range(arr_channel.shape[0] - 1)]
+    pairs = [
+        (arr_channel[i], arr_channel[i + 1], flow_args)
+        for i in range(arr_channel.shape[0] - 1)
+    ]
+
     with Pool(cpu_count()) as pool:
         flow_list = pool.map(compute_flow_pair, pairs)
+
     return np.stack(flow_list)
 
-def calculate_optical_flow(arr: np.ndarray, default=False) -> np.ndarray:
+
+def calculate_optical_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
     """
     Computes optical flow between the first two channels of the TIFF stack using the Farneback method.
+    Accepts any Farneback parameters as keyword arguments.
 
     Args:
-        arr: the array to be calculated
-        default (bool): Use default optical flow parameters if True.
+        arr (np.ndarray): The TIFF stack array to process.
+        **kwargs: Additional keyword arguments passed to `optical_flow` for Farneback parameters:
+            - pyr_scale (float)
+            - levels (int)
+            - winsize (int)
+            - iterations (int)
+            - poly_n (int)
+            - poly_sigma (float)
+            - flags (int)
 
     Returns:
         np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
     """
-    flow_channel1 = optical_flow(arr, 1)
-    flow_channel2 = optical_flow(arr, 2)
+    flow_channel1 = optical_flow(arr, 1, **kwargs)
+    flow_channel2 = optical_flow(arr, 2, **kwargs)
     combined = combine_flows([flow_channel1, flow_channel2])
     return combined
 
-def show_flow(flow : np.ndarray, title='Optical Flow', 
-              step : int = 25, figsize : int | int = (12,6), scale : int = 200, 
-              pivot : str = 'tail', color : str = 'blue', save_path : str = None) -> None:
+
+def show_flow(
+    flow: np.ndarray,
+    title="Optical Flow",
+    step: int = 25,
+    figsize: int | int = (12, 6),
+    scale: int = 200,
+    pivot: str = "tail",
+    color: str = "blue",
+    save_path: str = None,
+) -> None:
     """
     Displays optical flow as a quiver plot using matplotlib.
 
@@ -129,7 +153,7 @@ def show_flow(flow : np.ndarray, title='Optical Flow',
     Returns:
         None: Just displays the plot.
     """
-    Y, X = np.mgrid[0:flow.shape[0]:step, 0:flow.shape[1]:step]
+    Y, X = np.mgrid[0 : flow.shape[0] : step, 0 : flow.shape[1] : step]
     U = flow[::step, ::step, 0]  # dx
     V = flow[::step, ::step, 1]  # dy
 
@@ -143,6 +167,6 @@ def show_flow(flow : np.ndarray, title='Optical Flow',
     plt.ylabel("Y")
     plt.tight_layout()
     if save_path:
-        plt.savefig(save_path, bbox_inches='tight')
+        plt.savefig(save_path, bbox_inches="tight")
     else:
         plt.show()
