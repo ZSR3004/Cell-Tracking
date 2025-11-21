@@ -24,7 +24,6 @@ One of the ways you can run our Cell_Tracking software is through the Command Li
 ### Prerequisites
 
 Before using the CLI, ensure that you have the following installed:
-
 1. Python 3 is installed 
 2. A Command Line Interface, such as: 
     * Terminal (Mac)
@@ -70,6 +69,7 @@ cd CELL-TRACKING-PATH
 Replace "CELL-TRACKING-PATH" with the path that you copied earlier. 
 
 Example: 
+
 ```bash
 cd Users/shitaloli/Documents/Cell-Tracking
 ```
@@ -84,7 +84,7 @@ When you run this command inside the Cell-Tracking repository, it launches the m
 
 The program will first ask: 
 ```bash
-Have you intialized your Cell-Tracking? "[y/n]":
+Have you intialized your Cell-Tracking? [y/n]:
 ```
     * Type "y" if you have run this program before and already created the ouput directory 
     * Type "n" if this is your first time. (The software will automatically create new folders for saving your outputs.)
@@ -97,9 +97,10 @@ Press "Enter" or "Return" on your keyboard after typing your response
 
 You will see: 
 ```bash
-Type the directory where your folder is saved (type ~/folder_name or folder_name):
+Type the directory where your folder is saved "(type ~/folder_name or folder_name)":
 ```
     Examples: 
+
     * Documents 
     * Downloads 
     * Desktop 
@@ -113,6 +114,7 @@ Enter your file path name:
    Paste the full path to your TIFF file here (Make sure that you TIFF file is on the folder that you are working with).
 
     Example: 
+
 ```bash
 Enter your file path name:/Users/shitaloli/Downloads/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif
 ```
@@ -168,7 +170,7 @@ Type:
 
 If your TIFF file contains multiple channels, the CLI will ask: 
 ```bash
-Do you want to calculate the combined flows of channels one and two? "[y/n]"
+Do you want to calculate the combined flows of channels one and two? [y/n]
 ```
 Type: 
     * y if you want the software to compute optcial flow across both channels simultaneously 
