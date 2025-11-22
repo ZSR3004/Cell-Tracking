@@ -418,79 +418,61 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs2_path = tmp_path / "stack6_kwargs2.mp4"
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
-    with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_FFMpegWriter, \
-         patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation:
-        mock_anim_instance = MagicMock()
-        mock_FuncAnimation.return_value = mock_anim_instance
-        mock_writer_instance = MagicMock()
-        mock_FFMpegWriter.return_value = mock_writer_instance
+    def test_case_x(image_stackx: np.ndarray, stackx_kwargsx_path: str, kwargsx: dict):
+        """
+        Tests whether the save_original_video method works correctly on a given test case.
 
-        save_stack1_kwargs1 = save.save_original_video(
-            "stack1_kwargs1", stack1_kwargs1_path, im, image_stack1, fig, ax, **kwargs1
-        )
+        Args:
+            image_stackx (np.ndarray): Image stack of shape (T, H, W).
+            stackx_kwargsx_path (str): The path to save the video file to.
+            kwargsx (dict): Additional keyword arguments that include:
+                - T (int): Total number of frames in the image stack.
+                - fps (int): Frames per second for the video.
 
-        T = kwargs1.get("T", image_stack1.shape[0])
-        fps = kwargs1.get("fps", 10)
+        Returns:
+            None.
+        """
+        with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_FFMpegWriter, \
+            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation:
+            mock_anim_instance = MagicMock()
+            mock_FuncAnimation.return_value = mock_anim_instance
+            mock_writer_instance = MagicMock()
+            mock_FFMpegWriter.return_value = mock_writer_instance
 
-        args_FuncAnimation, kwargs_FuncAnimation = mock_FuncAnimation.call_args
-        assert args_FuncAnimation[0] == fig
-        assert callable(args_FuncAnimation[1])
-        assert kwargs_FuncAnimation["frames"] == T
-        assert kwargs_FuncAnimation["interval"] == 1000 / fps
-        assert kwargs_FuncAnimation["blit"] == False
+            save.save_original_video("Video_Name", stackx_kwargsx_path, im, image_stackx, fig, ax, **kwargsx)
 
-        _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
-        assert kwargs_FFMpegWriter["fps"] == fps
+            T = kwargsx.get("T", image_stackx.shape[0])
+            fps = kwargsx.get("fps", 10)
 
-        mock_anim_instance.save.assert_called_once_with(stack1_kwargs1_path, writer=mock_writer_instance)
-        mock_FuncAnimation.assert_called_once()
-        mock_FFMpegWriter.assert_called_once()
+            args_FuncAnimation, kwargs_FuncAnimation = mock_FuncAnimation.call_args
+            assert args_FuncAnimation[0] == fig
+            assert callable(args_FuncAnimation[1])
+            assert kwargs_FuncAnimation["frames"] == T
+            assert kwargs_FuncAnimation["interval"] == 1000 / fps
+            assert kwargs_FuncAnimation["blit"] == False
+
+            _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
+            assert kwargs_FFMpegWriter["fps"] == fps
+
+            mock_anim_instance.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
+            mock_FuncAnimation.assert_called_once()
+            mock_FFMpegWriter.assert_called_once()
+
+            gc.collect()
+
+    test_case_x(image_stack1, stack1_kwargs1_path, kwargs1)
+    test_case_x(image_stack1, stack1_kwargs3_path, kwargs3)
+    test_case_x(image_stack2, stack2_kwargs4_path, kwargs4)
+    test_case_x(image_stack2, stack2_kwargs5_path, kwargs5)
+    test_case_x(image_stack3, stack3_kwargs3_path, kwargs3)
+    test_case_x(image_stack3, stack3_kwargs5_path, kwargs5)
+    test_case_x(image_stack4, stack4_kwargs2_path, kwargs2)
+    test_case_x(image_stack4, stack4_kwargs4_path, kwargs4)
+    test_case_x(image_stack5, stack5_kwargs1_path, kwargs1)
+    test_case_x(image_stack5, stack5_kwargs3_path, kwargs3)
+    test_case_x(image_stack6, stack6_kwargs2_path, kwargs2)
+    test_case_x(image_stack6, stack6_kwargs4_path, kwargs4)
 
 
-
-
-#do above to everything below
-"""
-        save_stack1_kwargs3 = save.save_original_video(
-            "stack1_kwargs3", stack1_kwargs3_path, im1, image_stack1, fig, ax, **kwargs3
-        )
-        save_stack2_kwargs4 = save.save_original_video(
-            "stack2_kwargs4", stack2_kwargs4_path, im2, image_stack2, fig, ax, **kwargs4
-        )
-        save_stack2_kwargs5 = save.save_original_video(
-            "stack2_kwargs2", stack2_kwargs5_path, im2, image_stack2, fig, ax, **kwargs5
-        )
-        save_stack3_kwargs3 = save.save_original_video(
-            "stack3_kwargs3", stack3_kwargs3_path, im3, image_stack3, fig, ax, **kwargs3
-        )
-        save_stack3_kwargs5 = save.save_original_video(
-            "stack3_kwargs1", stack3_kwargs5_path, im3, image_stack3, fig, ax, **kwargs5
-        )
-        save_stack4_kwargs2 = save.save_original_video(
-            "stack4_kwargs2", stack4_kwargs2_path, im4, image_stack4, fig, ax, **kwargs2
-        )
-        save_stack4_kwargs4 = save.save_original_video(
-            "stack4_kwargs4", stack4_kwargs4_path, im4, image_stack4, fig, ax, **kwargs4
-        )
-        save_stack5_kwargs1 = save.save_original_video(
-            "stack5_kwargs1", stack5_kwargs1_path, im5, image_stack5, fig, ax, **kwargs1
-        )
-        save_stack5_kwargs3 = save.save_original_video(
-            "stack5_kwargs3", stack5_kwargs3_path, im5, image_stack5, fig, ax, **kwargs3
-        )
-        save_stack6_kwargs2 = save.save_original_video(
-            "stack6_kwargs2", stack6_kwargs2_path, im6, image_stack6, fig, ax, **kwargs2
-        )
-        save_stack6_kwargs4 = save.save_original_video(
-            "stack6_kwargs4", stack6_kwargs4_path, im6, image_stack6, fig, ax, **kwargs4
-        )
-"""
-#fig, ax = plt.subplots()
-"""im1 = ax.imshow(image_stack1[0], cmap="gray")
-    im2 = ax.imshow(image_stack2[0], cmap="gray")
-    im3 = ax.imshow(image_stack3[0], cmap="gray")
-    im4 = ax.imshow(image_stack4[0], cmap="gray")
-    im5 = ax.imshow(image_stack5[0], cmap="gray")
-    im6 = ax.imshow(image_stack6[0], cmap="gray")"""
 
         #REWRITE test_show_image USING PATCH AND MOCK AND test_save_original_video!
