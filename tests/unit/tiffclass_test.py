@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, pytest
+import cv2, pytest, gc
 from unittest.mock import patch, Mock, MagicMock
 from cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
@@ -123,26 +123,6 @@ def test_show_image(init_tiff: tuple, tmp_path):
     img, info = init_tiff
     f, c, h, w = info
 
-    kwargs1 = {
-        "gauss": {"ksize": (3, 3), "sigmaX": 1.5},
-        "median": {"ksize": 3},
-        "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
-        "contrast": {"alpha": 1.5, "beta": 20},
-        "skip": [],
-    }
-    kwargs2 = {
-        "gauss": {"ksize": (7, 7)},
-        "median": {"ksize": 9},
-        "minmax": {},
-        "contrast": {"alpha": 1.0},
-        "skip": ["gauss", "median", "minmax", "contrast"],
-    }
-    kwargs3 = {
-        "gauss": {"sigmaX": 1.5},
-        "minmax": {"alpha": 0, "beta": 1},
-        "skip": ["minmax", "contrast"],
-    }
-
     image1 = img.arr[0, 2, :, :]
     image2 = img.arr[(f - 1) // 2, 0, :, :]
     image3 = img.arr[f - 1, 1, :, :]
@@ -157,13 +137,70 @@ def test_show_image(init_tiff: tuple, tmp_path):
     image5_save_path = tmp_path / "image5_save.png"
     image6_save_path = tmp_path / "image6_save.png"
 
-    with patch("matplotlib.pyplot.figure") as mock_figure, \
-         patch("matplotlib.pyplot.imshow") as mock_imshow, \
-         patch("matplotlib.pyplot.title") as mock_title, \
-         patch("matplotlib.pyplot.axis") as mock_axis, \
-         patch("matplotlib.pyplot.savefig") as mock_savefig, \
-         patch("matplotlib.pyplot.show") as mock_show:
-    #CONT
+    def test_case_x(imagex: np.ndarray, titlex="Image", figsizex=(12, 8), imagex_save_path=None):
+        """
+        Tests whether the show_image method works correctly on a specific test case.
+
+        Args:
+            imagex (np.ndarray): Image to display.
+            titlex (str): Title of the window.
+            figsizex (tuple): Figure size in inches (width, height).
+            imagex_save_path (str, optional): If provided, saves the image to this path.
+
+        Return:
+            None
+        """
+        with patch("matplotlib.pyplot.figure") as mock_figure, \
+            patch("matplotlib.pyplot.imshow") as mock_imshow, \
+            patch("matplotlib.pyplot.title") as mock_title, \
+            patch("matplotlib.pyplot.axis") as mock_axis, \
+            patch("matplotlib.pyplot.savefig") as mock_savefig, \
+            patch("matplotlib.pyplot.show") as mock_show:
+            img.show_image(imagex, titlex, figsizex, imagex_save_path)
+
+            _, kwargs_figure = mock_figure.call_args
+            assert kwargs_figure["figsize"] == figsizex
+
+            args_imshow, kwargs_imshow = mock_imshow.call_args
+            assert args_imshow[0] == imagex
+            assert kwargs_imshow["cmap"] == "gray"
+
+            args_title, _ = mock_title.call_args
+            assert args_title[0] == titlex
+            
+            args_axis, _ = mock_axis.call_args
+            assert args_axis[0] == "off"
+
+            if imagex_save_path:
+                args_savefig, kwargs_savefig = mock_savefig.call_args
+                assert args_savefig[0] == imagex_save_path
+                assert kwargs_savefig["bbox_inches"] == "tight"
+
+                mock_savefig.assert_called_once()
+                mock_show.assert_not_called()
+            else:
+                mock_show.assert_called_once_with()
+                mock_savefig.assert_not_called()
+
+            mock_figure.assert_called_once()
+            mock_imshow.assert_called_once()
+            mock_title.assert_called_once()
+            mock_axis.assert_called_once()
+
+            gc.collect()
+
+    test_case_x(image1, "image1_save", (14, 10), image1_save_path)                          #image1 save
+    test_case_x(image1, "image1_show", (10, 6), None)                                       #image1 show
+    test_case_x(image2, save_path=image2_save_path)                                         #image2 save
+    test_case_x(image2)                                                                     #image2 show
+    test_case_x(image3, figsize=(18, 16), save_path=image3_save_path)                       #image3 save
+    test_case_x(image3, figsize=(7, 9), save_path=None)                                     #image3 show
+    test_case_x(image4, title="image4_save", figsize=(5, 7), save_path=image4_save_path)    #image4 save
+    test_case_x(image4, title="image4_show")                                                #image4 show
+    test_case_x(image5, title="image5_save", save_path=image5_save_path)                    #image5 save
+    test_case_x(image5, figsize=(3, 3))                                                     #image5 show
+    test_case_x(image6, "image6_save", figsize=(2, 10), save_path=image6_save_path)         #image6 save
+    test_case_x(image6, save_path=None)                                                     #image6 show
 
 
 
