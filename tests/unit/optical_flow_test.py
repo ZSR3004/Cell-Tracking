@@ -8,9 +8,9 @@ if ROOT_DIR not in sys.path:
 
 import sys, os, pytest
 from sympy import Idx
-from cell_tracking import optical_flow as flow
+from src.cell_tracking import optical_flow as flow
 import numpy as np
-from cell_tracking import tiffclass as tiff
+from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver

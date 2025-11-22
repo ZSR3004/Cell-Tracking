@@ -8,7 +8,7 @@ if ROOT_DIR not in sys.path:
 
 import cv2, pytest, gc
 from unittest.mock import patch, Mock, MagicMock
-from cell_tracking import tiffclass as tiff
+from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 import numpy as np
 
