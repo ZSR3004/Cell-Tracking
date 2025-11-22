@@ -158,6 +158,11 @@ def test_show_image(init_tiff: tuple, tmp_path):
     image6_save_path = tmp_path / "image6_save.png"
 
     with patch("matplotlib.pyplot.figure") as mock_figure, \
+         patch("matplotlib.pyplot.imshow") as mock_imshow, \
+         patch("matplotlib.pyplot.title") as mock_title, \
+         patch("matplotlib.pyplot.axis") as mock_axis, \
+         patch("matplotlib.pyplot.savefig") as mock_savefig, \
+         patch("matplotlib.pyplot.show") as mock_show:
     #CONT
 
 
