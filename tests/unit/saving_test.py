@@ -11,6 +11,8 @@ from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
 from unittest.mock import patch, Mock, MagicMock
+import matplotlib
+matplotlib.use("Agg") 
 import numpy as np
 from pathlib import Path
 from scipy.io import savemat
@@ -441,8 +443,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs2_path = tmp_path / "stack6_kwargs2.mp4"
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
-    with patch("matplotlib.animation.FFMpegWriter") as mock_FFMpegWriter, \
-         patch("matplotlib.animation.FuncAnimation") as mock_FuncAnimation:
+    with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_FFMpegWriter, \
+         patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation:
         mock_anim_instance = MagicMock()
         mock_FuncAnimation.return_value = mock_anim_instance
         mock_writer_instance = MagicMock()
