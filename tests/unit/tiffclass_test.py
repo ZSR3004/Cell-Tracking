@@ -7,6 +7,7 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 import cv2, pytest
+from unittest.mock import patch, Mock, MagicMock
 from cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 import numpy as np
@@ -105,7 +106,7 @@ def test_isolate_channel(init_tiff: tuple):
 
 def test_show_image(init_tiff: tuple, tmp_path):
     """
-    Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
+    Tests whether the show_image method works correctly.
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
@@ -145,9 +146,9 @@ def test_show_image(init_tiff: tuple, tmp_path):
     image1 = img.arr[0, 2, :, :]
     image2 = img.arr[(f - 1) // 2, 0, :, :]
     image3 = img.arr[f - 1, 1, :, :]
-    image4 = img.preprocess_frame((img.arr[0, 1, :, :], kwargs1))
-    image5 = img.preprocess_frame((img.arr[(f - 1) // 2, 2, :, :], kwargs2))
-    image6 = img.preprocess_frame((img.arr[f - 1, 0, :, :], kwargs3))
+    image4 = img.arr[0, 1, :, :]
+    image5 = img.arr[(f - 1) // 2, 2, :, :]
+    image6 = img.arr[f - 1, 0, :, :]
 
     image1_save_path = tmp_path / "image1_save.png"
     image2_save_path = tmp_path / "image2_save.png"
@@ -156,6 +157,13 @@ def test_show_image(init_tiff: tuple, tmp_path):
     image5_save_path = tmp_path / "image5_save.png"
     image6_save_path = tmp_path / "image6_save.png"
 
+    with patch("matplotlib.pyplot.figure") as mock_figure, \
+    #CONT
+
+
+
+"""
+DO ALL OF THESE:
     image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
     image1_show = img.show_image(image1, "image1_show", (10, 6), None)
     image2_save = img.show_image(image2, save_path=image2_save_path)
@@ -174,23 +182,10 @@ def test_show_image(init_tiff: tuple, tmp_path):
         image6, "image6_save", figsize=(2, 10), save_path=image6_save_path
     )
     image6_show = img.show_image(image6, save_path=None)
+"""
 
-    assert image1_save_path.exists()
-    assert image2_save_path.exists()
-    assert image3_save_path.exists()
-    assert image4_save_path.exists()
-    assert image5_save_path.exists()
-    assert image6_save_path.exists()
-
-    assert os.path.getsize(image1_save_path) > 0
-    assert os.path.getsize(image2_save_path) > 0
-    assert os.path.getsize(image3_save_path) > 0
-    assert os.path.getsize(image4_save_path) > 0
-    assert os.path.getsize(image5_save_path) > 0
-    assert os.path.getsize(image6_save_path) > 0
 
     #REWRITE!! BC IT OPENS IMAGES IN GUI
-    return NotImplementedError
 
 
 def test_preprocess_frame(init_tiff: tuple):

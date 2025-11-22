@@ -472,7 +472,3 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     test_case_x(image_stack5, stack5_kwargs3_path, kwargs3)
     test_case_x(image_stack6, stack6_kwargs2_path, kwargs2)
     test_case_x(image_stack6, stack6_kwargs4_path, kwargs4)
-
-
-
-        #REWRITE test_show_image USING PATCH AND MOCK AND test_save_original_video!
