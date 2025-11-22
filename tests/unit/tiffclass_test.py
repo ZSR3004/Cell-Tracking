@@ -162,7 +162,7 @@ def test_show_image(init_tiff: tuple, tmp_path):
             assert kwargs_figure["figsize"] == figsizex
 
             args_imshow, kwargs_imshow = mock_imshow.call_args
-            assert args_imshow[0] == imagex
+            assert np.array_equal(args_imshow[0], imagex)
             assert kwargs_imshow["cmap"] == "gray"
 
             args_title, _ = mock_title.call_args
@@ -189,45 +189,18 @@ def test_show_image(init_tiff: tuple, tmp_path):
 
             gc.collect()
 
-    test_case_x(image1, "image1_save", (14, 10), image1_save_path)                          #image1 save
-    test_case_x(image1, "image1_show", (10, 6), None)                                       #image1 show
-    test_case_x(image2, save_path=image2_save_path)                                         #image2 save
-    test_case_x(image2)                                                                     #image2 show
-    test_case_x(image3, figsize=(18, 16), save_path=image3_save_path)                       #image3 save
-    test_case_x(image3, figsize=(7, 9), save_path=None)                                     #image3 show
-    test_case_x(image4, title="image4_save", figsize=(5, 7), save_path=image4_save_path)    #image4 save
-    test_case_x(image4, title="image4_show")                                                #image4 show
-    test_case_x(image5, title="image5_save", save_path=image5_save_path)                    #image5 save
-    test_case_x(image5, figsize=(3, 3))                                                     #image5 show
-    test_case_x(image6, "image6_save", figsize=(2, 10), save_path=image6_save_path)         #image6 save
-    test_case_x(image6, save_path=None)                                                     #image6 show
-
-
-
-"""
-DO ALL OF THESE:
-    image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
-    image1_show = img.show_image(image1, "image1_show", (10, 6), None)
-    image2_save = img.show_image(image2, save_path=image2_save_path)
-    image2_show = img.show_image(image2)
-    image3_save = img.show_image(image3, figsize=(18, 16), save_path=image3_save_path)
-    image3_show = img.show_image(image3, figsize=(7, 9), save_path=None)
-    image4_save = img.show_image(
-        image4, title="image4_save", figsize=(5, 7), save_path=image4_save_path
-    )
-    image4_show = img.show_image(image4, title="image4_show")
-    image5_save = img.show_image(
-        image5, title="image5_save", save_path=image5_save_path
-    )
-    image5_show = img.show_image(image5, figsize=(3, 3))
-    image6_save = img.show_image(
-        image6, "image6_save", figsize=(2, 10), save_path=image6_save_path
-    )
-    image6_show = img.show_image(image6, save_path=None)
-"""
-
-
-    #REWRITE!! BC IT OPENS IMAGES IN GUI
+    test_case_x(image1, "image1_save", (14, 10), image1_save_path)                                  #image1 save
+    test_case_x(image1, "image1_show", (10, 6), None)                                               #image1 show
+    test_case_x(image2, imagex_save_path=image2_save_path)                                          #image2 save
+    test_case_x(image2)                                                                             #image2 show
+    test_case_x(image3, figsizex=(18, 16), imagex_save_path=image3_save_path)                       #image3 save
+    test_case_x(image3, figsizex=(7, 9), imagex_save_path=None)                                     #image3 show
+    test_case_x(image4, titlex="image4_save", figsizex=(5, 7), imagex_save_path=image4_save_path)   #image4 save
+    test_case_x(image4, titlex="image4_show")                                                       #image4 show
+    test_case_x(image5, titlex="image5_save", imagex_save_path=image5_save_path)                    #image5 save
+    test_case_x(image5, figsizex=(3, 3))                                                            #image5 show
+    test_case_x(image6, "image6_save", figsizex=(2, 10), imagex_save_path=image6_save_path)         #image6 save
+    test_case_x(image6, imagex_save_path=None)                                                      #image6 show
 
 
 def test_preprocess_frame(init_tiff: tuple):
