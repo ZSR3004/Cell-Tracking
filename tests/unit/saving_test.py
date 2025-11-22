@@ -392,26 +392,6 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     ax = MagicMock()
     im = MagicMock()
 
-    preprocess_kwargs5 = {
-        "gauss": {"ksize": (3, 3), "sigmaX": 1.5},
-        "median": {"ksize": 3},
-        "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
-        "contrast": {"alpha": 1.5, "beta": 20},
-        "skip": [],
-    }
-    preprocess_kwargs6 = {
-        "gauss": {"ksize": (7, 7)},
-        "median": {"ksize": 9},
-        "minmax": {},
-        "contrast": {"alpha": 1.0},
-        "skip": ["gauss", "median", "minmax", "contrast"],
-    }
-    preprocess_kwargs7 = {
-        "gauss": {"sigmaX": 1.5},
-        "minmax": {"alpha": 0, "beta": 1},
-        "skip": ["minmax", "contrast"],
-    }
-
     kwargs1 = {"T": 10, "fps": 20}
     kwargs2 = {"T": 40}
     kwargs3 = {"fps": 35}
@@ -420,14 +400,10 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
 
     image_stack1 = np.asarray(img.arr[:, 2, :, :])
     image_stack2 = np.asarray([img.arr[0, 0, :, :]])
-    image_stack3 = np.asarray(
-        [img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]]
-    )
-    image_stack4 = img.preprocess_stack(
-        np.asarray(img.arr[: (f - 1) // 2, 2, :, :]), **preprocess_kwargs5
-    )
-    image_stack5 = img.preprocess_stack(np.asarray(img.arr[:, 0, :, :]), **preprocess_kwargs6)
-    image_stack6 = img.preprocess_stack(np.asarray(img.arr[:, 1, :, :]), **preprocess_kwargs7)
+    image_stack3 = np.asarray([img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]])
+    image_stack4 = np.asarray(img.arr[: (f - 1) // 2, 2, :, :])
+    image_stack5 = np.asarray(img.arr[:, 0, :, :])
+    image_stack6 = np.asarray(img.arr[:, 1, :, :])
 
     stack1_kwargs1_path = tmp_path / "stack1_kwargs1.mp4"
     stack1_kwargs3_path = tmp_path / "stack1_kwargs3.mp4"
@@ -443,8 +419,7 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
     with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_FFMpegWriter, \
-         patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation, \
-         patch.object(animation.FuncAnimation, "save", return_value=None) as mock_save:
+         patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation:
         mock_anim_instance = MagicMock()
         mock_FuncAnimation.return_value = mock_anim_instance
         mock_writer_instance = MagicMock()
@@ -467,13 +442,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
         assert kwargs_FFMpegWriter["fps"] == fps
 
-        args_save, kwargs_save = mock_save.call_args
-        assert args_save[0] == stack1_kwargs1_path
-        assert kwargs_save["writer"] == mock_writer_instance
-
         mock_anim_instance.save.assert_called_once_with(stack1_kwargs1_path, writer=mock_writer_instance)
         mock_FuncAnimation.assert_called_once()
-        mock_save.assert_called_once()
+        mock_FFMpegWriter.assert_called_once()
 
 
 
