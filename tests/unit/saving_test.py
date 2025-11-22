@@ -6,13 +6,12 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, json, pytest, gc, shutil, xyz_py
+import cv2, json, pytest, gc, xyz_py
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
 from unittest.mock import patch, Mock, MagicMock
 import matplotlib
-matplotlib.use("Agg") 
 import numpy as np
 from pathlib import Path
 from scipy.io import savemat
@@ -317,7 +316,7 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
         args, kwargs = mock_savemat.call_args
         save_path = args[0]
         opt_flow_fortran = args[1]["optical_flow"]
-        do_compression = kwargs.get("do_compression", True)
+        do_compression = kwargs["do_compression"]
 
         assert name in str(save_path)
         assert str(save_path).endswith(".mat")
@@ -444,7 +443,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
     with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_FFMpegWriter, \
-         patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation:
+         patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation, \
+         patch.object(animation.FuncAnimation, "save", return_value=None) as mock_save:
         mock_anim_instance = MagicMock()
         mock_FuncAnimation.return_value = mock_anim_instance
         mock_writer_instance = MagicMock()
@@ -467,9 +467,13 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
         assert kwargs_FFMpegWriter["fps"] == fps
 
+        args_save, kwargs_save = mock_save.call_args
+        assert args_save[0] == stack1_kwargs1_path
+        assert kwargs_save["writer"] == mock_writer_instance
+
         mock_anim_instance.save.assert_called_once_with(stack1_kwargs1_path, writer=mock_writer_instance)
         mock_FuncAnimation.assert_called_once()
-        mock_anim_instance.save.assert_called_once_with(stack1_kwargs1_path, writer=mock_writer_instance)
+        mock_save.assert_called_once()
 
 
 
