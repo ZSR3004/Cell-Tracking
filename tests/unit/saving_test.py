@@ -442,8 +442,7 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
 
     with patch("matplotlib.animation.FFMpegWriter") as mock_FFMpegWriter, \
-         patch("matplotlib.animation.FuncAnimation") as mock_FuncAnimation, \
-         patch("matplotlib.animation.save") as mock_save:
+         patch("matplotlib.animation.FuncAnimation") as mock_FuncAnimation:
         mock_anim_instance = MagicMock()
         mock_FuncAnimation.return_value = mock_anim_instance
         mock_writer_instance = MagicMock()
@@ -456,14 +455,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         T = kwargs1.get("T", image_stack1.shape[0])
         fps = kwargs1.get("fps", 10)
 
-        def update(frame):
-            im1.set_data(image_stack1[frame])
-            ax.set_title(f"Frame {frame}")
-        writer = animation.FFMpegWriter(fps=fps)
-
         args_FuncAnimation, kwargs_FuncAnimation = mock_FuncAnimation.call_args
         assert args_FuncAnimation[0] == fig
-        assert args_FuncAnimation[1] == update
+        assert callable(args_FuncAnimation[1])
         assert kwargs_FuncAnimation["frames"] == T
         assert kwargs_FuncAnimation["interval"] == 1000 / fps
         assert kwargs_FuncAnimation["blit"] == False
@@ -471,11 +465,10 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
         assert kwargs_FFMpegWriter["fps"] == fps
 
-        args_save, kwargs_save = mock_save.call_args
-        assert args_save[0] == stack1_kwargs1_path
-        assert kwargs_save["writer"] == writer
-        
+        mock_anim_instance.save.assert_called_once_with(stack1_kwargs1_path, writer=mock_writer_instance)
         mock_FuncAnimation.assert_called_once()
+        mock_anim_instance.save.assert_called_once_with(stack1_kwargs1_path, writer=mock_writer_instance)
+
 
 
 
