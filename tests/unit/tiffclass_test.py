@@ -436,27 +436,24 @@ def test_preprocess_stack(init_tiff: tuple):
         Returns:
             None
         """
-        with patch("multiprocessing.Pool") as mock_pool:
+        with patch("src.cell_tracking.tiffclass.Pool") as mock_pool:
             mock_pool_instance = mock_pool.return_value.__enter__.return_value
-            mock_pool_instance.map.side_effect = lambda func, arr1: np.zeros_like(frames)
+            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros_like(x[0]) for x in arr1]
+
+            frames = [(stackx[i], kwargsx) for i in range(stackx.shape[0])]
+            preprocessed_frames = [np.zeros_like(x[0]) for x in frames]
+            return_val = np.stack(preprocessed_frames, axis=0)
 
             preprocess_stack_return = img.preprocess_stack(stackx, **kwargsx)
-            frames = [(stackx[i], kwargsx) for i in range(stackx.shape[0])]
-            preprocessed_frames = mock_pool_instance.map.return_value
-            return_val = np.stack(preprocessed_frames, axis=0)
 
             pool_args, _ = mock_pool.call_args
             assert pool_args[0] == cpu_count()
-
-            pool_map_args, _ = mock_pool.map.call_args
-            assert pool_map_args[0] == tiff.preprocess_frame
-            assert np.array_equal(pool_map_args[1], frames)
 
             assert return_val.shape == preprocess_stack_return.shape
             assert preprocess_stack_return.shape == stackx.shape
             assert isinstance(preprocess_stack_return, np.ndarray)
             mock_pool.assert_called_once()
-            mock_pool_instance.map.assert_called_once_with(tiff.preprocess_frame, frames)
+            mock_pool_instance.map.assert_called_once_with(tiff.Tiff.preprocess_frame, frames)
 
             del preprocess_stack_return, frames, preprocessed_frames, return_val
             gc.collect()
