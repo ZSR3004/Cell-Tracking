@@ -1,10 +1,10 @@
-import seaborn as sns
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as colors
 
 
-def generate_heatmaps(flow, normalize=True):
+def vector_magnitude_heatmaps(flow, normalize=True):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
@@ -17,7 +17,18 @@ def generate_heatmaps(flow, normalize=True):
         heatmaps (np.ndarray): Array of shape (frames, height, width) or (frames, height, width, 3)
                                depending on apply_colormap.
     """
-    raise NotImplementedError
+    magnitudes = np.linalg.norm(flow, axis=-1)
+
+    if normalize:
+        heatmaps = []
+        for frame in magnitudes:
+            norm = cv2.normalize(frame, None, 0, 255, cv2.NORM_MINMAX)
+            norm = norm.astype(np.uint8)
+            heatmaps.append(norm)
+        heatmaps = np.stack(heatmaps, axis=0)
+    else:
+        heatmaps = magnitudes
+    return heatmaps
 
 def save_heatmap_video(flow, output_path='heatmap_video.mp4', fps=10, normalize=True):
     """
@@ -29,4 +40,23 @@ def save_heatmap_video(flow, output_path='heatmap_video.mp4', fps=10, normalize=
         fps (int): Frames per second of the output video
         normalize (bool): Whether to normalize magnitudes per frame
     """
+    heatmaps = vector_magnitude_heatmaps(flow, normalize=normalize)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(heatmaps[0], cmap='jet', animated=True)
+    ax.axis('off')
+
+    def update(frame_idx):
+        im.set_array(heatmaps[frame_idx])
+        return [im]
+
+    ani = animation.FuncAnimation(
+        fig,
+        update,
+        frames=len(heatmaps),
+        interval=1000 / fps,
+        blit=True
+    )
+    ani.save(output_path, fps=fps, extra_args=['-vcodec', 'libx264'])
+    plt.close(fig)
     
