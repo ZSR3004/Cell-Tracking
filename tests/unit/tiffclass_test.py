@@ -5,25 +5,42 @@ import sys
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
-   
+
 import cv2, pytest
-from src import tiffclass as tiff
+from cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 import numpy as np
 
-@pytest.fixture
-def sample_tiff():
-    path = "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-    f, c, h, w = 96, 3, 520, 2329
-    return path, f, c, h, w
+TIFF_PATHS = [
+    (
+        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+        (96, 3, 520, 2329),
+    )
+]
 
-def test_init(sample_tiff):
+
+@pytest.fixture(params=TIFF_PATHS)
+def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+    """
+    Creates a Tiff class instance.
+
+    Args:
+        request (pytest.FixtureRequest): The paths to generate Tiff instances from.
+
+    Returns:
+        (tiff.Tiff): Tiff class instance of the path.
+    """
+    path, info = request.param
+    return (tiff.Tiff(path), info)
+
+
+def test_init(init_tiff: tuple):
     """
     Tests whether the Tiff class initializes correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -32,29 +49,28 @@ def test_init(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
 
-    assert img.path == str(path)
     assert isinstance(img.arr, np.ndarray)
     assert hasattr(img, "path")
     assert hasattr(img, "timestamp")
     assert hasattr(img, "arr")
 
-    assert img.arr.shape == (f,c,h,w)
+    assert img.arr.shape == (f, c, h, w)
     assert img.arr.shape[0] == f  # number of frames
     assert img.arr.shape[1] == c  # number of channels
     assert img.arr.shape[2] == h  # height
     assert img.arr.shape[3] == w  # width
 
 
-def test_isolate_channel(sample_tiff):
+def test_isolate_channel(init_tiff: tuple):
     """
     Tests whether the isolate_channel method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -63,8 +79,8 @@ def test_isolate_channel(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
 
     channel_0 = img.isolate_channel(0)
     channel_1 = img.isolate_channel(1)
@@ -85,14 +101,15 @@ def test_isolate_channel(sample_tiff):
     assert not np.array_equal(channel_0, channel_1)
     assert not np.array_equal(channel_1, channel_2)
     assert not np.array_equal(channel_0, channel_2)
-    
-def test_show_image(sample_tiff, tmp_path):
+
+
+def test_show_image(init_tiff: tuple, tmp_path):
     """
     Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -102,26 +119,42 @@ def test_show_image(sample_tiff, tmp_path):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
 
-    kwargs1 = {"gauss": {"ksize": (3, 3), "sigmaX": 1.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
-    kwargs2 = {"gauss": {"ksize": (7, 7)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
-    kwargs3 = {"gauss": {"sigmaX": 1.5}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
+    kwargs1 = {
+        "gauss": {"ksize": (3, 3), "sigmaX": 1.5},
+        "median": {"ksize": 3},
+        "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
+        "contrast": {"alpha": 1.5, "beta": 20},
+        "skip": [],
+    }
+    kwargs2 = {
+        "gauss": {"ksize": (7, 7)},
+        "median": {"ksize": 9},
+        "minmax": {},
+        "contrast": {"alpha": 1.0},
+        "skip": ["gauss", "median", "minmax", "contrast"],
+    }
+    kwargs3 = {
+        "gauss": {"sigmaX": 1.5},
+        "minmax": {"alpha": 0, "beta": 1},
+        "skip": ["minmax", "contrast"],
+    }
 
     image1 = img.arr[0, 2, :, :]
-    image2 = img.arr[(f-1)//2, 0, :, :]
-    image3 = img.arr[f-1, 1, :, :]
+    image2 = img.arr[(f - 1) // 2, 0, :, :]
+    image3 = img.arr[f - 1, 1, :, :]
     image4 = img.preprocess_frame((img.arr[0, 1, :, :], kwargs1))
-    image5 = img.preprocess_frame((img.arr[(f-1)//2, 2, :, :], kwargs2))
-    image6 = img.preprocess_frame((img.arr[f-1, 0, :, :], kwargs3))
+    image5 = img.preprocess_frame((img.arr[(f - 1) // 2, 2, :, :], kwargs2))
+    image6 = img.preprocess_frame((img.arr[f - 1, 0, :, :], kwargs3))
 
-    image1_save_path = tmp_path / 'image1_save.png'
-    image2_save_path = tmp_path / 'image2_save.png'
-    image3_save_path = tmp_path / 'image3_save.png'
-    image4_save_path = tmp_path / 'image4_save.png'
-    image5_save_path = tmp_path / 'image5_save.png'
-    image6_save_path = tmp_path / 'image6_save.png'
+    image1_save_path = tmp_path / "image1_save.png"
+    image2_save_path = tmp_path / "image2_save.png"
+    image3_save_path = tmp_path / "image3_save.png"
+    image4_save_path = tmp_path / "image4_save.png"
+    image5_save_path = tmp_path / "image5_save.png"
+    image6_save_path = tmp_path / "image6_save.png"
 
     image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
     image1_show = img.show_image(image1, "image1_show", (10, 6), None)
@@ -129,11 +162,17 @@ def test_show_image(sample_tiff, tmp_path):
     image2_show = img.show_image(image2)
     image3_save = img.show_image(image3, figsize=(18, 16), save_path=image3_save_path)
     image3_show = img.show_image(image3, figsize=(7, 9), save_path=None)
-    image4_save = img.show_image(image4, title="image4_save", figsize=(5,7), save_path=image4_save_path)
+    image4_save = img.show_image(
+        image4, title="image4_save", figsize=(5, 7), save_path=image4_save_path
+    )
     image4_show = img.show_image(image4, title="image4_show")
-    image5_save = img.show_image(image5, title="image5_save", save_path=image5_save_path)
-    image5_show = img.show_image(image5, figsize=(3,3))
-    image6_save = img.show_image(image6, "image6_save", figsize=(2,10), save_path=image6_save_path)
+    image5_save = img.show_image(
+        image5, title="image5_save", save_path=image5_save_path
+    )
+    image5_show = img.show_image(image5, figsize=(3, 3))
+    image6_save = img.show_image(
+        image6, "image6_save", figsize=(2, 10), save_path=image6_save_path
+    )
     image6_show = img.show_image(image6, save_path=None)
 
     assert image1_save_path.exists()
@@ -150,13 +189,14 @@ def test_show_image(sample_tiff, tmp_path):
     assert os.path.getsize(image5_save_path) > 0
     assert os.path.getsize(image6_save_path) > 0
 
-def test_preprocess_frame(sample_tiff):
+
+def test_preprocess_frame(init_tiff: tuple):
     """
     Tests whether the preprocess_frame method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -165,34 +205,84 @@ def test_preprocess_frame(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
 
     first_frame_channel_0 = img.arr[0, 0, :, :]
-    middle_frame_channel_1 = img.arr[(f-1)//2, 1, :, :]
-    last_frame_channel_2 = img.arr[f-1, 2, :, :]
+    middle_frame_channel_1 = img.arr[(f - 1) // 2, 1, :, :]
+    last_frame_channel_2 = img.arr[f - 1, 2, :, :]
 
     kwargs1 = {"gauss": {}, "median": {}, "minmax": {}, "contrast": {}, "skip": []}
-    kwargs2 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
-    kwargs3 = {"gauss": {"ksize": (1, 1)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
-    kwargs4 = {"median": {"ksize": 7}, "contrast": {"alpha": 0.5}, "skip": ["gauss", "median"]}
-    kwargs5 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["minmax", "contrast"]}
+    kwargs2 = {
+        "gauss": {"ksize": (3, 3), "sigmaX": 2.5},
+        "median": {"ksize": 3},
+        "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
+        "contrast": {"alpha": 1.5, "beta": 20},
+        "skip": [],
+    }
+    kwargs3 = {
+        "gauss": {"ksize": (1, 1)},
+        "median": {"ksize": 9},
+        "minmax": {},
+        "contrast": {"alpha": 1.0},
+        "skip": ["gauss", "median", "minmax", "contrast"],
+    }
+    kwargs4 = {
+        "median": {"ksize": 7},
+        "contrast": {"alpha": 0.5},
+        "skip": ["gauss", "median"],
+    }
+    kwargs5 = {
+        "gauss": {"sigmaX": 1.0},
+        "minmax": {"alpha": 0, "beta": 1},
+        "skip": ["minmax", "contrast"],
+    }
 
-    kwargs1_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs1))
-    kwargs1_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs1))
-    kwargs1_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs1))
-    kwargs2_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs2))
-    kwargs2_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs2))
-    kwargs2_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs2))
-    kwargs3_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs3))
-    kwargs3_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs3))
-    kwargs3_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs3))
-    kwargs4_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs4))
-    kwargs4_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs4))
-    kwargs4_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs4))
-    kwargs5_preprocess_first_frame = img.preprocess_frame((first_frame_channel_0, kwargs5))
-    kwargs5_preprocess_middle_frame = img.preprocess_frame((middle_frame_channel_1, kwargs5))
-    kwargs5_preprocess_last_frame = img.preprocess_frame((last_frame_channel_2, kwargs5))
+    kwargs1_preprocess_first_frame = img.preprocess_frame(
+        (first_frame_channel_0, kwargs1)
+    )
+    kwargs1_preprocess_middle_frame = img.preprocess_frame(
+        (middle_frame_channel_1, kwargs1)
+    )
+    kwargs1_preprocess_last_frame = img.preprocess_frame(
+        (last_frame_channel_2, kwargs1)
+    )
+    kwargs2_preprocess_first_frame = img.preprocess_frame(
+        (first_frame_channel_0, kwargs2)
+    )
+    kwargs2_preprocess_middle_frame = img.preprocess_frame(
+        (middle_frame_channel_1, kwargs2)
+    )
+    kwargs2_preprocess_last_frame = img.preprocess_frame(
+        (last_frame_channel_2, kwargs2)
+    )
+    kwargs3_preprocess_first_frame = img.preprocess_frame(
+        (first_frame_channel_0, kwargs3)
+    )
+    kwargs3_preprocess_middle_frame = img.preprocess_frame(
+        (middle_frame_channel_1, kwargs3)
+    )
+    kwargs3_preprocess_last_frame = img.preprocess_frame(
+        (last_frame_channel_2, kwargs3)
+    )
+    kwargs4_preprocess_first_frame = img.preprocess_frame(
+        (first_frame_channel_0, kwargs4)
+    )
+    kwargs4_preprocess_middle_frame = img.preprocess_frame(
+        (middle_frame_channel_1, kwargs4)
+    )
+    kwargs4_preprocess_last_frame = img.preprocess_frame(
+        (last_frame_channel_2, kwargs4)
+    )
+    kwargs5_preprocess_first_frame = img.preprocess_frame(
+        (first_frame_channel_0, kwargs5)
+    )
+    kwargs5_preprocess_middle_frame = img.preprocess_frame(
+        (middle_frame_channel_1, kwargs5)
+    )
+    kwargs5_preprocess_last_frame = img.preprocess_frame(
+        (last_frame_channel_2, kwargs5)
+    )
 
     kwargs1_gauss = cv2.GaussianBlur(middle_frame_channel_1, (5, 5), 1.5)
     kwargs1_median = cv2.medianBlur(kwargs1_gauss, 5)
@@ -265,13 +355,14 @@ def test_preprocess_frame(sample_tiff):
     assert kwargs5_preprocess_middle_frame.shape == middle_frame_channel_1.shape
     assert kwargs5_preprocess_last_frame.shape == last_frame_channel_2.shape
 
-def test_preprocess_stack(sample_tiff):
+
+def test_preprocess_stack(init_tiff: tuple):
     """
     Tests whether the preprocess_stack method works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file:
-            - path (str): The path to the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
             - f (int): Number of frames.
             - c (int): Number of channels.
             - h (int): Height.
@@ -280,19 +371,37 @@ def test_preprocess_stack(sample_tiff):
     Return:
         None
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
 
     stack1 = np.asarray(img.arr[:, 0, :, :])
     stack2 = np.asarray([img.arr[0, 1, :, :]])
-    stack3 = np.asarray([img.arr[0, 2, :, :], img.arr[(f-1)//2, 1, :, :], img.arr[f-1, 0, :, :]])
-    stack4 = np.asarray(img.arr[:(f-1)//2, 2, :, :])
+    stack3 = np.asarray(
+        [img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]]
+    )
+    stack4 = np.asarray(img.arr[: (f - 1) // 2, 2, :, :])
     stack5 = np.asarray(img.arr[:, 1, :, :])
     stack6 = np.asarray(img.arr[:, 2, :, :])
 
-    kwargs6 = {"gauss": {"ksize": (3, 3), "sigmaX": 2.5}, "median": {"ksize": 3}, "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX}, "contrast": {"alpha": 1.5, "beta": 20}, "skip": []}
-    kwargs7 = {"gauss": {"ksize": (7, 7)}, "median": {"ksize": 9}, "minmax": {}, "contrast": {"alpha": 1.0}, "skip": ["gauss", "median", "minmax", "contrast"]}
-    kwargs8 = {"gauss": {"sigmaX": 1.0}, "minmax": {"alpha": 0, "beta": 1}, "skip": ["gauss", "median"]}
+    kwargs6 = {
+        "gauss": {"ksize": (3, 3), "sigmaX": 2.5},
+        "median": {"ksize": 3},
+        "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
+        "contrast": {"alpha": 1.5, "beta": 20},
+        "skip": [],
+    }
+    kwargs7 = {
+        "gauss": {"ksize": (7, 7)},
+        "median": {"ksize": 9},
+        "minmax": {},
+        "contrast": {"alpha": 1.0},
+        "skip": ["gauss", "median", "minmax", "contrast"],
+    }
+    kwargs8 = {
+        "gauss": {"sigmaX": 1.0},
+        "minmax": {"alpha": 0, "beta": 1},
+        "skip": ["gauss", "median"],
+    }
 
     kwargs6_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs6)
     kwargs6_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs6)
@@ -313,13 +422,55 @@ def test_preprocess_stack(sample_tiff):
     kwargs8_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs8)
     kwargs8_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs8)
 
-    assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs6))]), kwargs6_preprocess_stack2)
-    assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs7))]), kwargs7_preprocess_stack2)
-    assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs8))]), kwargs8_preprocess_stack2)
+    assert np.array_equal(
+        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs6))]),
+        kwargs6_preprocess_stack2,
+    )
+    assert np.array_equal(
+        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs7))]),
+        kwargs7_preprocess_stack2,
+    )
+    assert np.array_equal(
+        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs8))]),
+        kwargs8_preprocess_stack2,
+    )
 
-    assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs6)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs6)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs6))]), kwargs6_preprocess_stack3)
-    assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs7)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs7))]), kwargs7_preprocess_stack3)
-    assert np.array_equal(np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[(f-1)//2, 1, :, :]), kwargs8)), img.preprocess_frame((np.asarray(img.arr[f-1, 0, :, :]), kwargs8))]), kwargs8_preprocess_stack3)
+    assert np.array_equal(
+        np.asarray(
+            [
+                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs6)),
+                img.preprocess_frame(
+                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs6)
+                ),
+                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs6)),
+            ]
+        ),
+        kwargs6_preprocess_stack3,
+    )
+    assert np.array_equal(
+        np.asarray(
+            [
+                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs7)),
+                img.preprocess_frame(
+                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs7)
+                ),
+                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs7)),
+            ]
+        ),
+        kwargs7_preprocess_stack3,
+    )
+    assert np.array_equal(
+        np.asarray(
+            [
+                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs8)),
+                img.preprocess_frame(
+                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs8)
+                ),
+                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs8)),
+            ]
+        ),
+        kwargs8_preprocess_stack3,
+    )
 
     assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
     assert not np.array_equal(kwargs6_preprocess_stack2, stack2)

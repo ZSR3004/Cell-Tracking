@@ -1,4 +1,5 @@
 import click
+<<<<<<< HEAD
 
 import file_input_cli as fic
 import optical_flow_cli as opt
@@ -185,3 +186,5 @@ def main():
 if __name__ == "__main__":
     main()
 
+=======
+>>>>>>> 425e42ced3302da7c9c325a9f27376191c94bb29

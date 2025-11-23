@@ -13,7 +13,8 @@ def vector_magnitude_heatmaps(flow, normalize=True):
     """
     raise NotImplementedError
 
-def save_heatmap_video(flow, output_path='heatmap_video.mp4', fps=10, normalize=True):
+
+def save_heatmap_video(flow, output_path="heatmap_video.mp4", fps=10, normalize=True):
     """
     Saves a heatmap video (MP4) from a flow array using matplotlib.
 

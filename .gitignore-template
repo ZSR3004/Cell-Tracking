@@ -1,0 +1,14 @@
+# Core
+.venv/
+.gitignore
+.vscode/
+
+# Machine Code
+**/__pycache__
+**/.DS_Store
+dist/
+build/
+*.egg-info/
+*.pyc
+.pytest_cache/
+

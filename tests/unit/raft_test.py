@@ -8,13 +8,11 @@ if ROOT_DIR not in sys.path:
 import torch
 import pytest
 import numpy as np
-from src import raft
-from src import tiffclass as tiff
+from cell_tracking import raft
+from cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = [
-    "../../datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-]
+TIFF_PATHS = ["datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -216,8 +214,8 @@ class TestGetRAFTOpticalFlow:
         batches = (batch_1, batch_2)
 
         with (
-            patch("src.raft.raft_small") as mock_small,
-            patch("src.raft.raft_large") as mock_large,
+            patch("cell_tracking.raft.raft_small") as mock_small,
+            patch("cell_tracking.raft.raft_large") as mock_large,
         ):
 
             mock_model = Mock()
@@ -236,8 +234,8 @@ class TestGetRAFTOpticalFlow:
             mock_large.assert_not_called()
 
         with (
-            patch("src.raft.raft_small") as mock_small,
-            patch("src.raft.raft_large") as mock_large,
+            patch("cell_tracking.raft.raft_small") as mock_small,
+            patch("cell_tracking.raft.raft_large") as mock_large,
         ):
 
             mock_model = Mock()
@@ -272,7 +270,7 @@ class TestGetRAFTOpticalFlow:
 
         custom_weights = {"layer1.weight": torch.randn(10, 10)}
 
-        with patch("src.raft.raft_small") as mock_raft:
+        with patch("cell_tracking.raft.raft_small") as mock_raft:
             mock_model = Mock()
             mock_model.eval = Mock(return_value=None)
             mock_model.to = Mock(return_value=mock_model)
@@ -288,7 +286,7 @@ class TestGetRAFTOpticalFlow:
                 custom_weights, strict=False
             )
 
-        with patch("src.raft.raft_small") as mock_raft:
+        with patch("cell_tracking.raft.raft_small") as mock_raft:
             mock_model = Mock()
             mock_model.eval = Mock(return_value=None)
             mock_model.to = Mock(return_value=mock_model)
@@ -318,7 +316,7 @@ class TestGetRAFTOpticalFlow:
         batches = (batch_1, batch_2)
 
         with (
-            patch("src.raft.raft_small") as mock_raft,
+            patch("cell_tracking.raft.raft_small") as mock_raft,
             patch("torch.cuda.is_available", return_value=True),
         ):
 
@@ -337,7 +335,7 @@ class TestGetRAFTOpticalFlow:
             call_args = mock_model.to.call_args_list[0][0][0]
             assert call_args.type == "cuda"
 
-        with patch("src.raft.raft_small") as mock_raft:
+        with patch("cell_tracking.raft.raft_small") as mock_raft:
             mock_model = Mock()
             mock_model.eval = Mock(return_value=None)
             mock_model.to = Mock(return_value=mock_model)
@@ -354,7 +352,7 @@ class TestGetRAFTOpticalFlow:
             assert call_args.type == "cpu"
 
         with (
-            patch("src.raft.raft_small") as mock_raft,
+            patch("cell_tracking.raft.raft_small") as mock_raft,
             patch("torch.cuda.is_available", return_value=False),
         ):
 
@@ -390,7 +388,7 @@ class TestGetRAFTOpticalFlow:
         self._check_if_custom_weights_used(ten)
         self._check_if_gpu_used(ten)
 
-        with patch("src.raft.raft_small") as mock_raft:
+        with patch("cell_tracking.raft.raft_small") as mock_raft:
             expected_flow = torch.randn(
                 batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
             )
@@ -462,7 +460,7 @@ class TestCalcOpticalFlowRAFT:
         """
         Tests the calcOpticalFlowRAFT function.
         """
-        with patch("src.raft.raft_small") as mock_raft:
+        with patch("cell_tracking.raft.raft_small") as mock_raft:
             mock_model = type(
                 "MockModel",
                 (),
@@ -492,7 +490,7 @@ class TestCalcOpticalFlowRAFT:
         """
         custom_weights = {"layer1.weight": torch.randn(10, 10)}
 
-        with patch("src.raft.raft_large") as mock_raft:
+        with patch("cell_tracking.raft.raft_large") as mock_raft:
             mock_model = type(
                 "MockModel",
                 (),
