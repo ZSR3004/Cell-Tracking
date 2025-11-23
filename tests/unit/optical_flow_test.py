@@ -159,6 +159,7 @@ def test_compute_flow_pair(init_tiff):
             assert my_flow.shape == (h, w, 2)
             assert np.array_equal(my_flow, fake_flow)
             assert isinstance(my_flow, np.ndarray)
+            mock_farneback.assert_called_once()
 
     test_case_x(frame0_channel0, frame1_channel0, flow_args1)
     test_case_x(frame0_channel0, frame1_channel0, flow_args2)
