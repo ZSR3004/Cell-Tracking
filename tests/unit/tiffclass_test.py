@@ -7,7 +7,7 @@ if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
 import cv2, pytest, gc
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock, ANY
 from multiprocessing import Pool, cpu_count
 from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
@@ -441,21 +441,24 @@ def test_preprocess_stack(init_tiff: tuple):
             mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros_like(x[0]) for x in arr1]
 
             frames = [(stackx[i], kwargsx) for i in range(stackx.shape[0])]
-            preprocessed_frames = [np.zeros_like(x[0]) for x in frames]
-            return_val = np.stack(preprocessed_frames, axis=0)
 
-            preprocess_stack_return = img.preprocess_stack(stackx, **kwargsx)
+            result = img.preprocess_stack(stackx, **kwargsx)
 
             pool_args, _ = mock_pool.call_args
             assert pool_args[0] == cpu_count()
 
-            assert return_val.shape == preprocess_stack_return.shape
-            assert preprocess_stack_return.shape == stackx.shape
-            assert isinstance(preprocess_stack_return, np.ndarray)
-            mock_pool.assert_called_once()
-            mock_pool_instance.map.assert_called_once_with(tiff.Tiff.preprocess_frame, frames)
+            pool_map_args, _ = mock_pool_instance.map.call_args
+            assert callable(pool_map_args[0])
+            for i in range(0, len(frames)):
+                assert np.array_equal(pool_map_args[1][i][0], frames[i][0])
+                assert pool_map_args[1][i][1] == frames[i][1]
 
-            del preprocess_stack_return, frames, preprocessed_frames, return_val
+            assert result.shape == stackx.shape
+            assert isinstance(result, np.ndarray)
+            mock_pool.assert_called_once()
+            mock_pool_instance.map.assert_called_once()
+
+            del result, frames
             gc.collect()
 
 
