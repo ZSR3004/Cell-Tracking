@@ -12,7 +12,12 @@ from src.cell_tracking import raft
 from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = ["datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
+TIFF_PATHS = [
+    (
+        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+        (96, 3, 520, 2329),
+    )
+]
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -26,7 +31,8 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     Returns:
         (tiff.Tiff): Tiff class instance of the path.
     """
-    return tiff.Tiff(request.param)
+    path, info = request.param
+    return (tiff.Tiff(path), info)
 
 
 @pytest.fixture(params=TIFF_PATHS)

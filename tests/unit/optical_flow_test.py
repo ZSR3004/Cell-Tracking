@@ -16,23 +16,27 @@ from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
 import cv2
 
+TIFF_PATHS = [
+    (
+        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+        (96, 3, 520, 2329),
+    )
+]
 
-@pytest.fixture
-def sample_tiff():
+
+@pytest.fixture(params=TIFF_PATHS)
+def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     """
-    Fixture to provide a sample TIFF file for testing.
+    Creates a Tiff class instance.
+
+    Args:
+        request (pytest.FixtureRequest): The paths to generate Tiff instances from.
 
     Returns:
-        tuple: A tuple containing information about the TIFF file.
-            - path (str): The path to the TIFF file.
-            - f (int): Number of frames.
-            - c (int): Number of channels.
-            - h (int): Height.
-            - w (int): Width.
+        (tiff.Tiff): Tiff class instance of the path.
     """
-    path = "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-    f, c, h, w = 96, 3, 520, 2329
-    return path, f, c, h, w
+    path, info = request.param
+    return (tiff.Tiff(path), info)
 
 
 def test_combine_flows(sample_tiff):
