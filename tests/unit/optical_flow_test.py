@@ -114,6 +114,7 @@ def test_compute_flow_pair(init_tiff):
     # Test output shape
     assert my_flow.shape == (h, w, 2)
 
+    #MOCK AND PATCH
     return NotImplementedError
 
 
@@ -194,6 +195,7 @@ def test_optical_flow(init_tiff):
     assert not np.allclose(all_zeros, flow3_channel1)
     assert not np.allclose(all_zeros, flow3_channel2)
 
+    #MOCK AND PATCH
     return NotImplementedError
 
 
@@ -230,6 +232,7 @@ def test_calculate_optical_flow(init_tiff):
     # Test output shape
     assert my_flow.shape == (f - 1, c, h, w, 2)
 
+    #MOCK AND PATCH
     return NotImplementedError
 
 
@@ -262,4 +265,5 @@ def test_show_flow(init_tiff):
     assert isinstance(fig, Figure)
     plt.close()
 
+    #MOCK AND PATCH
     return NotImplementedError
