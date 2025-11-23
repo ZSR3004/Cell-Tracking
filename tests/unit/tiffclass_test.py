@@ -8,6 +8,7 @@ if ROOT_DIR not in sys.path:
 
 import cv2, pytest, gc
 from unittest.mock import patch, Mock, MagicMock
+from multiprocessing import Pool, cpu_count
 from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 import numpy as np
@@ -386,15 +387,17 @@ def test_preprocess_stack(init_tiff: tuple):
     """
     img, info = init_tiff
     f, c, h, w = info
+    tiff_arr = img.arr
 
-    stack1 = np.asarray(img.arr[:, 0, :, :])
-    stack2 = np.asarray([img.arr[0, 1, :, :]])
+    stack1 = np.asarray(tiff_arr[:, 0, :, :])
+    stack2 = np.asarray([tiff_arr[0, 1, :, :]])
     stack3 = np.asarray(
-        [img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]]
+        [tiff_arr[0, 2, :, :], tiff_arr[(f - 1) // 2, 1, :, :], tiff_arr[f - 1, 0, :, :]]
     )
-    stack4 = np.asarray(img.arr[: (f - 1) // 2, 2, :, :])
-    stack5 = np.asarray(img.arr[:, 1, :, :])
-    stack6 = np.asarray(img.arr[:, 2, :, :])
+    stack4 = np.asarray(tiff_arr[: (f - 1) // 2, 2, :, :])
+    stack5 = np.asarray(tiff_arr[:, 1, :, :])
+    stack6 = np.asarray(tiff_arr[:, 2, :, :])
+    stack7 = tiff_arr
 
     kwargs6 = {
         "gauss": {"ksize": (3, 3), "sigmaX": 2.5},
@@ -415,6 +418,83 @@ def test_preprocess_stack(init_tiff: tuple):
         "minmax": {"alpha": 0, "beta": 1},
         "skip": ["gauss", "median"],
     }
+    kwargs9 = {}
+
+    def test_case_x(stackx: np.ndarray, **kwargsx):
+        """
+        Tests whether the preprocess_stack method works correctly on a specific test case.
+
+        Args:
+            stackx (np.ndarray): Input stack of frames (shape: N x H x W).
+            **kwargsx: Dictionary with preprocessing parameters:
+                - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+                - median (dict): {'ksize': int}
+                - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+                - contrast (dict): {'alpha': float, 'beta': int}
+                - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
+
+        Returns:
+            None
+        """
+        with patch("multiprocessing.Pool") as mock_pool:
+            mock_pool_instance = mock_pool.return_value.__enter__.return_value
+            mock_pool_instance.map.side_effect = lambda func, arr1: np.zeros_like(frames)
+
+            preprocess_stack_return = img.preprocess_stack(stackx, **kwargsx)
+            frames = [(stackx[i], kwargsx) for i in range(stackx.shape[0])]
+            preprocessed_frames = mock_pool_instance.map.return_value
+            return_val = np.stack(preprocessed_frames, axis=0)
+
+            pool_args, _ = mock_pool.call_args
+            assert pool_args[0] == cpu_count()
+
+            pool_map_args, _ = mock_pool.map.call_args
+            assert pool_map_args[0] == tiff.preprocess_frame
+            assert np.array_equal(pool_map_args[1], frames)
+
+            assert return_val.shape == preprocess_stack_return.shape
+            assert preprocess_stack_return.shape == stackx.shape
+            assert isinstance(preprocess_stack_return, np.ndarray)
+            mock_pool.assert_called_once()
+            mock_pool_instance.map.assert_called_once_with(tiff.preprocess_frame, frames)
+
+            del preprocess_stack_return, frames, preprocessed_frames, return_val
+            gc.collect()
+
+
+    test_case_x(stack1, **kwargs6)
+    test_case_x(stack2, **kwargs6)
+    test_case_x(stack3, **kwargs6)
+    test_case_x(stack4, **kwargs6)
+    test_case_x(stack5, **kwargs6)
+    test_case_x(stack6, **kwargs6)
+    test_case_x(stack7, **kwargs6)
+    test_case_x(stack1, **kwargs7)
+    test_case_x(stack2, **kwargs7)
+    test_case_x(stack3, **kwargs7)
+    test_case_x(stack4, **kwargs7)
+    test_case_x(stack5, **kwargs7)
+    test_case_x(stack6, **kwargs7)
+    test_case_x(stack7, **kwargs7)
+    test_case_x(stack1, **kwargs8)
+    test_case_x(stack2, **kwargs8)
+    test_case_x(stack3, **kwargs8)
+    test_case_x(stack4, **kwargs8)
+    test_case_x(stack5, **kwargs8)
+    test_case_x(stack6, **kwargs8)
+    test_case_x(stack7, **kwargs8)
+    test_case_x(stack1, **kwargs9)
+    test_case_x(stack2, **kwargs9)
+    test_case_x(stack3, **kwargs9)
+    test_case_x(stack4, **kwargs9)
+    test_case_x(stack5, **kwargs9)
+    test_case_x(stack6, **kwargs9)
+    test_case_x(stack7, **kwargs9)
+
+
+
+
+
 
     kwargs6_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs6)
     kwargs6_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs6)
@@ -422,30 +502,134 @@ def test_preprocess_stack(init_tiff: tuple):
     kwargs6_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs6)
     kwargs6_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs6)
     kwargs6_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs6)
+    kwargs6_preprocess_stack7 = img.preprocess_stack(stack7, **kwargs6)
     kwargs7_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs7)
     kwargs7_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs7)
     kwargs7_preprocess_stack3 = img.preprocess_stack(stack3, **kwargs7)
     kwargs7_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs7)
     kwargs7_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs7)
     kwargs7_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs7)
+    kwargs7_preprocess_stack7 = img.preprocess_stack(stack7, **kwargs7)
     kwargs8_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs8)
     kwargs8_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs8)
     kwargs8_preprocess_stack3 = img.preprocess_stack(stack3, **kwargs8)
     kwargs8_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs8)
     kwargs8_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs8)
     kwargs8_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs8)
+    kwargs8_preprocess_stack7 = img.preprocess_stack(stack7, **kwargs8)
+    kwargs9_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs9)
+    kwargs9_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs9)
+    kwargs9_preprocess_stack3 = img.preprocess_stack(stack3, **kwargs9)
+    kwargs9_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs9)
+    kwargs9_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs9)
+    kwargs9_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs9)
+    kwargs9_preprocess_stack7 = img.preprocess_stack(stack7, **kwargs9)
 
+    #NO
+    assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
+    assert not np.array_equal(kwargs6_preprocess_stack2, stack2)
+    assert not np.array_equal(kwargs6_preprocess_stack3, stack3)
+    assert not np.array_equal(kwargs6_preprocess_stack4, stack4)
+    assert not np.array_equal(kwargs6_preprocess_stack5, stack5)
+    assert not np.array_equal(kwargs6_preprocess_stack6, stack6)
+    assert not np.array_equal(kwargs6_preprocess_stack7, stack7)
+    assert np.array_equal(kwargs7_preprocess_stack1, stack1)
+    assert np.array_equal(kwargs7_preprocess_stack2, stack2)
+    assert np.array_equal(kwargs7_preprocess_stack3, stack3)
+    assert np.array_equal(kwargs7_preprocess_stack4, stack4)
+    assert np.array_equal(kwargs7_preprocess_stack5, stack5)
+    assert np.array_equal(kwargs7_preprocess_stack6, stack6)
+    assert np.array_equal(kwargs7_preprocess_stack7, stack7)
+    assert not np.array_equal(kwargs8_preprocess_stack1, stack1)
+    assert not np.array_equal(kwargs8_preprocess_stack2, stack2)
+    assert not np.array_equal(kwargs8_preprocess_stack3, stack3)
+    assert not np.array_equal(kwargs8_preprocess_stack4, stack4)
+    assert not np.array_equal(kwargs8_preprocess_stack5, stack5)
+    assert not np.array_equal(kwargs8_preprocess_stack6, stack6)
+    assert not np.array_equal(kwargs8_preprocess_stack7, stack7)
+    assert not np.array_equal(kwargs9_preprocess_stack1, stack1)
+    assert not np.array_equal(kwargs9_preprocess_stack2, stack2)
+    assert not np.array_equal(kwargs9_preprocess_stack3, stack3)
+    assert not np.array_equal(kwargs9_preprocess_stack4, stack4)
+    assert not np.array_equal(kwargs9_preprocess_stack5, stack5)
+    assert not np.array_equal(kwargs9_preprocess_stack6, stack6)
+    assert not np.array_equal(kwargs9_preprocess_stack7, stack7)
+
+    assert isinstance(kwargs6_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack5, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack6, np.ndarray)
+    assert isinstance(kwargs6_preprocess_stack7, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack5, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack6, np.ndarray)
+    assert isinstance(kwargs7_preprocess_stack7, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack5, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack6, np.ndarray)
+    assert isinstance(kwargs8_preprocess_stack7, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack1, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack2, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack3, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack4, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack5, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack6, np.ndarray)
+    assert isinstance(kwargs9_preprocess_stack7, np.ndarray)
+
+    assert kwargs6_preprocess_stack1.shape == stack1.shape
+    assert kwargs6_preprocess_stack2.shape == stack2.shape
+    assert kwargs6_preprocess_stack3.shape == stack3.shape
+    assert kwargs6_preprocess_stack4.shape == stack4.shape
+    assert kwargs6_preprocess_stack5.shape == stack5.shape
+    assert kwargs6_preprocess_stack6.shape == stack6.shape
+    assert kwargs6_preprocess_stack7.shape == stack7.shape
+    assert kwargs7_preprocess_stack1.shape == stack1.shape
+    assert kwargs7_preprocess_stack2.shape == stack2.shape
+    assert kwargs7_preprocess_stack3.shape == stack3.shape
+    assert kwargs7_preprocess_stack4.shape == stack4.shape
+    assert kwargs7_preprocess_stack5.shape == stack5.shape
+    assert kwargs7_preprocess_stack6.shape == stack6.shape
+    assert kwargs7_preprocess_stack7.shape == stack7.shape
+    assert kwargs8_preprocess_stack1.shape == stack1.shape
+    assert kwargs8_preprocess_stack2.shape == stack2.shape
+    assert kwargs8_preprocess_stack3.shape == stack3.shape
+    assert kwargs8_preprocess_stack4.shape == stack4.shape
+    assert kwargs8_preprocess_stack5.shape == stack5.shape
+    assert kwargs8_preprocess_stack6.shape == stack6.shape
+    assert kwargs8_preprocess_stack7.shape == stack7.shape
+    assert kwargs9_preprocess_stack1.shape == stack1.shape
+    assert kwargs9_preprocess_stack2.shape == stack2.shape
+    assert kwargs9_preprocess_stack3.shape == stack3.shape
+    assert kwargs9_preprocess_stack4.shape == stack4.shape
+    assert kwargs9_preprocess_stack5.shape == stack5.shape
+    assert kwargs9_preprocess_stack6.shape == stack6.shape
+    assert kwargs9_preprocess_stack7.shape == stack7.shape
+
+
+    #NO
     assert np.array_equal(
         np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs6))]),
-        kwargs6_preprocess_stack2,
+        img.preprocess_stack(stack2, **kwargs6),
     )
     assert np.array_equal(
         np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs7))]),
-        kwargs7_preprocess_stack2,
+        img.preprocess_stack(stack2, **kwargs7),
     )
     assert np.array_equal(
         np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs8))]),
-        kwargs8_preprocess_stack2,
+        img.preprocess_stack(stack2, **kwargs8),
+    )
+    assert np.array_equal(
+        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs9))]),
+        img.preprocess_stack(stack2, **kwargs9),
     )
 
     assert np.array_equal(
@@ -458,7 +642,7 @@ def test_preprocess_stack(init_tiff: tuple):
                 img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs6)),
             ]
         ),
-        kwargs6_preprocess_stack3,
+        img.preprocess_stack(stack3, **kwargs6),
     )
     assert np.array_equal(
         np.asarray(
@@ -470,7 +654,7 @@ def test_preprocess_stack(init_tiff: tuple):
                 img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs7)),
             ]
         ),
-        kwargs7_preprocess_stack3,
+        img.preprocess_stack(stack3, **kwargs7),
     )
     assert np.array_equal(
         np.asarray(
@@ -482,62 +666,17 @@ def test_preprocess_stack(init_tiff: tuple):
                 img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs8)),
             ]
         ),
-        kwargs8_preprocess_stack3,
+        img.preprocess_stack(stack3, **kwargs8),
     )
-
-    assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
-    assert not np.array_equal(kwargs6_preprocess_stack2, stack2)
-    assert not np.array_equal(kwargs6_preprocess_stack3, stack3)
-    assert not np.array_equal(kwargs6_preprocess_stack4, stack4)
-    assert not np.array_equal(kwargs6_preprocess_stack5, stack5)
-    assert not np.array_equal(kwargs6_preprocess_stack6, stack6)
-    assert np.array_equal(kwargs7_preprocess_stack1, stack1)
-    assert np.array_equal(kwargs7_preprocess_stack2, stack2)
-    assert np.array_equal(kwargs7_preprocess_stack3, stack3)
-    assert np.array_equal(kwargs7_preprocess_stack4, stack4)
-    assert np.array_equal(kwargs7_preprocess_stack5, stack5)
-    assert np.array_equal(kwargs7_preprocess_stack6, stack6)
-    assert not np.array_equal(kwargs8_preprocess_stack1, stack1)
-    assert not np.array_equal(kwargs8_preprocess_stack2, stack2)
-    assert not np.array_equal(kwargs8_preprocess_stack3, stack3)
-    assert not np.array_equal(kwargs8_preprocess_stack4, stack4)
-    assert not np.array_equal(kwargs8_preprocess_stack5, stack5)
-    assert not np.array_equal(kwargs8_preprocess_stack6, stack6)
-
-    assert isinstance(kwargs6_preprocess_stack1, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack2, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack3, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack4, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack5, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack6, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack1, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack2, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack3, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack4, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack5, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack6, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack1, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack2, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack3, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack4, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack5, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack6, np.ndarray)
-
-    assert kwargs6_preprocess_stack1.shape == stack1.shape
-    assert kwargs6_preprocess_stack2.shape == stack2.shape
-    assert kwargs6_preprocess_stack3.shape == stack3.shape
-    assert kwargs6_preprocess_stack4.shape == stack4.shape
-    assert kwargs6_preprocess_stack5.shape == stack5.shape
-    assert kwargs6_preprocess_stack6.shape == stack6.shape
-    assert kwargs7_preprocess_stack1.shape == stack1.shape
-    assert kwargs7_preprocess_stack2.shape == stack2.shape
-    assert kwargs7_preprocess_stack3.shape == stack3.shape
-    assert kwargs7_preprocess_stack4.shape == stack4.shape
-    assert kwargs7_preprocess_stack5.shape == stack5.shape
-    assert kwargs7_preprocess_stack6.shape == stack6.shape
-    assert kwargs8_preprocess_stack1.shape == stack1.shape
-    assert kwargs8_preprocess_stack2.shape == stack2.shape
-    assert kwargs8_preprocess_stack3.shape == stack3.shape
-    assert kwargs8_preprocess_stack4.shape == stack4.shape
-    assert kwargs8_preprocess_stack5.shape == stack5.shape
-    assert kwargs8_preprocess_stack6.shape == stack6.shape
+    assert np.array_equal(
+        np.asarray(
+            [
+                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs9)),
+                img.preprocess_frame(
+                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs9)
+                ),
+                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs9)),
+            ]
+        ),
+        img.preprocess_stack(stack3, **kwargs9),
+    )

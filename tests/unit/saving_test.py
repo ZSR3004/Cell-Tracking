@@ -432,31 +432,31 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
-        with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_FFMpegWriter, \
-            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_FuncAnimation:
+        with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter, \
+            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation:
             mock_anim_instance = MagicMock()
-            mock_FuncAnimation.return_value = mock_anim_instance
+            mock_funcanimation.return_value = mock_anim_instance
             mock_writer_instance = MagicMock()
-            mock_FFMpegWriter.return_value = mock_writer_instance
+            mock_ffmpegwriter.return_value = mock_writer_instance
 
             save.save_original_video("Video_Name", stackx_kwargsx_path, im, image_stackx, fig, ax, **kwargsx)
 
             T = kwargsx.get("T", image_stackx.shape[0])
             fps = kwargsx.get("fps", 10)
 
-            args_FuncAnimation, kwargs_FuncAnimation = mock_FuncAnimation.call_args
+            args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
             assert args_FuncAnimation[0] == fig
             assert callable(args_FuncAnimation[1])
             assert kwargs_FuncAnimation["frames"] == T
             assert kwargs_FuncAnimation["interval"] == 1000 / fps
             assert kwargs_FuncAnimation["blit"] == False
 
-            _, kwargs_FFMpegWriter = mock_FFMpegWriter.call_args
+            _, kwargs_FFMpegWriter = mock_ffmpegwriter.call_args
             assert kwargs_FFMpegWriter["fps"] == fps
 
             mock_anim_instance.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
-            mock_FuncAnimation.assert_called_once()
-            mock_FFMpegWriter.assert_called_once()
+            mock_funcanimation.assert_called_once()
+            mock_ffmpegwriter.assert_called_once()
 
             gc.collect()
 
