@@ -59,9 +59,6 @@ def test_combine_flows(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    with patch("src.cell_tracking.optical_flow.optical_flow") as mock_opt_flow:
-        
-
     flow_0 = flow.optical_flow(tiff_arr, 0)
     flow_1 = flow.optical_flow(tiff_arr, 1)
     flow_2 = flow.optical_flow(tiff_arr, 2)
@@ -73,8 +70,6 @@ def test_combine_flows(init_tiff):
     assert combine_flow_0.shape == (f - 1, c, h, w, 2)
     assert combine_flow_1.shape == (f - 1, c, h, w, 2)
     assert combine_flow_2.shape == (f - 1, c, h, w, 2)
-
-    return NotImplementedError
 
 
 def test_compute_flow_pair(init_tiff):

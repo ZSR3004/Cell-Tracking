@@ -409,7 +409,11 @@ class TestGetRAFTOpticalFlow:
             mock_raft.return_value = mock_model
 
             batches = (batch_1, batch_2)
-            result = raft.get_raft_optical_flow(batches)
+            
+            if torch.cuda.is_available():
+                result = raft.get_raft_optical_flow(batches, gpu_flag=True)
+            else:
+                result = raft.get_raft_optical_flow(batches, gpu_flag=False)
 
             assert result.shape == (
                 batch_1.shape[0],
