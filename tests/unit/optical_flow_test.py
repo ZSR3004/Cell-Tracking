@@ -91,11 +91,15 @@ def test_compute_flow_pair(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    # Grab the first two frames of channel 0
-    f1 = tiff_arr[0, 0]  # shape: (height, width)
-    f2 = tiff_arr[1, 0]  # shape: (height, width)
+    # shapes of these: (height, width)
+    frame0_channel0 = tiff_arr[0, 0]  
+    frame1_channel0 = tiff_arr[1, 0]
+    middleframe0_channel1 = tiff_arr[f//2, 1]
+    middleframe1_channel1 = tiff_arr[(f//2)-1, 1]
+    lastframe0_channel2 = tiff_arr[-1, 2]
+    lastframe1_channel2 = tiff_arr[-2, 2]
 
-    flow_args = {
+    flow_args1 = {
         "pyr_scale": 0.5,
         "levels": 3,
         "winsize": 15,
@@ -104,18 +108,64 @@ def test_compute_flow_pair(init_tiff):
         "poly_sigma": 1.2,
         "flags": 0,
     }
+    flow_args2 = {
+        "pyr_scale": 0.75,
+        "levels": 5,
+        "winsize": 17,
+        "iterations": 6,
+        "poly_n": 3,
+        "poly_sigma": 1.8,
+        "flags": 1,
+    }
 
-    args = (f1, f2, flow_args)
-    my_flow = flow.compute_flow_pair(args)
+    def test_case_x(f1: np.ndarray, f2: np.ndarray, flow_argsx: dict):
+        """
+        Tests whether the compute_flow_pair function works correctly on a specific test case.
 
-    # Test output type
-    assert isinstance(my_flow, np.ndarray)
+        Args:
+            f1 (np.ndarray): First frame.
+            f2 (np.ndarray): Second frame.
+            flow_argsx (dict): Dictionary with parameters for optical flow calculation.
+                - pyr_scale (float): Scale factor for pyramid.
+                - levels (int): Number of pyramid levels.
+                - winsize (int): Size of the window for averaging.
+                - iterations (int): Number of iterations at each pyramid level.
+                - poly_n (int): Size of the pixel neighborhood.
+                - poly_sigma (float): Standard deviation of the Gaussian used for polynomial expansion.
+                - flag (int): Operation flags
 
-    # Test output shape
-    assert my_flow.shape == (h, w, 2)
+        Returns:
+            None.
+        """
+        with patch("cv2.calcOpticalFlowFarneback") as mock_farneback:
+            fake_flow = np.zeros((h, w, 2), dtype=f1.dtype)
+            mock_farneback.return_value = fake_flow
 
-    #MOCK AND PATCH
-    return NotImplementedError
+            my_flow = flow.compute_flow_pair((f1, f2, flow_argsx))
+
+            farneback_args, _ = mock_farneback.call_args
+            assert np.array_equal(farneback_args[0], f1)
+            assert np.array_equal(farneback_args[1], f2)
+            assert farneback_args[2] == None
+            assert farneback_args[3] == flow_argsx["pyr_scale"]
+            assert farneback_args[4] == flow_argsx["levels"]
+            assert farneback_args[5] == flow_argsx["winsize"]
+            assert farneback_args[6] == flow_argsx["iterations"]
+            assert farneback_args[7] == flow_argsx["poly_n"]
+            assert farneback_args[8] == flow_argsx["poly_sigma"]
+            assert farneback_args[9] == flow_argsx["flags"]
+
+            assert my_flow.shape == fake_flow.shape
+            assert my_flow.shape == (h, w, 2)
+            assert np.array_equal(my_flow, fake_flow)
+            assert isinstance(my_flow, np.ndarray)
+
+    test_case_x(frame0_channel0, frame1_channel0, flow_args1)
+    test_case_x(frame0_channel0, frame1_channel0, flow_args2)
+    test_case_x(middleframe0_channel1, middleframe1_channel1, flow_args1)
+    test_case_x(middleframe0_channel1, middleframe1_channel1, flow_args2)
+    test_case_x(lastframe0_channel2, lastframe1_channel2, flow_args1)
+    test_case_x(lastframe0_channel2, lastframe1_channel2, flow_args2)
 
 
 def test_optical_flow(init_tiff):
