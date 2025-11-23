@@ -461,7 +461,6 @@ def test_preprocess_stack(init_tiff: tuple):
             del result, frames
             gc.collect()
 
-
     test_case_x(stack1, **kwargs6)
     test_case_x(stack2, **kwargs6)
     test_case_x(stack3, **kwargs6)

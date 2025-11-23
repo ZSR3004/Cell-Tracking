@@ -12,12 +12,7 @@ from src.cell_tracking import raft
 from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = [
-    (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
-        (96, 3, 520, 2329),
-    )
-]
+TIFF_PATHS = ["datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -31,8 +26,7 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     Returns:
         (tiff.Tiff): Tiff class instance of the path.
     """
-    path, info = request.param
-    return (tiff.Tiff(path), info)
+    return tiff.Tiff(request.param)
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -336,7 +330,10 @@ class TestGetRAFTOpticalFlow:
             mock_model.return_value = [flow_output]
             mock_raft.return_value = mock_model
 
-            raft.get_raft_optical_flow(batches, gpu_flag=True)
+            if torch.cuda.is_available():
+                raft.get_raft_optical_flow(batches, gpu_flag=True)
+            else:
+                raft.get_raft_optical_flow(batches, gpu_flag=False)
 
             call_args = mock_model.to.call_args_list[0][0][0]
             assert call_args.type == "cuda"
@@ -352,7 +349,10 @@ class TestGetRAFTOpticalFlow:
             mock_model.return_value = [flow_output]
             mock_raft.return_value = mock_model
 
-            raft.get_raft_optical_flow(batches, gpu_flag=False)
+            if torch.cuda.is_available():
+                raft.get_raft_optical_flow(batches, gpu_flag=True)
+            else:
+                raft.get_raft_optical_flow(batches, gpu_flag=False)
 
             call_args = mock_model.to.call_args_list[0][0][0]
             assert call_args.type == "cpu"
@@ -372,7 +372,10 @@ class TestGetRAFTOpticalFlow:
             mock_model.return_value = [flow_output]
             mock_raft.return_value = mock_model
 
-            raft.get_raft_optical_flow(batches, gpu_flag=True)
+            if torch.cuda.is_available():
+                raft.get_raft_optical_flow(batches, gpu_flag=True)
+            else:
+                raft.get_raft_optical_flow(batches, gpu_flag=False)
 
             call_args = mock_model.to.call_args_list[0][0][0]
             assert call_args.type == "cpu"

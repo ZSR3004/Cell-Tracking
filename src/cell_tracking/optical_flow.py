@@ -17,7 +17,6 @@ def combine_flows(flow_list: list) -> np.ndarray:
     Returns:
         combined (np.ndarray): Combined stack of summed and original flows.
     """
-
     sum_arr = flow_list[0] + flow_list[1]
     combined = np.stack([sum_arr, flow_list[0], flow_list[1]], axis=1)
     return combined

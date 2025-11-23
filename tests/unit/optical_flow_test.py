@@ -10,6 +10,7 @@ import sys, os, pytest
 from sympy import Idx
 from src.cell_tracking import optical_flow as flow
 import numpy as np
+from unittest.mock import patch, Mock, MagicMock
 from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
@@ -39,12 +40,12 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     return (tiff.Tiff(path), info)
 
 
-def test_combine_flows(sample_tiff):
+def test_combine_flows(init_tiff):
     """
     Tests whether the combine_flows function works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -54,12 +55,16 @@ def test_combine_flows(sample_tiff):
     Returns:
         None.
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
 
-    flow_0 = flow.optical_flow(img.arr, 0)
-    flow_1 = flow.optical_flow(img.arr, 1)
-    flow_2 = flow.optical_flow(img.arr, 2)
+    with patch("src.cell_tracking.optical_flow.optical_flow") as mock_opt_flow:
+        
+
+    flow_0 = flow.optical_flow(tiff_arr, 0)
+    flow_1 = flow.optical_flow(tiff_arr, 1)
+    flow_2 = flow.optical_flow(tiff_arr, 2)
 
     combine_flow_0 = flow.combine_flows([flow_0, flow_1])
     combine_flow_1 = flow.combine_flows([flow_1, flow_2])
@@ -69,13 +74,15 @@ def test_combine_flows(sample_tiff):
     assert combine_flow_1.shape == (f - 1, c, h, w, 2)
     assert combine_flow_2.shape == (f - 1, c, h, w, 2)
 
+    return NotImplementedError
 
-def test_compute_flow_pair(sample_tiff):
+
+def test_compute_flow_pair(init_tiff):
     """
     Tests whether the compute_flow_pair function works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -85,12 +92,13 @@ def test_compute_flow_pair(sample_tiff):
     Returns:
         None.
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
 
     # Grab the first two frames of channel 0
-    f1 = img.arr[0, 0]  # shape: (height, width)
-    f2 = img.arr[1, 0]  # shape: (height, width)
+    f1 = tiff_arr[0, 0]  # shape: (height, width)
+    f2 = tiff_arr[1, 0]  # shape: (height, width)
 
     flow_args = {
         "pyr_scale": 0.5,
@@ -111,13 +119,15 @@ def test_compute_flow_pair(sample_tiff):
     # Test output shape
     assert my_flow.shape == (h, w, 2)
 
+    return NotImplementedError
 
-def test_optical_flow(sample_tiff):
+
+def test_optical_flow(init_tiff):
     """
     Tests whether the optical_flow function works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -127,8 +137,9 @@ def test_optical_flow(sample_tiff):
     Returns:
         None.
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
 
     # arguments for testing
     flow_args1 = {
@@ -143,15 +154,15 @@ def test_optical_flow(sample_tiff):
     flow_args2 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
     flow_args3 = {}
 
-    flow1_channel0 = flow.optical_flow(img.arr, 0, **flow_args1)
-    flow1_channel1 = flow.optical_flow(img.arr, 1, **flow_args1)
-    flow1_channel2 = flow.optical_flow(img.arr, 2, **flow_args1)
-    flow2_channel0 = flow.optical_flow(img.arr, 0, **flow_args2)
-    flow2_channel1 = flow.optical_flow(img.arr, 1, **flow_args2)
-    flow2_channel2 = flow.optical_flow(img.arr, 2, **flow_args2)
-    flow3_channel0 = flow.optical_flow(img.arr, 0, **flow_args3)
-    flow3_channel1 = flow.optical_flow(img.arr, 1, **flow_args3)
-    flow3_channel2 = flow.optical_flow(img.arr, 2, **flow_args3)
+    flow1_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args1)
+    flow1_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args1)
+    flow1_channel2 = flow.optical_flow(tiff_arr, 2, **flow_args1)
+    flow2_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args2)
+    flow2_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args2)
+    flow2_channel2 = flow.optical_flow(tiff_arr, 2, **flow_args2)
+    flow3_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args3)
+    flow3_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args3)
+    flow3_channel2 = flow.optical_flow(tiff_arr, 2, **flow_args3)
 
     # Test output type
     assert isinstance(flow1_channel0, np.ndarray)
@@ -188,13 +199,15 @@ def test_optical_flow(sample_tiff):
     assert not np.allclose(all_zeros, flow3_channel1)
     assert not np.allclose(all_zeros, flow3_channel2)
 
+    return NotImplementedError
 
-def test_calculate_optical_flow(sample_tiff):
+
+def test_calculate_optical_flow(init_tiff):
     """
     Tests whether the calculate_optical_flow function works correctly.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -204,8 +217,9 @@ def test_calculate_optical_flow(sample_tiff):
     Returns:
         None.
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
 
     # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
     process_args = {
@@ -213,7 +227,7 @@ def test_calculate_optical_flow(sample_tiff):
         "gauss": {"ksize": (5, 5), "sigmaX": 1.5},
     }
 
-    my_flow = flow.calculate_optical_flow(img.arr, **process_args)
+    my_flow = flow.calculate_optical_flow(tiff_arr, **process_args)
 
     # Test output type
     assert isinstance(my_flow, np.ndarray)
@@ -221,13 +235,15 @@ def test_calculate_optical_flow(sample_tiff):
     # Test output shape
     assert my_flow.shape == (f - 1, c, h, w, 2)
 
+    return NotImplementedError
 
-def test_show_flow(sample_tiff):
+
+def test_show_flow(init_tiff):
     """
     Tests the show_flow function.
 
     Args:
-        sample_tiff (tuple): A tuple containing information about the TIFF file.
+        init_tiff (tuple): A tuple containing information about the TIFF file.
             - path (str): The path to the TIFF file.
             - f (int): Number of frames.
             - c (int): Number of channels.
@@ -237,10 +253,11 @@ def test_show_flow(sample_tiff):
     Returns:
         None.
     """
-    path, f, c, h, w = sample_tiff
-    img = tiff.Tiff(path)
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
 
-    my_flow = flow.optical_flow(img.arr, 0)
+    my_flow = flow.optical_flow(tiff_arr, 0)
     first_flow_frame = my_flow[0]
     video = flow.show_flow(
         first_flow_frame, "Optical Flow", 25, (12, 6), 200, "tail", "blue", None
@@ -249,3 +266,5 @@ def test_show_flow(sample_tiff):
     fig = plt.gcf()
     assert isinstance(fig, Figure)
     plt.close()
+
+    return NotImplementedError
