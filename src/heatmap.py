@@ -1,14 +1,8 @@
-def array_to_vid(args, video): 
-    """
-    Args: 
-    Array
-    Returns: 
-    Video 
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+import matplotlib.colors as colors
 
-    Function takes in an array and returns a video 
-    """
-    
-    raise NotImplementedError
 
 def generate_heatmaps(flow, normalize=True):
     """
@@ -35,4 +29,4 @@ def save_heatmap_video(flow, output_path='heatmap_video.mp4', fps=10, normalize=
         fps (int): Frames per second of the output video
         normalize (bool): Whether to normalize magnitudes per frame
     """
-    raise NotImplementedError
+    
