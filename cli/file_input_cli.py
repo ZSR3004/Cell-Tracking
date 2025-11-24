@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from src import tiffclass as tiff
+from src.cell_tracking import tiffclass as tiff
 import numpy as np
 
 
@@ -14,7 +14,6 @@ def init_tiff_class(path: str) -> tiff.Tiff:
     """
     This function initializes a tiff class from the command line.
 
-<<<<<<< HEAD
     Args:
       The path name to a tiff file.
 
@@ -44,8 +43,3 @@ def preprocess_tiff(tiff_obj: tiff.Tiff, **kwargs) -> np.ndarray:
       The preprocessed stack (as a numpy array.)
     """
     return tiff_obj.preprocess_stack(tiff_obj.arr, **kwargs)
-=======
-
-def preprocess_tiff(tiff: tiff.Tiff) -> np.ndarray:
-    raise NotImplementedError
->>>>>>> 425e42ced3302da7c9c325a9f27376191c94bb29

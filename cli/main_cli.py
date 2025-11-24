@@ -14,10 +14,10 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from src.memory import MemoryManagement
+from src.cell_tracking.memory import MemoryManager
 
 OUTPUT_OPTIONS = [
-    "Optical Flow",
+    "Optical Flow Video",
     "Heatmap",
     "Kymograph",
     "Raw Data"
@@ -93,7 +93,7 @@ def main():
             parent_dir = os.path.join(os.path.expanduser("~"), parent_dir)
 
         cell_tracking_path = os.path.join(parent_dir, "CellTracking")
-        my_folders = MemoryManagement(cell_tracking_path)
+        my_folders = MemoryManager(cell_tracking_path)
         my_folders.create_main_dir()
         os.chdir(cell_tracking_path)
         my_folders._write_default_yaml()
@@ -108,7 +108,7 @@ def main():
             parent_dir = os.path.join(os.path.expanduser("~"), parent_dir)
 
         cell_tracking_path = os.path.join(parent_dir, "CellTracking")
-        my_folders = MemoryManagement(cell_tracking_path)
+        my_folders = MemoryManager(cell_tracking_path)
         my_folders.create_main_dir()
         os.chdir(cell_tracking_path)
 
@@ -116,7 +116,7 @@ def main():
     full_path = get_video()
     tiff_name = os.path.basename(full_path)
     my_video = fic.init_tiff_class(full_path)
-    s.save_original_video_cli(tiff_name, os.getcwd())
+    #s.save_original_video_cli(tiff_name, os.getcwd())
 
     if not os.path.exists(os.getcwd() + "/" + tiff_name):
         my_folders.create_tiff_dir(tiff_name)
@@ -135,55 +135,74 @@ def main():
     outputs = desired_outputs()
 
     #Ask user what kind of video they input, do optical flow calculation
-    if "Optical Flow" in outputs:
-        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/optical_flows")
-        vid_type = get_video_type()
+    os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/optical_flows")
+    vid_type = get_video_type()
         
-        if vid_type == 'n':
-            flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 0)
-            flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
-            answer = click.prompt("Do you want to calculate the combined flows of channels 1 and 2? [y/n]", 
+    if vid_type == 'n':
+        flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 0)
+        flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
+        answer = click.prompt("Do you want to calculate the combined flows of channels 1 and 2? [y/n]", 
                          type=click.Choice(['y', 'n'], case_sensitive=False))
             
-            if answer.lower() == 'y':
-                combined_flow = opt.calculate_combined_flow(my_video.arr)
+        if answer.lower() == 'y':
+            combined_flow = opt.calculate_combined_flow(my_video.arr)
+            if "Raw Data" in outputs:
                 os.chdir(parent_dir + "/CellTracking/" + tiff_name + "raw_data")
                 s.save_flow_cli("Combined_Flow_XYZ", "Combined_Flow_Mat", "Combined_Flow_NP", combined_flow, os.path.getcwd())
-
                 os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
-                #call save_vector_video here?
 
+            
+            if "Optical Flow Video" in outputs:
+                #call save vector video here
+                pass
+
+            if "Heatmap" in outputs:
+                os.chdir(parent_dir + "/CellTracking/" + tiff_name + "heatmaps")
+                v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "/heatmap_combined_flow"))
+                
+            if "Kymograph" in outputs:
+                os.chdir(parent_dir + "/CellTracking/" + tiff_name + "kymographs")
+                #call kymograph function
+
+        if "Raw Data" in outputs:
             os.chdir(parent_dir + "/CellTracking/" + tiff_name + "raw_data")
             s.save_flow_cli("Channel_1_XYZ", "Channel_1_Mat", "Channel_1_NP", flow_channel_1, os.path.getcwd())
             s.save_flow_cli("Channel_2_XYZ", "Channel_2_Mat", "Channel_2_NP", flow_channel_2, os.path.getcwd())
+        
+        if "Optical Flow Video" in outputs:
+                #call save vector video here
+                pass
 
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
-            #call save_vector_video here?
+        if "Heatmap" in outputs:
+            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "heatmaps")
+            v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "/heatmap_channel_1"))
+            v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"/heatmap_channel_2"))
+                
+        if "Kymograph" in outputs:
+            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "kymographs")
+            #call kymograph function
 
-        elif vid_type == 'p':
-            raft_flow = opt.calculate_raft_optical_flow(my_video)
+        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
+
+    elif vid_type == 'p':
+        raft_flow = opt.calculate_raft_optical_flow(my_video)
+
+        if "Raw Data" in outputs:
             os.chdir(parent_dir + "/CellTracking/" + tiff_name + "raw_data")
             s.save_flow_cli("Flow_XYZ", "Flow_Mat", "Flow_NP", raft_flow, os.path.getcwd())
-
-            #call save vector video here?
             os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
-            
-    
-    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
+        
+        if "Optical Flow Video" in outputs:
+            #call save vector video here
+            pass
 
-    #Generates the heatmaps, saves to heatmap folder
-    if "Heatmap" in outputs:
-        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/heatmaps")
-        #v.show_heatmaps()
-        #save the heatmaps, maybe nest this in optical flow if it requires the optical flow arrays
-
-    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
-
-    #Generates the kymographs, save to kymograph folders
-    if "Kymograph" in outputs:
-        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/kymographs")
-        #v.show_kymograph()
-        #again, nest this if it requires the optical flow arrays
+        if "Heatmap" in outputs:
+            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "heatmaps")
+            v.save_heatmap_video_cli(raft_flow, os.path.join(os.getcwd(), "/heatmap_phase_contrast"))
+        
+        if "Kymograph" in outputs:
+            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "kymographs")
+            #call kymograph function
 
     os.chdir(parent_dir + "/CellTracking/" + tiff_name)
 

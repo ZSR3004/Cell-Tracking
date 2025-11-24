@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from src import saving
+from src.cell_tracking import saving
 import numpy as np
 
 def save_flow_cli(xyz_name: str, matlab_name: str, numpy_name: str, 

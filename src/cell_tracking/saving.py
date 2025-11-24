@@ -7,8 +7,8 @@ import matplotlib.animation as animation
 import xyz_py
 import scipy.io
 from scipy.io import savemat
-from cell_tracking import tiffclass as tiff
-from cell_tracking.defaults import default_process, default_flow
+from . import tiffclass as tiff
+from .defaults import default_process, default_flow
 import matplotlib.image, matplotlib.figure, matplotlib.axes
 
 

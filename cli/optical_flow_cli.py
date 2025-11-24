@@ -5,12 +5,11 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-from src import optical_flow as of
-from src import raft
-from src import tiffclass
+from src.cell_tracking import optical_flow as of
+from src.cell_tracking import raft
+from src.cell_tracking import tiffclass
 import numpy as np
 
-<<<<<<< HEAD
 def calculate_nuclei_optical_flow(arr: np.ndarray, channel: int) -> np.ndarray:
     """
     This function preprocess the tiff stack with the parameters.
@@ -46,12 +45,3 @@ def calculate_raft_optical_flow(Tiff: tiffclass.Tiff) -> np.ndarray:
       The raft flow for the third channel
       """
     return raft.calcOpticalFlowRAFT(Tiff)
-=======
-
-def calculate_nuclei_optical_flow(arr: np.ndarray) -> np.ndarray:
-    raise NotImplementedError
-
-
-def calculate_phase_optical_flow(arr: np.ndarray) -> np.ndarray:
-    raise NotImplementedError
->>>>>>> 425e42ced3302da7c9c325a9f27376191c94bb29

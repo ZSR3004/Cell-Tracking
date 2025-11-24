@@ -1,10 +1,10 @@
 import numpy as np
-from src import heatmap as hm
-from src import kymograph as kg
-from src import tiffclass as tiff
+from src.cell_tracking import heatmap as hm
+from src.cell_tracking import kymograph as kg
+from src.cell_tracking import tiffclass as tiff
 import optical_flow_cli as ofc
 
-def show_heatmaps(flow, normalize=True):
+def save_heatmap_video_cli(flow, output_path, normalize=True):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
@@ -16,7 +16,7 @@ def show_heatmaps(flow, normalize=True):
     Returns:
         None, just visualizes the heatmap
     """
-    my_heatmap = hm.generate_heatmaps(flow)
+    hm.save_heatmap_video(flow, output_path)
 
 
 def show_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', origin='upper', label='Kymograph', 
@@ -113,5 +113,4 @@ def show_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
       The raft flow for the third channel
       """
     return NotImplementedError
-
      
