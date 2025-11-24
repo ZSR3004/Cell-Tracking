@@ -1,6 +1,6 @@
 import os
 import sys
-
+import matplotlib
 # Add the project root (Cell-Tracking) to sys.path
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 if ROOT_DIR not in sys.path:
@@ -8,6 +8,26 @@ if ROOT_DIR not in sys.path:
 
 from src import saving
 import numpy as np
+
+def save_flow_cli(xyz_name: str, matlab_name: str, numpy_name: str, 
+                  opt_flow: np.ndarray, main_path: str):
+    """
+    Saves the raw data to the specified foler (raw data folder)
+
+    Args:
+        xyz_name: name of the xyz array
+        matlab_name: name of the matlab array
+        numpy_name: name of the numpy arrayj
+        opt_flow: the optical flow array to save
+        main_path: the path to the file to save
+
+    Returns:
+        None: just saves the arrays to the specified directories
+    """
+
+    saving.save_optical_flow_as_xyz(xyz_name, opt_flow, main_path)
+    saving.save_optical_flow_as_matlab(matlab_name, opt_flow, main_path)
+    saving.save_optical_flow_as_numpy(numpy_name, opt_flow, main_path)
 
 def save_arr_cli(arr : np.array) -> None:
     """
@@ -19,48 +39,10 @@ def save_arr_cli(arr : np.array) -> None:
     Returns:
         None: Just saves the array to a file.
     """
-    return saving.save_arr(arr)
+    saving.save_arr(arr)
 
 
-def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) -> None:
-     """
-    Saves the optical flow array as an XYZ file.
-
-    Args:
-        name (str): Name of the numpy array.
-        opt_flow (np.ndarray): The optical flow array.
-        main_path (str): Main path to the directory.
-
-    Returns:
-        None: Just saves the optical flow array to a file.
-    """
-
-def save_optical_flow_as_matlab(name: str, opt_flow: np.ndarray, main_path: str) -> None:
-    """
-    Saves the optical flow array as a MATLAB array file.
-
-    Args:
-        name (str): Name of the numpy array.
-        opt_flow (np.ndarray): The optical flow array.
-        main_path (str): Main path to the directory.
-
-    Returns:
-        None: Just saves the optical flow array to a file.
-    """
-
-def save_optical_flow_as_numpy(name: str, opt_flow: np.ndarray, main_path: str) -> None:
-    """
-    Saves the optical flow array as a numpy array.
-
-    Args:
-        name (str): Name of the numpy array.
-        opt_flow (np.ndarray): The optical flow array.
-        main_path (str): Main path to the directory.
-
-    Returns:
-        None: Just saves the optical flow array to a file.
-    """
-def save_original_video_cli(name : str, **kwargs) -> None:
+def save_original_video_cli(name: str, file_path: str) -> None:
     """
     Saves a video of image frames using matplotlib.
     Args:
@@ -75,7 +57,7 @@ def save_original_video_cli(name : str, **kwargs) -> None:
         Returns:
             None: Just saves the video to the specified path.
     """
-    return saving.save_original_video(name, **kwargs)
+    return saving.save_original_video(name, file_path, )
 
 def save_vector_video_cli(name : str, flag : str, **kwargs) -> None:
     """
