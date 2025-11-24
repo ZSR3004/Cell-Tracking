@@ -5,6 +5,7 @@ import optical_flow_cli as opt
 import visualization_cli as v
 import saving_cli as s
 import questionary
+import matplotlib.pyplot as plt
 
 import os
 import sys
@@ -116,7 +117,8 @@ def main():
     full_path = get_video()
     tiff_name = os.path.basename(full_path)
     my_video = fic.init_tiff_class(full_path)
-    #s.save_original_video_cli(tiff_name, os.getcwd())
+
+    #s.save_original_video_cli(tiff_name, os.getcwd(), )
 
     if not os.path.exists(os.getcwd() + "/" + tiff_name):
         my_folders.create_tiff_dir(tiff_name)
