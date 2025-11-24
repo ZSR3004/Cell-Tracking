@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import sys
 import matplotlib
 # Add the project root (Cell-Tracking) to sys.path
@@ -9,7 +10,7 @@ if ROOT_DIR not in sys.path:
 from src.cell_tracking import saving
 import numpy as np
 
-def save_flow_cli(xyz_name: str, matlab_name: str, numpy_name: str, 
+def save_flow_cli(name: str,
                   opt_flow: np.ndarray, main_path: str):
     """
     Saves the raw data to the specified foler (raw data folder)
@@ -25,9 +26,11 @@ def save_flow_cli(xyz_name: str, matlab_name: str, numpy_name: str,
         None: just saves the arrays to the specified directories
     """
 
-    saving.save_optical_flow_as_xyz(xyz_name, opt_flow, main_path)
-    saving.save_optical_flow_as_matlab(matlab_name, opt_flow, main_path)
-    saving.save_optical_flow_as_numpy(numpy_name, opt_flow, main_path)
+    main_path = Path(main_path)
+    
+    saving.save_optical_flow_as_xyz(name, opt_flow, main_path)
+    saving.save_optical_flow_as_matlab(name, opt_flow, main_path)
+    saving.save_optical_flow_as_numpy(name, opt_flow, main_path)
 
 def save_arr_cli(arr : np.array) -> None:
     """

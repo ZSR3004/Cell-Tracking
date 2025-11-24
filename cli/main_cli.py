@@ -85,7 +85,7 @@ def get_video_type() -> str:
 def main():
     #Checks to see if they've created the CellTracking folder yet. Relies on the user knowing this information.
     if not is_created():
-        my_path = click.prompt("Type the folder you want to save your CellTracking folder to (type ~/folder_name or folder_name)", type=str)
+        my_path = click.prompt("Type the folder you want to save your Cell-Tracking folder to (type ~/folder_name or folder_name)", type=str)
 
         parent_dir = os.path.expanduser(my_path)
 
@@ -93,7 +93,7 @@ def main():
         if not os.path.isabs(parent_dir):
             parent_dir = os.path.join(os.path.expanduser("~"), parent_dir)
 
-        cell_tracking_path = os.path.join(parent_dir, "CellTracking")
+        cell_tracking_path = os.path.join(parent_dir, "Cell-Tracking")
         my_folders = MemoryManager(cell_tracking_path)
         my_folders.create_main_dir()
         os.chdir(cell_tracking_path)
@@ -108,7 +108,7 @@ def main():
         if not os.path.isabs(parent_dir):
             parent_dir = os.path.join(os.path.expanduser("~"), parent_dir)
 
-        cell_tracking_path = os.path.join(parent_dir, "CellTracking")
+        cell_tracking_path = os.path.join(parent_dir, "Cell-Tracking")
         my_folders = MemoryManager(cell_tracking_path)
         my_folders.create_main_dir()
         os.chdir(cell_tracking_path)
@@ -126,7 +126,9 @@ def main():
         i=1
         while os.path.exists(os.path.join(os.getcwd(), f"{tiff_name} ({i})")):
             i += 1
-        my_folders.create_tiff_dir(f"{tiff_name} ({i})")
+        new_name = f"{tiff_name} ({i})"
+        my_folders.create_tiff_dir(new_name)
+        tiff_name = new_name
 
     #Creates a Tiff class instance and preprocesses based on the yaml config file.
     my_folders.read_yaml()
@@ -137,7 +139,7 @@ def main():
     outputs = desired_outputs()
 
     #Ask user what kind of video they input, do optical flow calculation
-    os.chdir(parent_dir + "/CellTracking/" + tiff_name + "/optical_flows")
+    os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
     vid_type = get_video_type()
         
     if vid_type == 'n':
@@ -149,9 +151,9 @@ def main():
         if answer.lower() == 'y':
             combined_flow = opt.calculate_combined_flow(my_video.arr)
             if "Raw Data" in outputs:
-                os.chdir(parent_dir + "/CellTracking/" + tiff_name + "raw_data")
-                s.save_flow_cli("Combined_Flow_XYZ", "Combined_Flow_Mat", "Combined_Flow_NP", combined_flow, os.path.getcwd())
-                os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
+                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
+                s.save_flow_cli("Combined_Flow", combined_flow, os.getcwd())
+                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
 
             
             if "Optical Flow Video" in outputs:
@@ -159,54 +161,54 @@ def main():
                 pass
 
             if "Heatmap" in outputs:
-                os.chdir(parent_dir + "/CellTracking/" + tiff_name + "heatmaps")
+                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
                 v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "/heatmap_combined_flow"))
                 
             if "Kymograph" in outputs:
-                os.chdir(parent_dir + "/CellTracking/" + tiff_name + "kymographs")
+                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
                 #call kymograph function
 
         if "Raw Data" in outputs:
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "raw_data")
-            s.save_flow_cli("Channel_1_XYZ", "Channel_1_Mat", "Channel_1_NP", flow_channel_1, os.path.getcwd())
-            s.save_flow_cli("Channel_2_XYZ", "Channel_2_Mat", "Channel_2_NP", flow_channel_2, os.path.getcwd())
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
+            s.save_flow_cli("Channel_1", flow_channel_1, os.getcwd())
+            s.save_flow_cli("Channel_2", flow_channel_2, os.getcwd())
         
         if "Optical Flow Video" in outputs:
                 #call save vector video here
                 pass
 
         if "Heatmap" in outputs:
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "heatmaps")
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
             v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "/heatmap_channel_1"))
             v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"/heatmap_channel_2"))
                 
         if "Kymograph" in outputs:
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "kymographs")
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
             #call kymograph function
 
-        os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
+        os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
 
     elif vid_type == 'p':
         raft_flow = opt.calculate_raft_optical_flow(my_video)
 
         if "Raw Data" in outputs:
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "raw_data")
-            s.save_flow_cli("Flow_XYZ", "Flow_Mat", "Flow_NP", raft_flow, os.path.getcwd())
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "optical_flows")
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
+            s.save_flow_cli("Flow", raft_flow, os.getcwd())
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
         
         if "Optical Flow Video" in outputs:
             #call save vector video here
             pass
 
         if "Heatmap" in outputs:
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "heatmaps")
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
             v.save_heatmap_video_cli(raft_flow, os.path.join(os.getcwd(), "/heatmap_phase_contrast"))
         
         if "Kymograph" in outputs:
-            os.chdir(parent_dir + "/CellTracking/" + tiff_name + "kymographs")
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
             #call kymograph function
 
-    os.chdir(parent_dir + "/CellTracking/" + tiff_name)
+    os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
 
 

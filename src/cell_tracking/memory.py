@@ -15,7 +15,7 @@ class MemoryManager:
             yaml_path (str): The path of the YAML configuration file.
             config (dict): The dictionary representation of the YAML file.
         """
-        self.path = os.path.join(path, "Cell-Tracking")
+        self.path = path
         self.yaml_path = os.path.join(self.path, "config.yaml")
         if not os.path.exists(self.yaml_path):
             self.create_main_dir()
