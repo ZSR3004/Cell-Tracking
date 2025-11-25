@@ -6,7 +6,7 @@ from pathlib import Path
 import matplotlib.animation as animation
 import scipy.io
 import gc
-import fileprocessingutils as fputil
+#import fileprocessingutils as fputil
 from scipy.io import savemat
 from . import tiffclass as tiff
 from .defaults import default_process, default_flow
@@ -68,10 +68,14 @@ def save_optical_flow_as_xyz(opt_flow : np.ndarray, save_path : str) -> None:
     """
     opt_flow_c0 = opt_flow[:, 0, ...]
     xyz_save_path = save_path.replace('.npy', '.pt').replace('flow_arr', 'flow_xyz')
-    fputil.saveas_xyz(opt_flow_c0, xyz_save_path)
+    #fputil.saveas_xyz(opt_flow_c0, xyz_save_path)
 
     del opt_flow_c0
     gc.collect()
+
+    #have to make/import fileprocessingutils.py (from Ziyad)
+    #Also since i changed this function I have to rewrite all its tests
+    raise NotImplementedError
 
 
 def save_optical_flow_as_matlab(
