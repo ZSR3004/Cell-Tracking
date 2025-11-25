@@ -220,9 +220,6 @@ def test_optical_flow(init_tiff):
             None.
         """
         with patch("src.cell_tracking.optical_flow.Pool") as mock_pool:
-            mock_pool_instance = mock_pool.return_value.__enter__.return_value
-            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros((len(arr1[0][0]), len(arr1[0][1]), 2)) for i in range len(arr1)]
-
             flow_args = {
                 "pyr_scale": 0.5,
                 "levels": 3,
@@ -238,6 +235,9 @@ def test_optical_flow(init_tiff):
                 (arr_channel[i], arr_channel[i + 1], flow_args)
                 for i in range(arr_channel.shape[0] - 1)
             ]
+
+            mock_pool_instance = mock_pool.return_value.__enter__.return_value
+            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros((x[0].shape[0], x[0].shape[1], 2)) for x in arr1]
 
             result = flow.optical_flow(tiff_arr, channelx, **kwargsx)
 
