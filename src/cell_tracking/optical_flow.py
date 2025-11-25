@@ -118,7 +118,7 @@ def calculate_optical_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
             - flags (int)
 
     Returns:
-        np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
+        np.ndarray: Combined flow vectors of shape (N-1, 3, H, W, 2).
     """
     flow_channel1 = optical_flow(arr, 1, **kwargs)
     flow_channel2 = optical_flow(arr, 2, **kwargs)

@@ -361,22 +361,38 @@ def test_calculate_optical_flow(init_tiff):
         """
         with patch("src.cell_tracking.optical_flow.optical_flow") as mock_optflow, \
             patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine:
-            mock_optflow.return_value = np.zeros((f-1, h, w, 2))
-            mock_combine.return_value = np.zeros((f-1, h, w, 2))
+            fake_flow1 = np.zeros((f-1, h, w, 2))
+            fake_flow2 = np.zeros((f-1, h, w, 2))
+            mock_optflow.return_value = [fake_flow1, fake_flow2]
+            mock_combine.return_value = np.zeros((f-1, 3, h, w, 2))
 
-            (f - 1, c, h, w, 2)
+            result = flow.calculate_optical_flow(tiff_arr, **kwargsx)
 
+            first_optflow_args, first_optflow_kwargs = mock_optflow.call_args_list[0]
+            assert np.array_equal(tiff_arr, first_optflow_args[0])
+            assert first_optflow_args[1] == 1
+            assert first_optflow_kwargs == kwargsx
 
-    my_flow = flow.calculate_optical_flow(tiff_arr, **process_args)
+            second_optflow_args, second_optflow_kwargs = mock_optflow.call_args_list[1]
+            assert np.array_equal(tiff_arr, second_optflow_args[0])
+            assert second_optflow_args[1] == 2
+            assert second_optflow_kwargs == kwargsx
 
-    # Test output type
-    assert isinstance(my_flow, np.ndarray)
+            combine_args, _ = mock_combine.call_args
+            assert np.array_equal(combine_args[0][0], fake_flow1)
+            assert np.array_equal(combine_args[0][1], fake_flow2)
 
-    # Test output shape
-    assert my_flow.shape == (f - 1, c, h, w, 2)
+            assert np.array_equal(result, np.zeros((f-1, 3, h, w, 2)))
+            assert result.shape == (f-1, 3, h, w, 2)
+            assert isinstance(result, np.ndarray)
 
-    #MOCK AND PATCH
-    return NotImplementedError
+            assert mock_optflow.call_count == 2
+            mock_combine.assert_called_once()
+
+    test_case_x(**kwargs1)
+    test_case_x(**kwargs2)
+    test_case_x(**kwargs3)
+    test_case_x(**kwargs4)
 
 
 def test_show_flow(init_tiff):
