@@ -252,64 +252,23 @@ def test_optical_flow(init_tiff):
                 assert pool_map_args[1][i][2][0] == pairs[i][2][0]
                 assert pool_map_args[1][i][2][0] == pairs[i][2][0]
 
+            all_zeros = np.zeros((f - 1, h, w, 2), order="C")
+            assert not np.allclose(all_zeros, result)
             assert isinstance(result, np.ndarray)
             mock_pool.assert_called_once()
             mock_pool_instance.map.assert_called_once()
 
             assert result.shape == (f-1, h, w, 2)
 
-            
-
-
-
-
-    flow1_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args1)
-    flow1_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args1)
-    flow1_channel2 = flow.optical_flow(tiff_arr, 2, **flow_args1)
-    flow2_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args2)
-    flow2_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args2)
-    flow2_channel2 = flow.optical_flow(tiff_arr, 2, **flow_args2)
-    flow3_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args3)
-    flow3_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args3)
-    flow3_channel2 = flow.optical_flow(tiff_arr, 2, **flow_args3)
-
-    # Test output type
-    assert isinstance(flow1_channel0, np.ndarray)
-    assert isinstance(flow1_channel1, np.ndarray)
-    assert isinstance(flow1_channel2, np.ndarray)
-    assert isinstance(flow2_channel0, np.ndarray)
-    assert isinstance(flow2_channel1, np.ndarray)
-    assert isinstance(flow2_channel2, np.ndarray)
-    assert isinstance(flow3_channel0, np.ndarray)
-    assert isinstance(flow3_channel1, np.ndarray)
-    assert isinstance(flow3_channel2, np.ndarray)
-
-    # Test output shape
-    assert flow1_channel0.shape == (f - 1, h, w, 2)
-    assert flow1_channel1.shape == (f - 1, h, w, 2)
-    assert flow1_channel2.shape == (f - 1, h, w, 2)
-    assert flow2_channel0.shape == (f - 1, h, w, 2)
-    assert flow2_channel1.shape == (f - 1, h, w, 2)
-    assert flow2_channel2.shape == (f - 1, h, w, 2)
-    assert flow3_channel0.shape == (f - 1, h, w, 2)
-    assert flow3_channel1.shape == (f - 1, h, w, 2)
-    assert flow3_channel2.shape == (f - 1, h, w, 2)
-
-    # Test if output is not an array with only zeros
-    all_zeros = np.zeros((f - 1, h, w, 2), order="C")
-
-    assert not np.allclose(all_zeros, flow1_channel0)
-    assert not np.allclose(all_zeros, flow1_channel1)
-    assert not np.allclose(all_zeros, flow1_channel2)
-    assert not np.allclose(all_zeros, flow2_channel0)
-    assert not np.allclose(all_zeros, flow2_channel1)
-    assert not np.allclose(all_zeros, flow2_channel2)
-    assert not np.allclose(all_zeros, flow3_channel0)
-    assert not np.allclose(all_zeros, flow3_channel1)
-    assert not np.allclose(all_zeros, flow3_channel2)
-
-    #MOCK AND PATCH
-    return NotImplementedError
+    test_case_x(0, **kwargs1)
+    test_case_x(1, **kwargs1)
+    test_case_x(2, **kwargs1)
+    test_case_x(0, **kwargs2)
+    test_case_x(1, **kwargs2)
+    test_case_x(2, **kwargs2)
+    test_case_x(0, **kwargs3)
+    test_case_x(1, **kwargs3)
+    test_case_x(2, **kwargs3)
 
 
 def test_calculate_optical_flow(init_tiff):
