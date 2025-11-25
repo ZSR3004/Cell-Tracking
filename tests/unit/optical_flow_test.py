@@ -6,16 +6,16 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import sys, os, pytest
+import cv2, pytest
 from sympy import Idx
 from src.cell_tracking import optical_flow as flow
 import numpy as np
 from unittest.mock import patch, Mock, MagicMock
+from multiprocessing import Pool, cpu_count
 from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
-import cv2
 
 TIFF_PATHS = [
     (
@@ -188,8 +188,7 @@ def test_optical_flow(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    # arguments for testing
-    flow_args1 = {
+    kwargs1 = {
         "pyr_scale": 0.75,
         "levels": 5,
         "winsize": 17,
@@ -198,8 +197,71 @@ def test_optical_flow(init_tiff):
         "poly_sigma": 1.4,
         "flags": 1,
     }
-    flow_args2 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
-    flow_args3 = {}
+    kwargs2 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
+    kwargs3 = {}
+
+    def test_case_x(channelx: int, **kwargsx):
+        """
+        Computes dense optical flow using Farneback method on a preprocessed channel.
+        Accepts all Farneback parameters as keyword arguments.
+
+        Args:
+            channelx (int): The channel to process.
+            **kwargsx: Additional keyword arguments passed to cv2.calcOpticalFlowFarneback:
+                - pyr_scale (float): Scale factor for pyramid. Default 0.5
+                - levels (int): Number of pyramid levels. Default 3
+                - winsize (int): Window size for averaging. Default 15
+                - iterations (int): Number of iterations per pyramid level. Default 3
+                - poly_n (int): Size of pixel neighborhood. Default 5
+                - poly_sigma (float): Gaussian std for polynomial expansion. Default 1.2
+                - flags (int): Operation flags. Default 0
+
+        Returns:
+            None.
+        """
+        with patch("src.cell_tracking.optical_flow.Pool") as mock_pool:
+            mock_pool_instance = mock_pool.return_value.__enter__.return_value
+            mock_pool_instance.map.side_effect = lambda func, arr1: np.zeros((arr1[0].shape[0], arr1[0].shape[1], 2))
+
+            flow_args = {
+                "pyr_scale": 0.5,
+                "levels": 3,
+                "winsize": 15,
+                "iterations": 3,
+                "poly_n": 5,
+                "poly_sigma": 1.2,
+                "flags": 0,
+            }
+            flow_args.update(kwargsx)
+            arr_channel = tiff_arr[:, channelx, :, :]
+            pairs = [
+                (arr_channel[i], arr_channel[i + 1], flow_args)
+                for i in range(arr_channel.shape[0] - 1)
+            ]
+
+            result = flow.optical_flow(tiff_arr, channelx, **kwargsx)
+
+            pool_args, _ = mock_pool.call_args
+            assert pool_args[0] == cpu_count()
+
+            pool_map_args, _ = mock_pool_instance.map.call_args
+            assert callable(pool_map_args[0])
+            for i in range(0, len(pairs)):
+                assert np.array_equal(pool_map_args[1][i][0], pairs[i][0])
+                assert np.array_equal(pool_map_args[1][i][1], pairs[i][1])
+                assert pool_map_args[1][i][2][0] == pairs[i][2][0]
+                assert pool_map_args[1][i][2][0] == pairs[i][2][0]
+
+            assert isinstance(result, np.ndarray)
+            mock_pool.assert_called_once()
+            mock_pool_instance.map.assert_called_once()
+
+            assert result.shape == (f-1, h, w, 2)
+
+            
+
+
+
 
     flow1_channel0 = flow.optical_flow(tiff_arr, 0, **flow_args1)
     flow1_channel1 = flow.optical_flow(tiff_arr, 1, **flow_args1)
