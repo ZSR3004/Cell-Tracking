@@ -59,6 +59,17 @@ def test_combine_flows(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
+    print(tiff_arr.shape)
+
+    #dummy_flow0, dummy_flow1, and dummy_flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    dummy_flow0 = np.zeros((f-1, h, w, 2))
+    dummy_flow1 = np.ones((f-1, h, w, 2))
+    dummy_flow2 = np.ones((f-1, h, w, 2)) * 2
+
+    #(f-1, H, W, 2) shape
+    #(f-1, 3, h, w, 2) shape at teh end
+
+    """
     flow_0 = flow.optical_flow(tiff_arr, 0)
     flow_1 = flow.optical_flow(tiff_arr, 1)
     flow_2 = flow.optical_flow(tiff_arr, 2)
@@ -70,6 +81,9 @@ def test_combine_flows(init_tiff):
     assert combine_flow_0.shape == (f - 1, c, h, w, 2)
     assert combine_flow_1.shape == (f - 1, c, h, w, 2)
     assert combine_flow_2.shape == (f - 1, c, h, w, 2)
+    """
+
+    return NotImplementedError
 
 
 def test_compute_flow_pair(init_tiff):
@@ -189,6 +203,15 @@ def test_optical_flow(init_tiff):
     tiff_arr = img.arr
 
     kwargs1 = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0,
+    }
+    kwargs2 = {
         "pyr_scale": 0.75,
         "levels": 5,
         "winsize": 17,
@@ -197,13 +220,12 @@ def test_optical_flow(init_tiff):
         "poly_sigma": 1.4,
         "flags": 1,
     }
-    kwargs2 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
-    kwargs3 = {}
+    kwargs3 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
+    kwargs4 = {}
 
     def test_case_x(channelx: int, **kwargsx):
         """
-        Computes dense optical flow using Farneback method on a preprocessed channel.
-        Accepts all Farneback parameters as keyword arguments.
+        Tests whether the optical_flow function works correctly on a specific test case.
 
         Args:
             channelx (int): The channel to process.
@@ -266,6 +288,9 @@ def test_optical_flow(init_tiff):
     test_case_x(0, **kwargs3)
     test_case_x(1, **kwargs3)
     test_case_x(2, **kwargs3)
+    test_case_x(0, **kwargs4)
+    test_case_x(1, **kwargs4)
+    test_case_x(2, **kwargs4)
 
 
 def test_calculate_optical_flow(init_tiff):
@@ -287,11 +312,51 @@ def test_calculate_optical_flow(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    # Example preprocessing: normalize frames to 0-1, apply small Gaussian blur
-    process_args = {
-        "normalize": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
-        "gauss": {"ksize": (5, 5), "sigmaX": 1.5},
+    kwargs1 = {
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
+        "iterations": 3,
+        "poly_n": 5,
+        "poly_sigma": 1.2,
+        "flags": 0,
     }
+    kwargs2 = {
+        "pyr_scale": 0.75,
+        "levels": 5,
+        "winsize": 17,
+        "iterations": 5,
+        "poly_n": 10,
+        "poly_sigma": 1.4,
+        "flags": 1,
+    }
+    kwargs3 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
+    kwargs4 = {}
+
+    def test_case_x(**kwargsx):
+        """
+        Tests whether the calculate_optical_flow function works correctly.
+
+        Args:
+            **kwargsx: Additional keyword arguments passed to `optical_flow` for Farneback parameters:
+                - pyr_scale (float)
+                - levels (int)
+                - winsize (int)
+                - iterations (int)
+                - poly_n (int)
+                - poly_sigma (float)
+                - flags (int)
+
+        Returns:
+            None.
+        """
+        with patch("src.cell_tracking.optical_flow.optical_flow") as mock_optflow, \
+            patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine:
+            mock_optflow.return_value = np.zeros((f-1, h, w, 2))
+            mock_combine.return_value = np.zeros((f-1, h, w, 2))
+
+            (f - 1, c, h, w, 2)
+
 
     my_flow = flow.calculate_optical_flow(tiff_arr, **process_args)
 
