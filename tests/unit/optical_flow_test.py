@@ -59,31 +59,40 @@ def test_combine_flows(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    print(tiff_arr.shape)
+    def dummy_optical_flow(channel: int):
+        """
+        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
+        faster than calling flow.optical_flow (which is why it's perfect for testing)
 
-    #dummy_flow0, dummy_flow1, and dummy_flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
-    dummy_flow0 = np.zeros((f-1, h, w, 2))
-    dummy_flow1 = np.ones((f-1, h, w, 2))
-    dummy_flow2 = np.ones((f-1, h, w, 2)) * 2
+        Args:
+            channel (int): The channel to process.
 
-    #(f-1, H, W, 2) shape
-    #(f-1, 3, h, w, 2) shape at teh end
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
 
-    """
-    flow_0 = flow.optical_flow(tiff_arr, 0)
-    flow_1 = flow.optical_flow(tiff_arr, 1)
-    flow_2 = flow.optical_flow(tiff_arr, 2)
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
 
-    combine_flow_0 = flow.combine_flows([flow_0, flow_1])
-    combine_flow_1 = flow.combine_flows([flow_1, flow_2])
-    combine_flow_2 = flow.combine_flows([flow_0, flow_2])
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
 
-    assert combine_flow_0.shape == (f - 1, c, h, w, 2)
-    assert combine_flow_1.shape == (f - 1, c, h, w, 2)
-    assert combine_flow_2.shape == (f - 1, c, h, w, 2)
-    """
+    #flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    flow0 = dummy_optical_flow(0)
+    flow1 = dummy_optical_flow(1)
+    flow2 = dummy_optical_flow(2)
 
-    return NotImplementedError
+    combine_flow_0 = flow.combine_flows([flow0, flow1])
+    combine_flow_1 = flow.combine_flows([flow1, flow2])
+    combine_flow_2 = flow.combine_flows([flow0, flow2])
+
+    assert combine_flow_0.shape == (f - 1, 3, h, w, 2)
+    assert combine_flow_1.shape == (f - 1, 3, h, w, 2)
+    assert combine_flow_2.shape == (f - 1, 3, h, w, 2)
+
+    assert isinstance(combine_flow_0, np.ndarray)
+    assert isinstance(combine_flow_1, np.ndarray)
+    assert isinstance(combine_flow_2, np.ndarray)
 
 
 def test_compute_flow_pair(init_tiff):
