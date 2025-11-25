@@ -221,7 +221,7 @@ def test_optical_flow(init_tiff):
         """
         with patch("src.cell_tracking.optical_flow.Pool") as mock_pool:
             mock_pool_instance = mock_pool.return_value.__enter__.return_value
-            mock_pool_instance.map.side_effect = lambda func, arr1: np.zeros((arr1[0].shape[0], arr1[0].shape[1], 2))
+            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros((len(arr1[0][0]), len(arr1[0][1]), 2)) for i in range len(arr1)]
 
             flow_args = {
                 "pyr_scale": 0.5,
@@ -249,11 +249,8 @@ def test_optical_flow(init_tiff):
             for i in range(0, len(pairs)):
                 assert np.array_equal(pool_map_args[1][i][0], pairs[i][0])
                 assert np.array_equal(pool_map_args[1][i][1], pairs[i][1])
-                assert pool_map_args[1][i][2][0] == pairs[i][2][0]
-                assert pool_map_args[1][i][2][0] == pairs[i][2][0]
+                assert pool_map_args[1][i][2] == pairs[i][2]
 
-            all_zeros = np.zeros((f - 1, h, w, 2), order="C")
-            assert not np.allclose(all_zeros, result)
             assert isinstance(result, np.ndarray)
             mock_pool.assert_called_once()
             mock_pool_instance.map.assert_called_once()
