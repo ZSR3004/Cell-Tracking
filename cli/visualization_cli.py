@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from src.cell_tracking import heatmap as hm
 from src.cell_tracking import kymograph as kg
 from src.cell_tracking import tiffclass as tiff
@@ -19,9 +20,8 @@ def save_heatmap_video_cli(flow, output_path, normalize=True):
     hm.save_heatmap_video(flow, output_path)
 
 
-def show_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', origin='upper', label='Kymograph', 
-                   xlabel='Position along line', ylabel='Time (frame index)', title='Kymograph', show=True, save_path=None):
-     """
+def plot_basic_kymo_cli(arr:np.ndarray, threshold=0.5, save_path = os.getcwd()):
+    """
     Plots a kymograph from a 2D array.
 
     Args:
@@ -40,77 +40,6 @@ def show_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', o
     Returns:
         None: Just displays the kymograph.
     """
-     my_kymograph = kg.plot_kymograph(line)
+    kg.plot_basic_kymo(arr, save_path)
 
-def show_tiff_image(Tiff: tiff.Tiff, image: np.ndarray, title='Image', figsize=(12, 8), save_path=None) -> None:
-    """
-    Displays or saves an image using matplotlib.
-
-    Args:
-        image (np.ndarray): Image to display.
-        title (str): Title of the window.
-        figsize (tuple): Figure size in inches (width, height).
-        save_path (str, optional): If provided, saves the image to this path.
-
-    Assumptions:
-        The integers in the 'figsize' tuple are greater than 0.
-
-    Returns:
-        None
-    """
-    tiff.Tiff.show_image(image)
-
-def show_original_video(Tiff: tiff.Tiff):
-    """
-    Displays or saves an image using matplotlib.
-
-    Args:
-        image (np.ndarray): Image to display.
-        title (str): Title of the window.
-        figsize (tuple): Figure size in inches (width, height).
-        save_path (str, optional): If provided, saves the image to this path.
-
-    Assumptions:
-        The integers in the 'figsize' tuple are greater than 0.
-
-    Returns:
-        None
-    """
-    return NotImplementedError
-
-def show_nuclei_flow(arr: np.ndarray, channel: int) -> np.ndarray:
-    """
-    This function preprocess the tiff stack with the parameters.
-
-    Args:
-      arr: The stack from the initialized tiff class
-    
-    Returns:
-      The optical flow array. 
-      """
-    raise NotImplementedError
-
-def show_combined_flow(arr: np.ndarray) -> np.ndarray:
-    """
-    This function preprocess the tiff stack with the parameters.
-
-    Args:
-      arr: The stack from the initialized tiff class
-    
-    Returns:
-      The optical flow array from combining the channels. 
-      """
-    return NotImplementedError
-
-def show_raft_optical_flow(arr: np.ndarray) -> np.ndarray:
-    """
-    This function preprocess the tiff stack with the parameters.
-
-    Args:
-      arr: The stack from the initialized tiff class.
-    
-    Returns:
-      The raft flow for the third channel
-      """
-    return NotImplementedError
      

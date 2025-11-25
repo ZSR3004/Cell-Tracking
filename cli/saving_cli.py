@@ -44,6 +44,18 @@ def save_arr_cli(arr : np.array) -> None:
     """
     saving.save_arr(arr)
 
+def save_video_cli():
+    """
+    Saves the video to the desired path
+
+    Args:
+        Video to be saved
+        Path to save the video to
+    
+    Returns:
+        None, just saves the videos to the desired path
+    """
+    return NotImplementedError
 
 def save_original_video_cli(name: str, file_path: str) -> None:
     """

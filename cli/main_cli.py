@@ -166,7 +166,7 @@ def main():
                 
             if "Kymograph" in outputs:
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-                #call kymograph function
+                v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "/kymo_combined_flow"))
 
         if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
@@ -184,7 +184,8 @@ def main():
                 
         if "Kymograph" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            #call kymograph function
+            v.plot_basic_kymo_cli(flow_channel_1, os.path.join(os.getcwd(), "/kymo_channel_1"))
+            v.plot_basic_kymo_cli(flow_channel_2, os.path.join(os.getcwd(), "/kymo_channel_2"))
 
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
 
@@ -206,7 +207,7 @@ def main():
         
         if "Kymograph" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            #call kymograph function
+            v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "/kymo_phase_contrast"))
 
     os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
