@@ -62,7 +62,7 @@ def test_combine_flows(init_tiff):
     def dummy_optical_flow(channel: int):
         """
         A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
-        faster than calling flow.optical_flow (which is why it's perfect for testing)
+        faster than calling flow.optical_flow (which is why it's perfect for testing).
 
         Args:
             channel (int): The channel to process.
@@ -361,9 +361,7 @@ def test_calculate_optical_flow(init_tiff):
         """
         with patch("src.cell_tracking.optical_flow.optical_flow") as mock_optflow, \
             patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine:
-            fake_flow1 = np.zeros((f-1, h, w, 2))
-            fake_flow2 = np.zeros((f-1, h, w, 2))
-            mock_optflow.return_value = [fake_flow1, fake_flow2]
+            mock_optflow.return_value = np.zeros((f-1, h, w, 2))
             mock_combine.return_value = np.zeros((f-1, 3, h, w, 2))
 
             result = flow.calculate_optical_flow(tiff_arr, **kwargsx)
@@ -379,8 +377,7 @@ def test_calculate_optical_flow(init_tiff):
             assert second_optflow_kwargs == kwargsx
 
             combine_args, _ = mock_combine.call_args
-            assert np.array_equal(combine_args[0][0], fake_flow1)
-            assert np.array_equal(combine_args[0][1], fake_flow2)
+            assert np.array_equal(combine_args[0], [np.zeros((f-1, h, w, 2)), np.zeros((f-1, h, w, 2))])
 
             assert np.array_equal(result, np.zeros((f-1, 3, h, w, 2)))
             assert result.shape == (f-1, 3, h, w, 2)
