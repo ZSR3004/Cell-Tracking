@@ -54,17 +54,17 @@ def save_arr(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
     np.save(save_path, tiff_arr)
 
 
-def save_optical_flow_as_xyz(opt_flow : np.ndarray, save_path : str) -> None:
+def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) -> None:
     """
-    Converts the optical flow numpy arrays to XYZ format and saves them.
-    The XYZ files are saved in the 'flow_xyz' directory.
+    Saves the optical flow array as an XYZ file.
 
     Args:
-        opt_flow (np.ndarray): The optical flow numpy array.
-        save_path (str): Path to save the XYZ file to.
+        name (str): Name of the numpy array.
+        opt_flow (np.ndarray): The optical flow array.
+        main_path (str): Main path to the directory.
 
     Returns:
-        None.
+        None: Just saves the optical flow array to a file.
     """
     save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.xyz", main_path)
 
