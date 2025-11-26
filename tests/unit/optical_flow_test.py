@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, pytest
+import cv2, gc, pytest
 from sympy import Idx
 from src.cell_tracking import optical_flow as flow
 import numpy as np
@@ -392,7 +392,7 @@ def test_calculate_optical_flow(init_tiff):
     test_case_x(**kwargs4)
 
 
-def test_show_flow(init_tiff):
+def test_show_flow(init_tiff, tmp_path):
     """
     Tests the show_flow function.
 
@@ -403,6 +403,7 @@ def test_show_flow(init_tiff):
             - c (int): Number of channels.
             - h (int): Height.
             - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
 
     Returns:
         None.
@@ -411,15 +412,161 @@ def test_show_flow(init_tiff):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    my_flow = flow.optical_flow(tiff_arr, 0)
-    first_flow_frame = my_flow[0]
+    def dummy_optical_flow(channel: int):
+        """
+        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
+        faster than calling flow.optical_flow (which is why it's perfect for testing).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    dummy_optical_flow_channel0 = dummy_optical_flow(0)
+    dummy_optical_flow_channel1 = dummy_optical_flow(1)
+    dummy_optical_flow_channel2 = dummy_optical_flow(2)
+
+    first_frame_channel0 = dummy_optical_flow_channel0[0]
+    middle_frame_channel0 = dummy_optical_flow_channel0[f//2]
+    last_frame_channel0 = dummy_optical_flow_channel0[-1]
+    first_frame_channel1 = dummy_optical_flow_channel1[0]
+    middle_frame_channel1 = dummy_optical_flow_channel1[f//2]
+    last_frame_channel1 = dummy_optical_flow_channel1[-1]
+    first_frame_channel2 = dummy_optical_flow_channel2[0]
+    middle_frame_channel2 = dummy_optical_flow_channel2[f//2]
+    last_frame_channel2 = dummy_optical_flow_channel2[-1]
+
+    first_frame_channel0_save_path = tmp_path / "first_frame_channel0.png"
+    middle_frame_channel0_save_path = tmp_path / "middle_frame_channel0.png"
+    last_frame_channel0_save_path = tmp_path / "last_frame_channel0.png"
+    first_frame_channel1_save_path = tmp_path / "first_frame_channel1.png"
+    middle_frame_channel1_save_path = tmp_path / "middle_frame_channel1.png"
+    last_frame_channel1_save_path = tmp_path / "last_frame_channel1.png"
+    first_frame_channel2_save_path = tmp_path / "first_frame_channel2.png"
+    middle_frame_channel2_save_path = tmp_path / "middle_frame_channel2.png"
+    last_frame_channel2_save_path = tmp_path / "last_frame_channel2.png"
+
+    def test_case_x(flowx: np.ndarray,
+                    titlex="Optical Flow",
+                    stepx: int = 25,
+                    figsizex: int | int = (12, 6),
+                    scalex: int = 200,
+                    pivotx: str = "tail",
+                    colorx: str = "blue",
+                    x_save_path: str = None):
+        """
+        Tests the show_flow function on a specific test case.
+
+        Args:
+            flow (np.ndarray): Optical flow array of shape (H, W, 2) where H is height, W is width,
+                               and the last dimension contains the flow vectors (dx, dy).
+            title (str): Title of the plot. Default is 'Optical Flow'.
+            step (int): Step size for downsampling the flow vectors for visualization. Default is 25.
+            figsize (tuple): Size of the figure in inches (width, height). Default is (12, 6).
+            scale (float): Scale factor for the quiver arrows. Default is 200.
+            pivot (str): Pivot point for the arrows. Default is 'tail'.
+            color (str): Color of the arrows. Default is 'white'.
+            save_path (str, optional): If provided, saves the image to this path.
+
+        Returns:
+            None.
+        """
+        Y, X = np.mgrid[0 : flowx.shape[0] : stepx, 0 : flowx.shape[1] : stepx]
+        U = flowx[::stepx, ::stepx, 0]  # dx
+        V = flowx[::stepx, ::stepx, 1]  # dy
+
+        with patch("matplotlib.pyplot.figure") as mock_figure, \
+            patch("matplotlib.pyplot.quiver") as mock_quiver, \
+            patch("matplotlib.pyplot.title") as mock_title, \
+            patch("matplotlib.pyplot.xlim") as mock_xlim, \
+            patch("matplotlib.pyplot.ylim") as mock_ylim, \
+            patch("matplotlib.pyplot.xlabel") as mock_xlabel, \
+            patch("matplotlib.pyplot.ylabel") as mock_ylabel, \
+            patch("matplotlib.pyplot.tight_layout") as mock_tight_layout, \
+            patch("matplotlib.pyplot.savefig") as mock_savefig, \
+            patch("matplotlib.pyplot.show") as mock_show:
+            flow.show_flow(flowx, titlex, stepx, figsizex, scalex, pivotx, colorx, x_save_path)
+            
+            _, figure_kwargs = mock_figure.call_args
+            assert figure_kwargs["figsize"] == figsizex
+
+            quiver_args, quiver_kwargs = mock_quiver.call_args
+            assert np.array_equal(quiver_args[0], X)
+            assert np.array_equal(quiver_args[1], Y)
+            assert np.array_equal(quiver_args[2], U)
+            assert np.array_equal(quiver_args[3], V)
+            assert quiver_kwargs["scale"] == scalex
+            assert quiver_kwargs["pivot"] == pivotx
+            assert quiver_kwargs["color"] == colorx
+
+            title_args, _ = mock_title.call_args
+            assert title_args[0] == titlex
+
+            xlim_args, _ = mock_xlim.call_args
+            assert xlim_args[0] == 0
+            assert xlim_args[1] == flowx.shape[1]
+
+            ylim_args, _ = mock_ylim.call_args
+            assert ylim_args[0] == flowx.shape[0]
+            assert ylim_args[1] == 0
+
+            xlabel_args, _ = mock_xlabel.call_args
+            assert xlabel_args[0] == "X"
+
+            ylabel_args, _ = mock_ylabel.call_args
+            assert ylabel_args[0] == "Y"
+
+            if x_save_path:
+                args_savefig, kwargs_savefig = mock_savefig.call_args
+                assert args_savefig[0] == x_save_path
+                assert kwargs_savefig["bbox_inches"] == "tight"
+
+                mock_savefig.assert_called_once()
+                mock_show.assert_not_called()
+            else:
+                mock_show.assert_called_once_with()
+                mock_savefig.assert_not_called()
+
+            mock_figure.assert_called_once()
+            mock_quiver.assert_called_once()
+            mock_title.assert_called_once()
+            mock_xlim.assert_called_once()
+            mock_ylim.assert_called_once()
+            mock_xlabel.assert_called_once()
+            mock_ylabel.assert_called_once()
+            mock_tight_layout.assert_called_once_with()
+
+            fig = plt.gcf()
+            assert isinstance(fig, Figure)
+            plt.close(fig)
+
+            gc.collect()
+
+    test_case_x(first_frame_channel0_save_path, )
+            
+
+
+
+
+
+    #my_flow = flow.optical_flow(tiff_arr, 0)
+    #first_flow_frame = my_flow[0]
     video = flow.show_flow(
         first_flow_frame, "Optical Flow", 25, (12, 6), 200, "tail", "blue", None
     )
 
+    #gets current figure
     fig = plt.gcf()
     assert isinstance(fig, Figure)
-    plt.close()
+    plt.close(fig)
 
     #MOCK AND PATCH
     return NotImplementedError

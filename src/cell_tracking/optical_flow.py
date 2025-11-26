@@ -134,8 +134,8 @@ def show_flow(
     scale: int = 200,
     pivot: str = "tail",
     color: str = "blue",
-    save_path: str = None,
-) -> None:
+    save_path: str = None
+    ) -> None:
     """
     Displays optical flow as a quiver plot using matplotlib.
 
@@ -148,9 +148,10 @@ def show_flow(
         scale (float): Scale factor for the quiver arrows. Default is 200.
         pivot (str): Pivot point for the arrows. Default is 'tail'.
         color (str): Color of the arrows. Default is 'white'.
+        save_path (str, optional): If provided, saves the image to this path.
 
     Returns:
-        None: Just displays the plot.
+        None.
     """
     Y, X = np.mgrid[0 : flow.shape[0] : step, 0 : flow.shape[1] : step]
     U = flow[::step, ::step, 0]  # dx

@@ -11,6 +11,7 @@ from unittest.mock import patch, Mock, MagicMock, ANY
 from multiprocessing import Pool, cpu_count
 from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import numpy as np
 
 TIFF_PATHS = [
@@ -187,6 +188,10 @@ def test_show_image(init_tiff: tuple, tmp_path):
             mock_imshow.assert_called_once()
             mock_title.assert_called_once()
             mock_axis.assert_called_once()
+
+            fig = plt.gcf()
+            assert isinstance(fig, Figure)
+            plt.close(fig)
 
             gc.collect()
 
