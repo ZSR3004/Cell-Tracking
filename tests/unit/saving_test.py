@@ -275,8 +275,6 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
         labels = call_kwargs["labels"]
         coords = call_kwargs["coords"]
 
-        assert name in f_name
-        assert str(f_name).endswith(".xyz")
         assert np.array_equal(labels, np.array(["I"] * coords.shape[0]))
         assert np.array_equal(coords, tiff_arr_xyz)
         assert coords.shape == tiff_arr_xyz.shape

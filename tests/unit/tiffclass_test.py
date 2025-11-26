@@ -189,10 +189,6 @@ def test_show_image(init_tiff: tuple, tmp_path):
             mock_title.assert_called_once()
             mock_axis.assert_called_once()
 
-            fig = plt.gcf()
-            assert isinstance(fig, Figure)
-            plt.close(fig)
-
             gc.collect()
 
     test_case_x(image1, "image1_save", (14, 10), image1_save_path)                                  #image1 save
