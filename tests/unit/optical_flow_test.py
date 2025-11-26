@@ -455,7 +455,7 @@ def test_show_flow(init_tiff, tmp_path):
     last_frame_channel2_save_path = tmp_path / "last_frame_channel2.png"
 
     def test_case_x(flowx: np.ndarray,
-                    titlex="Optical Flow",
+                    titlex: str = "Optical Flow",
                     stepx: int = 25,
                     figsizex: int | int = (12, 6),
                     scalex: int = 200,
@@ -550,23 +550,21 @@ def test_show_flow(init_tiff, tmp_path):
 
             gc.collect()
 
-    test_case_x(first_frame_channel0_save_path, )
-            
-
-
-
-
-
-    #my_flow = flow.optical_flow(tiff_arr, 0)
-    #first_flow_frame = my_flow[0]
-    video = flow.show_flow(
-        first_flow_frame, "Optical Flow", 25, (12, 6), 200, "tail", "blue", None
-    )
-
-    #gets current figure
-    fig = plt.gcf()
-    assert isinstance(fig, Figure)
-    plt.close(fig)
-
-    #MOCK AND PATCH
-    return NotImplementedError
+    test_case_x(first_frame_channel0, "first_frame_channel0", 30, (14, 8), 300, "middle", "red", first_frame_channel0_save_path) #first_frame_channel0 save
+    test_case_x(first_frame_channel0, stepx=15, figsizex=(10,10), scalex=150, pivotx="tail", colorx="blue", x_save_path=None) #first_frame_channel0 show
+    test_case_x(middle_frame_channel0, title="Sample_Title", save_path_x=middle_frame_channel0_save_path) #middle_frame_channel0 save
+    test_case_x(flowx=middle_frame_channel0, titlex="middle_frame_channel0", stepx=18, figsizex=(12,10), scalex=225, pivotx="tip", colorx="green", x_save_path=None) #middle_frame_channel0 show
+    test_case_x(last_frame_channel0, titlex="last_frame_channel0", stepx=15, scalex=100, colorx="red", save_path_x=last_frame_channel0_save_path) #last_frame_channel0 save
+    test_case_x(last_frame_channel0) #last_frame_channel0 show
+    test_case_x(first_frame_channel1, x_save_path=first_frame_channel1_save_path) #first_frame_channel1 save
+    test_case_x(first_frame_channel1, titlex="Optical Flow", stepx=25, figsizex=(12, 6), scalex=200, pivotx="tail", colorx="blue", x_save_path=None) #first_frame_channel1 show
+    test_case_x(middle_frame_channel1, save_path_x=middle_frame_channel1_save_path) #middle_frame_channel1 save
+    test_case_x(middle_frame_channel1, titlex="middle_frame_channel1") #middle_frame_channel1 show
+    test_case_x(flowx=last_frame_channel1, titlex="last_frame_channel1", stepx=20, figsizex=(8,8), scalex=350, pivotx="middle", colorx="yellow", x_save_path=last_frame_channel1_save_path) #last_frame_channel1 save
+    test_case_x(last_frame_channel1, scalex=240) #last_frame_channel1 show
+    test_case_x(first_frame_channel2, x_save_path=first_frame_channel2_save_path) #first_frame_channel2 save
+    test_case_x(first_frame_channel2, stepx=180, scalex=400, pivotx="middle", colorx="black") #first_frame_channel2 show
+    test_case_x(middle_frame_channel2, titlex="middle_frame_channel2", figsizex=(6,8), scalex=200, pivotx="tip", colorx="orange", x_save_path=middle_frame_channel2_save_path) #middle_frame_channel2 save
+    test_case_x(middle_frame_channel2, "middle_frame_channel2", 27, (10, 6), 250, "tip", "purple", None) #middle_frame_channel2 show
+    test_case_x(last_frame_channel2, titlex="last_frame_channel2", figsizex=(12,6), x_save_path=last_frame_channel2_save_path) #last_frame_channel2 save
+    test_case_x(last_frame_channel2, titlex="last_frame_channel2", stepx=30, figsizex=(10,14), scalex=180, pivotx="middle", colorx="black") #last_frame_channel2 show

@@ -128,7 +128,7 @@ def calculate_optical_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
 
 def show_flow(
     flow: np.ndarray,
-    title="Optical Flow",
+    title: str = "Optical Flow",
     step: int = 25,
     figsize: int | int = (12, 6),
     scale: int = 200,
