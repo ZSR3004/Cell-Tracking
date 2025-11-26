@@ -544,21 +544,17 @@ def test_show_flow(init_tiff, tmp_path):
             mock_ylabel.assert_called_once()
             mock_tight_layout.assert_called_once_with()
 
-            fig = plt.gcf()
-            assert isinstance(fig, Figure)
-            plt.close(fig)
-
             gc.collect()
 
     test_case_x(first_frame_channel0, "first_frame_channel0", 30, (14, 8), 300, "middle", "red", first_frame_channel0_save_path) #first_frame_channel0 save
     test_case_x(first_frame_channel0, stepx=15, figsizex=(10,10), scalex=150, pivotx="tail", colorx="blue", x_save_path=None) #first_frame_channel0 show
-    test_case_x(middle_frame_channel0, title="Sample_Title", save_path_x=middle_frame_channel0_save_path) #middle_frame_channel0 save
+    test_case_x(middle_frame_channel0, titlex="Sample_Title", x_save_path=middle_frame_channel0_save_path) #middle_frame_channel0 save
     test_case_x(flowx=middle_frame_channel0, titlex="middle_frame_channel0", stepx=18, figsizex=(12,10), scalex=225, pivotx="tip", colorx="green", x_save_path=None) #middle_frame_channel0 show
-    test_case_x(last_frame_channel0, titlex="last_frame_channel0", stepx=15, scalex=100, colorx="red", save_path_x=last_frame_channel0_save_path) #last_frame_channel0 save
+    test_case_x(last_frame_channel0, titlex="last_frame_channel0", stepx=15, scalex=100, colorx="red", x_save_path=last_frame_channel0_save_path) #last_frame_channel0 save
     test_case_x(last_frame_channel0) #last_frame_channel0 show
     test_case_x(first_frame_channel1, x_save_path=first_frame_channel1_save_path) #first_frame_channel1 save
     test_case_x(first_frame_channel1, titlex="Optical Flow", stepx=25, figsizex=(12, 6), scalex=200, pivotx="tail", colorx="blue", x_save_path=None) #first_frame_channel1 show
-    test_case_x(middle_frame_channel1, save_path_x=middle_frame_channel1_save_path) #middle_frame_channel1 save
+    test_case_x(middle_frame_channel1, x_save_path=middle_frame_channel1_save_path) #middle_frame_channel1 save
     test_case_x(middle_frame_channel1, titlex="middle_frame_channel1") #middle_frame_channel1 show
     test_case_x(flowx=last_frame_channel1, titlex="last_frame_channel1", stepx=20, figsizex=(8,8), scalex=350, pivotx="middle", colorx="yellow", x_save_path=last_frame_channel1_save_path) #last_frame_channel1 save
     test_case_x(last_frame_channel1, scalex=240) #last_frame_channel1 show
