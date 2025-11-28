@@ -3,8 +3,8 @@ import numpy as np
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
-from . import tiffclass as tc
-from . import saving as save
+from src.cell_tracking import tiffclass as tc
+from src.cell_tracking import saving as save
 
 
 def combine_flows(flow_list: list) -> np.ndarray:
@@ -17,7 +17,6 @@ def combine_flows(flow_list: list) -> np.ndarray:
     Returns:
         combined (np.ndarray): Combined stack of summed and original flows.
     """
-
     sum_arr = flow_list[0] + flow_list[1]
     combined = np.stack([sum_arr, flow_list[0], flow_list[1]], axis=1)
     return combined
@@ -119,7 +118,7 @@ def calculate_optical_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
             - flags (int)
 
     Returns:
-        np.ndarray: Combined flow vectors of shape (N-1, H, W, 2).
+        np.ndarray: Combined flow vectors of shape (N-1, 3, H, W, 2).
     """
     flow_channel1 = optical_flow(arr, 1, **kwargs)
     flow_channel2 = optical_flow(arr, 2, **kwargs)
@@ -129,14 +128,14 @@ def calculate_optical_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
 
 def show_flow(
     flow: np.ndarray,
-    title="Optical Flow",
+    title: str = "Optical Flow",
     step: int = 25,
     figsize: int | int = (12, 6),
     scale: int = 200,
     pivot: str = "tail",
     color: str = "blue",
-    save_path: str = None,
-) -> None:
+    save_path: str = None
+    ) -> None:
     """
     Displays optical flow as a quiver plot using matplotlib.
 
@@ -149,9 +148,10 @@ def show_flow(
         scale (float): Scale factor for the quiver arrows. Default is 200.
         pivot (str): Pivot point for the arrows. Default is 'tail'.
         color (str): Color of the arrows. Default is 'white'.
+        save_path (str, optional): If provided, saves the image to this path.
 
     Returns:
-        None: Just displays the plot.
+        None.
     """
     Y, X = np.mgrid[0 : flow.shape[0] : step, 0 : flow.shape[1] : step]
     U = flow[::step, ::step, 0]  # dx

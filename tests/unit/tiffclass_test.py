@@ -6,9 +6,12 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, pytest
-from cell_tracking import tiffclass as tiff
+import cv2, pytest, gc
+from unittest.mock import patch, Mock, MagicMock, ANY
+from multiprocessing import Pool, cpu_count
+from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 import numpy as np
 
 TIFF_PATHS = [
@@ -105,7 +108,7 @@ def test_isolate_channel(init_tiff: tuple):
 
 def test_show_image(init_tiff: tuple, tmp_path):
     """
-    Tests whether the show_image method works correctly. Note that running these tests will cause 12 windows to pop up.
+    Tests whether the show_image method works correctly.
 
     Args:
         init_tiff (tuple): A tuple containing information about the TIFF file:
@@ -122,32 +125,12 @@ def test_show_image(init_tiff: tuple, tmp_path):
     img, info = init_tiff
     f, c, h, w = info
 
-    kwargs1 = {
-        "gauss": {"ksize": (3, 3), "sigmaX": 1.5},
-        "median": {"ksize": 3},
-        "minmax": {"alpha": 0, "beta": 255, "norm_type": cv2.NORM_MINMAX},
-        "contrast": {"alpha": 1.5, "beta": 20},
-        "skip": [],
-    }
-    kwargs2 = {
-        "gauss": {"ksize": (7, 7)},
-        "median": {"ksize": 9},
-        "minmax": {},
-        "contrast": {"alpha": 1.0},
-        "skip": ["gauss", "median", "minmax", "contrast"],
-    }
-    kwargs3 = {
-        "gauss": {"sigmaX": 1.5},
-        "minmax": {"alpha": 0, "beta": 1},
-        "skip": ["minmax", "contrast"],
-    }
-
     image1 = img.arr[0, 2, :, :]
     image2 = img.arr[(f - 1) // 2, 0, :, :]
     image3 = img.arr[f - 1, 1, :, :]
-    image4 = img.preprocess_frame((img.arr[0, 1, :, :], kwargs1))
-    image5 = img.preprocess_frame((img.arr[(f - 1) // 2, 2, :, :], kwargs2))
-    image6 = img.preprocess_frame((img.arr[f - 1, 0, :, :], kwargs3))
+    image4 = img.arr[0, 1, :, :]
+    image5 = img.arr[(f - 1) // 2, 2, :, :]
+    image6 = img.arr[f - 1, 0, :, :]
 
     image1_save_path = tmp_path / "image1_save.png"
     image2_save_path = tmp_path / "image2_save.png"
@@ -156,38 +139,70 @@ def test_show_image(init_tiff: tuple, tmp_path):
     image5_save_path = tmp_path / "image5_save.png"
     image6_save_path = tmp_path / "image6_save.png"
 
-    image1_save = img.show_image(image1, "image1_save", (14, 10), image1_save_path)
-    image1_show = img.show_image(image1, "image1_show", (10, 6), None)
-    image2_save = img.show_image(image2, save_path=image2_save_path)
-    image2_show = img.show_image(image2)
-    image3_save = img.show_image(image3, figsize=(18, 16), save_path=image3_save_path)
-    image3_show = img.show_image(image3, figsize=(7, 9), save_path=None)
-    image4_save = img.show_image(
-        image4, title="image4_save", figsize=(5, 7), save_path=image4_save_path
-    )
-    image4_show = img.show_image(image4, title="image4_show")
-    image5_save = img.show_image(
-        image5, title="image5_save", save_path=image5_save_path
-    )
-    image5_show = img.show_image(image5, figsize=(3, 3))
-    image6_save = img.show_image(
-        image6, "image6_save", figsize=(2, 10), save_path=image6_save_path
-    )
-    image6_show = img.show_image(image6, save_path=None)
+    def test_case_x(imagex: np.ndarray, titlex="Image", figsizex=(12, 8), imagex_save_path=None):
+        """
+        Tests whether the show_image method works correctly on a specific test case.
 
-    assert image1_save_path.exists()
-    assert image2_save_path.exists()
-    assert image3_save_path.exists()
-    assert image4_save_path.exists()
-    assert image5_save_path.exists()
-    assert image6_save_path.exists()
+        Args:
+            imagex (np.ndarray): Image to display.
+            titlex (str): Title of the window.
+            figsizex (tuple): Figure size in inches (width, height).
+            imagex_save_path (str, optional): If provided, saves the image to this path.
 
-    assert os.path.getsize(image1_save_path) > 0
-    assert os.path.getsize(image2_save_path) > 0
-    assert os.path.getsize(image3_save_path) > 0
-    assert os.path.getsize(image4_save_path) > 0
-    assert os.path.getsize(image5_save_path) > 0
-    assert os.path.getsize(image6_save_path) > 0
+        Return:
+            None
+        """
+        with patch("matplotlib.pyplot.figure") as mock_figure, \
+            patch("matplotlib.pyplot.imshow") as mock_imshow, \
+            patch("matplotlib.pyplot.title") as mock_title, \
+            patch("matplotlib.pyplot.axis") as mock_axis, \
+            patch("matplotlib.pyplot.savefig") as mock_savefig, \
+            patch("matplotlib.pyplot.show") as mock_show:
+            img.show_image(imagex, titlex, figsizex, imagex_save_path)
+
+            _, kwargs_figure = mock_figure.call_args
+            assert kwargs_figure["figsize"] == figsizex
+
+            args_imshow, kwargs_imshow = mock_imshow.call_args
+            assert np.array_equal(args_imshow[0], imagex)
+            assert kwargs_imshow["cmap"] == "gray"
+
+            args_title, _ = mock_title.call_args
+            assert args_title[0] == titlex
+            
+            args_axis, _ = mock_axis.call_args
+            assert args_axis[0] == "off"
+
+            if imagex_save_path:
+                args_savefig, kwargs_savefig = mock_savefig.call_args
+                assert args_savefig[0] == imagex_save_path
+                assert kwargs_savefig["bbox_inches"] == "tight"
+
+                mock_savefig.assert_called_once()
+                mock_show.assert_not_called()
+            else:
+                mock_show.assert_called_once_with()
+                mock_savefig.assert_not_called()
+
+            mock_figure.assert_called_once()
+            mock_imshow.assert_called_once()
+            mock_title.assert_called_once()
+            mock_axis.assert_called_once()
+
+            gc.collect()
+
+    test_case_x(image1, "image1_save", (14, 10), image1_save_path)                                  #image1 save
+    test_case_x(image1, "image1_show", (10, 6), None)                                               #image1 show
+    test_case_x(image2, imagex_save_path=image2_save_path)                                          #image2 save
+    test_case_x(image2)                                                                             #image2 show
+    test_case_x(image3, figsizex=(18, 16), imagex_save_path=image3_save_path)                       #image3 save
+    test_case_x(image3, figsizex=(7, 9), imagex_save_path=None)                                     #image3 show
+    test_case_x(image4, titlex="image4_save", figsizex=(5, 7), imagex_save_path=image4_save_path)   #image4 save
+    test_case_x(image4, titlex="image4_show")                                                       #image4 show
+    test_case_x(image5, titlex="image5_save", imagex_save_path=image5_save_path)                    #image5 save
+    test_case_x(image5, figsizex=(3, 3))                                                            #image5 show
+    test_case_x(image6, "image6_save", figsizex=(2, 10), imagex_save_path=image6_save_path)         #image6 save
+    test_case_x(image6, imagex_save_path=None)                                                      #image6 show
 
 
 def test_preprocess_frame(init_tiff: tuple):
@@ -373,15 +388,17 @@ def test_preprocess_stack(init_tiff: tuple):
     """
     img, info = init_tiff
     f, c, h, w = info
+    tiff_arr = img.arr
 
-    stack1 = np.asarray(img.arr[:, 0, :, :])
-    stack2 = np.asarray([img.arr[0, 1, :, :]])
+    stack1 = np.asarray(tiff_arr[:, 0, :, :])
+    stack2 = np.asarray([tiff_arr[0, 1, :, :]])
     stack3 = np.asarray(
-        [img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]]
+        [tiff_arr[0, 2, :, :], tiff_arr[(f - 1) // 2, 1, :, :], tiff_arr[f - 1, 0, :, :]]
     )
-    stack4 = np.asarray(img.arr[: (f - 1) // 2, 2, :, :])
-    stack5 = np.asarray(img.arr[:, 1, :, :])
-    stack6 = np.asarray(img.arr[:, 2, :, :])
+    stack4 = np.asarray(tiff_arr[: (f - 1) // 2, 2, :, :])
+    stack5 = np.asarray(tiff_arr[:, 1, :, :])
+    stack6 = np.asarray(tiff_arr[:, 2, :, :])
+    stack7 = tiff_arr
 
     kwargs6 = {
         "gauss": {"ksize": (3, 3), "sigmaX": 2.5},
@@ -402,129 +419,74 @@ def test_preprocess_stack(init_tiff: tuple):
         "minmax": {"alpha": 0, "beta": 1},
         "skip": ["gauss", "median"],
     }
+    kwargs9 = {}
 
-    kwargs6_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs6)
-    kwargs6_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs6)
-    kwargs6_preprocess_stack3 = img.preprocess_stack(stack3, **kwargs6)
-    kwargs6_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs6)
-    kwargs6_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs6)
-    kwargs6_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs6)
-    kwargs7_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs7)
-    kwargs7_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs7)
-    kwargs7_preprocess_stack3 = img.preprocess_stack(stack3, **kwargs7)
-    kwargs7_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs7)
-    kwargs7_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs7)
-    kwargs7_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs7)
-    kwargs8_preprocess_stack1 = img.preprocess_stack(stack1, **kwargs8)
-    kwargs8_preprocess_stack2 = img.preprocess_stack(stack2, **kwargs8)
-    kwargs8_preprocess_stack3 = img.preprocess_stack(stack3, **kwargs8)
-    kwargs8_preprocess_stack4 = img.preprocess_stack(stack4, **kwargs8)
-    kwargs8_preprocess_stack5 = img.preprocess_stack(stack5, **kwargs8)
-    kwargs8_preprocess_stack6 = img.preprocess_stack(stack6, **kwargs8)
+    def test_case_x(stackx: np.ndarray, **kwargsx):
+        """
+        Tests whether the preprocess_stack method works correctly on a specific test case.
 
-    assert np.array_equal(
-        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs6))]),
-        kwargs6_preprocess_stack2,
-    )
-    assert np.array_equal(
-        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs7))]),
-        kwargs7_preprocess_stack2,
-    )
-    assert np.array_equal(
-        np.asarray([img.preprocess_frame((np.asarray(img.arr[0, 1, :, :]), kwargs8))]),
-        kwargs8_preprocess_stack2,
-    )
+        Args:
+            stackx (np.ndarray): Input stack of frames (shape: N x H x W).
+            **kwargsx: Dictionary with preprocessing parameters:
+                - gauss (dict): {'ksize': (int, int), 'sigmaX': float}
+                - median (dict): {'ksize': int}
+                - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
+                - contrast (dict): {'alpha': float, 'beta': int}
+                - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
 
-    assert np.array_equal(
-        np.asarray(
-            [
-                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs6)),
-                img.preprocess_frame(
-                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs6)
-                ),
-                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs6)),
-            ]
-        ),
-        kwargs6_preprocess_stack3,
-    )
-    assert np.array_equal(
-        np.asarray(
-            [
-                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs7)),
-                img.preprocess_frame(
-                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs7)
-                ),
-                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs7)),
-            ]
-        ),
-        kwargs7_preprocess_stack3,
-    )
-    assert np.array_equal(
-        np.asarray(
-            [
-                img.preprocess_frame((np.asarray(img.arr[0, 2, :, :]), kwargs8)),
-                img.preprocess_frame(
-                    (np.asarray(img.arr[(f - 1) // 2, 1, :, :]), kwargs8)
-                ),
-                img.preprocess_frame((np.asarray(img.arr[f - 1, 0, :, :]), kwargs8)),
-            ]
-        ),
-        kwargs8_preprocess_stack3,
-    )
+        Returns:
+            None
+        """
+        with patch("src.cell_tracking.tiffclass.Pool") as mock_pool:
+            mock_pool_instance = mock_pool.return_value.__enter__.return_value
+            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros_like(x[0]) for x in arr1]
 
-    assert not np.array_equal(kwargs6_preprocess_stack1, stack1)
-    assert not np.array_equal(kwargs6_preprocess_stack2, stack2)
-    assert not np.array_equal(kwargs6_preprocess_stack3, stack3)
-    assert not np.array_equal(kwargs6_preprocess_stack4, stack4)
-    assert not np.array_equal(kwargs6_preprocess_stack5, stack5)
-    assert not np.array_equal(kwargs6_preprocess_stack6, stack6)
-    assert np.array_equal(kwargs7_preprocess_stack1, stack1)
-    assert np.array_equal(kwargs7_preprocess_stack2, stack2)
-    assert np.array_equal(kwargs7_preprocess_stack3, stack3)
-    assert np.array_equal(kwargs7_preprocess_stack4, stack4)
-    assert np.array_equal(kwargs7_preprocess_stack5, stack5)
-    assert np.array_equal(kwargs7_preprocess_stack6, stack6)
-    assert not np.array_equal(kwargs8_preprocess_stack1, stack1)
-    assert not np.array_equal(kwargs8_preprocess_stack2, stack2)
-    assert not np.array_equal(kwargs8_preprocess_stack3, stack3)
-    assert not np.array_equal(kwargs8_preprocess_stack4, stack4)
-    assert not np.array_equal(kwargs8_preprocess_stack5, stack5)
-    assert not np.array_equal(kwargs8_preprocess_stack6, stack6)
+            frames = [(stackx[i], kwargsx) for i in range(stackx.shape[0])]
 
-    assert isinstance(kwargs6_preprocess_stack1, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack2, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack3, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack4, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack5, np.ndarray)
-    assert isinstance(kwargs6_preprocess_stack6, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack1, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack2, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack3, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack4, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack5, np.ndarray)
-    assert isinstance(kwargs7_preprocess_stack6, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack1, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack2, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack3, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack4, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack5, np.ndarray)
-    assert isinstance(kwargs8_preprocess_stack6, np.ndarray)
+            result = img.preprocess_stack(stackx, **kwargsx)
 
-    assert kwargs6_preprocess_stack1.shape == stack1.shape
-    assert kwargs6_preprocess_stack2.shape == stack2.shape
-    assert kwargs6_preprocess_stack3.shape == stack3.shape
-    assert kwargs6_preprocess_stack4.shape == stack4.shape
-    assert kwargs6_preprocess_stack5.shape == stack5.shape
-    assert kwargs6_preprocess_stack6.shape == stack6.shape
-    assert kwargs7_preprocess_stack1.shape == stack1.shape
-    assert kwargs7_preprocess_stack2.shape == stack2.shape
-    assert kwargs7_preprocess_stack3.shape == stack3.shape
-    assert kwargs7_preprocess_stack4.shape == stack4.shape
-    assert kwargs7_preprocess_stack5.shape == stack5.shape
-    assert kwargs7_preprocess_stack6.shape == stack6.shape
-    assert kwargs8_preprocess_stack1.shape == stack1.shape
-    assert kwargs8_preprocess_stack2.shape == stack2.shape
-    assert kwargs8_preprocess_stack3.shape == stack3.shape
-    assert kwargs8_preprocess_stack4.shape == stack4.shape
-    assert kwargs8_preprocess_stack5.shape == stack5.shape
-    assert kwargs8_preprocess_stack6.shape == stack6.shape
+            pool_args, _ = mock_pool.call_args
+            assert pool_args[0] == cpu_count()
+
+            pool_map_args, _ = mock_pool_instance.map.call_args
+            assert callable(pool_map_args[0])
+            for i in range(0, len(frames)):
+                assert np.array_equal(pool_map_args[1][i][0], frames[i][0])
+                assert pool_map_args[1][i][1] == frames[i][1]
+
+            assert result.shape == stackx.shape
+            assert isinstance(result, np.ndarray)
+            mock_pool.assert_called_once()
+            mock_pool_instance.map.assert_called_once()
+
+            del result, frames
+            gc.collect()
+
+    test_case_x(stack1, **kwargs6)
+    test_case_x(stack2, **kwargs6)
+    test_case_x(stack3, **kwargs6)
+    test_case_x(stack4, **kwargs6)
+    test_case_x(stack5, **kwargs6)
+    test_case_x(stack6, **kwargs6)
+    test_case_x(stack7, **kwargs6)
+    test_case_x(stack1, **kwargs7)
+    test_case_x(stack2, **kwargs7)
+    test_case_x(stack3, **kwargs7)
+    test_case_x(stack4, **kwargs7)
+    test_case_x(stack5, **kwargs7)
+    test_case_x(stack6, **kwargs7)
+    test_case_x(stack7, **kwargs7)
+    test_case_x(stack1, **kwargs8)
+    test_case_x(stack2, **kwargs8)
+    test_case_x(stack3, **kwargs8)
+    test_case_x(stack4, **kwargs8)
+    test_case_x(stack5, **kwargs8)
+    test_case_x(stack6, **kwargs8)
+    test_case_x(stack7, **kwargs8)
+    test_case_x(stack1, **kwargs9)
+    test_case_x(stack2, **kwargs9)
+    test_case_x(stack3, **kwargs9)
+    test_case_x(stack4, **kwargs9)
+    test_case_x(stack5, **kwargs9)
+    test_case_x(stack6, **kwargs9)
+    test_case_x(stack7, **kwargs9)

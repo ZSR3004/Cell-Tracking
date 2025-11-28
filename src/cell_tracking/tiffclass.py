@@ -68,7 +68,7 @@ class Tiff:
             The integers in the 'figsize' tuple are greater than 0.
 
         Returns:
-            None
+            None.
         """
         plt.figure(figsize=figsize)
         plt.imshow(image, cmap="gray")

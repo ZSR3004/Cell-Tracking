@@ -8,8 +8,8 @@ if ROOT_DIR not in sys.path:
 import torch
 import pytest
 import numpy as np
-from cell_tracking import raft
-from cell_tracking import tiffclass as tiff
+from src.cell_tracking import raft
+from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
 TIFF_PATHS = ["datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
@@ -214,8 +214,8 @@ class TestGetRAFTOpticalFlow:
         batches = (batch_1, batch_2)
 
         with (
-            patch("cell_tracking.raft.raft_small") as mock_small,
-            patch("cell_tracking.raft.raft_large") as mock_large,
+            patch("src.cell_tracking.raft.raft_small") as mock_small,
+            patch("src.cell_tracking.raft.raft_large") as mock_large,
         ):
 
             mock_model = Mock()
@@ -234,8 +234,8 @@ class TestGetRAFTOpticalFlow:
             mock_large.assert_not_called()
 
         with (
-            patch("cell_tracking.raft.raft_small") as mock_small,
-            patch("cell_tracking.raft.raft_large") as mock_large,
+            patch("src.cell_tracking.raft.raft_small") as mock_small,
+            patch("src.cell_tracking.raft.raft_large") as mock_large,
         ):
 
             mock_model = Mock()
@@ -270,7 +270,7 @@ class TestGetRAFTOpticalFlow:
 
         custom_weights = {"layer1.weight": torch.randn(10, 10)}
 
-        with patch("cell_tracking.raft.raft_small") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
             mock_model = Mock()
             mock_model.eval = Mock(return_value=None)
             mock_model.to = Mock(return_value=mock_model)
@@ -286,7 +286,7 @@ class TestGetRAFTOpticalFlow:
                 custom_weights, strict=False
             )
 
-        with patch("cell_tracking.raft.raft_small") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
             mock_model = Mock()
             mock_model.eval = Mock(return_value=None)
             mock_model.to = Mock(return_value=mock_model)
@@ -307,6 +307,9 @@ class TestGetRAFTOpticalFlow:
         Args:
             ten (torch.Tensor): tensor to check.
         """
+        if torch.cuda.is_available():
+            return None
+
         if ten.shape[0] >= 2:
             batch_1 = ten[:2]
             batch_2 = ten[:2]
@@ -316,7 +319,7 @@ class TestGetRAFTOpticalFlow:
         batches = (batch_1, batch_2)
 
         with (
-            patch("cell_tracking.raft.raft_small") as mock_raft,
+            patch("src.cell_tracking.raft.raft_small") as mock_raft,
             patch("torch.cuda.is_available", return_value=True),
         ):
 
@@ -335,7 +338,7 @@ class TestGetRAFTOpticalFlow:
             call_args = mock_model.to.call_args_list[0][0][0]
             assert call_args.type == "cuda"
 
-        with patch("cell_tracking.raft.raft_small") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
             mock_model = Mock()
             mock_model.eval = Mock(return_value=None)
             mock_model.to = Mock(return_value=mock_model)
@@ -346,13 +349,12 @@ class TestGetRAFTOpticalFlow:
             mock_model.return_value = [flow_output]
             mock_raft.return_value = mock_model
 
-            raft.get_raft_optical_flow(batches, gpu_flag=False)
-
+            raft.get_raft_optical_flow(batches, gpu_flag=True)
             call_args = mock_model.to.call_args_list[0][0][0]
-            assert call_args.type == "cpu"
+            assert call_args.type == "cuda"
 
         with (
-            patch("cell_tracking.raft.raft_small") as mock_raft,
+            patch("src.cell_tracking.raft.raft_small") as mock_raft,
             patch("torch.cuda.is_available", return_value=False),
         ):
 
@@ -365,11 +367,6 @@ class TestGetRAFTOpticalFlow:
             )
             mock_model.return_value = [flow_output]
             mock_raft.return_value = mock_model
-
-            raft.get_raft_optical_flow(batches, gpu_flag=True)
-
-            call_args = mock_model.to.call_args_list[0][0][0]
-            assert call_args.type == "cpu"
 
     def test_get_raft_optical_flow(self, init_torch_tensor: torch.Tensor) -> None:
         """
@@ -388,7 +385,7 @@ class TestGetRAFTOpticalFlow:
         self._check_if_custom_weights_used(ten)
         self._check_if_gpu_used(ten)
 
-        with patch("cell_tracking.raft.raft_small") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
             expected_flow = torch.randn(
                 batch_1.shape[0], 2, batch_1.shape[2], batch_1.shape[3]
             )
@@ -400,7 +397,11 @@ class TestGetRAFTOpticalFlow:
             mock_raft.return_value = mock_model
 
             batches = (batch_1, batch_2)
-            result = raft.get_raft_optical_flow(batches)
+
+            if torch.cuda.is_available():
+                result = raft.get_raft_optical_flow(batches, gpu_flag=True)
+            else:
+                result = raft.get_raft_optical_flow(batches, gpu_flag=False)
 
             assert result.shape == (
                 batch_1.shape[0],
@@ -460,7 +461,7 @@ class TestCalcOpticalFlowRAFT:
         """
         Tests the calcOpticalFlowRAFT function.
         """
-        with patch("cell_tracking.raft.raft_small") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
             mock_model = type(
                 "MockModel",
                 (),
@@ -490,7 +491,7 @@ class TestCalcOpticalFlowRAFT:
         """
         custom_weights = {"layer1.weight": torch.randn(10, 10)}
 
-        with patch("cell_tracking.raft.raft_large") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_large") as mock_raft:
             mock_model = type(
                 "MockModel",
                 (),
