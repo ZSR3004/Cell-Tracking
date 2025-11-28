@@ -7,6 +7,7 @@ from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
+
 class Tiff:
     """
     This is a class that imports TIFF file to program, converts TIFF to numpy array using TIFFFILE,
@@ -26,7 +27,7 @@ class Tiff:
             arr (np.ndarray): 4D numpy array containing the image frames, shape is (n_frames, n_channels, height, width)
             Other metadata attributes as needed.
 
-        Returns: 
+        Returns:
             None
         """
         self.path = path
@@ -40,14 +41,20 @@ class Tiff:
         Args:
             channel_idx (int): Index of the channel to isolate (0-indexed).
 
+        Assertions:
+            'channel_idx' is greater or equal to 0.
+            'channel_idx' is less than the length of self.arr.
+
         Returns:
             np.ndarray: Isolated channel as a 3D numpy array.
         """
-        assert(channel_idx >= 0)
-        assert(channel_idx < len(self.arr))
-        return self.arr[:,channel_idx,:,:]
+        assert channel_idx >= 0
+        assert channel_idx < len(self.arr)
+        return self.arr[:, channel_idx, :, :]
 
-    def show_image(self, image: np.ndarray, title='Image', figsize=(12, 8), save_path=None) -> None:
+    def show_image(
+        self, image: np.ndarray, title="Image", figsize=(12, 8), save_path=None
+    ) -> None:
         """
         Displays or saves an image using matplotlib.
 
@@ -61,14 +68,14 @@ class Tiff:
             The integers in the 'figsize' tuple are greater than 0.
 
         Returns:
-            None
+            None.
         """
         plt.figure(figsize=figsize)
-        plt.imshow(image, cmap='gray')
+        plt.imshow(image, cmap="gray")
         plt.title(title)
-        plt.axis('off')
+        plt.axis("off")
         if save_path:
-            plt.savefig(save_path, bbox_inches='tight')
+            plt.savefig(save_path, bbox_inches="tight")
         else:
             plt.show()
 
@@ -118,7 +125,7 @@ class Tiff:
         if "contrast" not in skip:
             contrast_cfg = kwargs.get("contrast", {})
             alpha = contrast_cfg.get("alpha", 1.0)  # Contrast factor
-            beta = contrast_cfg.get("beta", 0)      # Brightness offset
+            beta = contrast_cfg.get("beta", 0)  # Brightness offset
             frame = cv2.convertScaleAbs(frame, alpha=alpha, beta=beta)
 
         return frame

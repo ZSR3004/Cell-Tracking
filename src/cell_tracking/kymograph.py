@@ -1,8 +1,20 @@
 import numpy as np
 
 
-def plot_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', origin='upper', label='Kymograph', 
-                   xlabel='Position along line', ylabel='Time (frame index)', title='Kymograph', show=True, save_path=None):
+def plot_kymograph(
+    line,
+    ax=None,
+    figsize=(10, 6),
+    aspect="auto",
+    cmap="PRGn",
+    origin="upper",
+    label="Kymograph",
+    xlabel="Position along line",
+    ylabel="Time (frame index)",
+    title="Kymograph",
+    show=True,
+    save_path=None,
+):
     """
     Plots a kymograph from a 2D array.
 
@@ -18,12 +30,15 @@ def plot_kymograph(line, ax=None, figsize=(10, 6), aspect='auto', cmap='PRGn', o
         ylabel (str): Label for the y-axis.
         title (str): Title of the plot.
         show (bool): Whether to display the plot immediately.
-    
+
     Returns:
         None: Just displays the kymograph.
     """
 
-def vector_kymograph(arr, values=['x dir'], method=np.median, combine=True, save_path=None):
+
+def vector_kymograph(
+    arr, values=["x dir"], method=np.median, combine=True, save_path=None
+):
     """
     Create and optionally combine kymographs from flow data.
     """
