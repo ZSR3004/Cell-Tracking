@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.colors as colors
 
 
-def vector_magnitude_heatmaps(flow, normalize=True):
+def vector_magnitude_heatmaps(flow: np.ndarray, normalize=True):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
@@ -32,7 +32,7 @@ def vector_magnitude_heatmaps(flow, normalize=True):
     return heatmaps
 
 
-def save_heatmap_video(flow, output_path="heatmap_video.mp4", fps=10, normalize=True):
+def save_heatmap_video(flow: np.ndarray, output_path="heatmap_video.mp4", fps=10, normalize=True):
     """
     Saves a heatmap video (MP4) from a flow array using matplotlib.
 
@@ -61,4 +61,3 @@ def save_heatmap_video(flow, output_path="heatmap_video.mp4", fps=10, normalize=
     )
     ani.save(output_path, fps=fps, extra_args=['-vcodec', 'libx264'])
     plt.close(fig)
-    

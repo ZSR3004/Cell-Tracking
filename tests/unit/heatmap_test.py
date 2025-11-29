@@ -38,4 +38,4 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     return (tiff.Tiff(path), info)
 
 
-def
+def test_vector_magnitude_heatmaps()
