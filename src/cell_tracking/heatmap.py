@@ -11,12 +11,10 @@ def vector_magnitude_heatmaps(flow: np.ndarray, normalize=True):
 
     Args:
         flow (np.ndarray): Array of shape (frames, height, width, 2) with (dx, dy) vectors.
-        apply_colormap (bool): If True, returns heatmaps with color (BGR, 3-channel).
         normalize (bool): If True, normalizes magnitudes to 0-255 range for visualization.
 
     Returns:
-        heatmaps (np.ndarray): Array of shape (frames, height, width) or (frames, height, width, 3)
-                               depending on apply_colormap.
+        heatmaps (np.ndarray): (frames, height, width) uint8
     """
     magnitudes = np.linalg.norm(flow, axis=-1)
 
