@@ -93,15 +93,43 @@ def test_vector_magnitude_heatmaps(init_tiff):
         """
         with patch("numpy.linalg.norm") as mock_linalg_norm, \
             patch("cv2.normalize") as mock_cv2_normalize:
-            result = heatmap.vector_magnitude_heatmaps(flowx, normalizex)
-
             #fake_flow has shape (f, h, w), which is the same shape as np.linalg.norm(flowx, axis=-1)
             fake_flow = flowx[..., 0]
             mock_linalg_norm.return_value = fake_flow
 
+            result = heatmap.vector_magnitude_heatmaps(flowx, normalizex)
+
+            magnitudes = np.linalg.norm(flowx, axis=-1)
+
             if normalizex:
-                #assert mock_cv2_normalize is called the right number of times
-                #note: cv2.normalize(frame, None, 0, 255, cv2.NORM_MINMAX) does NOT change the shape
-                #do more
+                cv2_normalize_args, _ = mock_cv2_normalize.call_args_list
+                
+                i = 0
+                for frame in magnitudes:
+                    assert cv2_normalize_args[i][0] == frame
+                    assert cv2_normalize_args[i][1] == None
+                    assert cv2_normalize_args[i][2] == 0
+                    assert cv2_normalize_args[i][3] == 255
+                    assert cv2_normalize_args[i][4] == cv2.NORM_MINMAX
+                    i += 1
+
+                assert mock_cv2_normalize.call_count == fake_flow.shape[0]
 
             else:
+                mock_cv2_normalize.assert_not_called()
+
+            mock_linalg_norm_args, mock_linalg_norm_kwargs = mock_linalg_norm.call_args_list
+            assert np.array_equal(mock_linalg_norm_args[0], flowx)
+            assert mock_linalg_norm_kwargs["axis"] == -1
+
+            mock_linalg_norm.assert_called_once()
+            assert result.shape == (f, h, w)
+            assert isinstance(result, np.ndarray)
+            assert result.dtype == np.uint8
+
+    test_case_x(flow0, True)
+    test_case_x(flow0, False)
+    test_case_x(flow1, True)
+    test_case_x(flow1, False)
+    test_case_x(flow2, True)
+    test_case_x(flow2, False)
