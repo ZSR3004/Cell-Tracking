@@ -99,18 +99,14 @@ def test_vector_magnitude_heatmaps(init_tiff):
 
             result = heatmap.vector_magnitude_heatmaps(flowx, normalizex)
 
-            magnitudes = np.linalg.norm(flowx, axis=-1)
-
             if normalizex:
-                cv2_normalize_args, _ = mock_cv2_normalize.call_args_list
-                
                 i = 0
-                for frame in magnitudes:
-                    assert cv2_normalize_args[i][0] == frame
-                    assert cv2_normalize_args[i][1] == None
-                    assert cv2_normalize_args[i][2] == 0
-                    assert cv2_normalize_args[i][3] == 255
-                    assert cv2_normalize_args[i][4] == cv2.NORM_MINMAX
+                for frame in fake_flow:
+                    assert np.array_equal(mock_cv2_normalize.call_args_list[i][0][0], frame)
+                    assert mock_cv2_normalize.call_args_list[i][0][1] == None
+                    assert mock_cv2_normalize.call_args_list[i][0][2] == 0
+                    assert mock_cv2_normalize.call_args_list[i][0][3] == 255
+                    assert mock_cv2_normalize.call_args_list[i][0][4] == cv2.NORM_MINMAX
                     i += 1
 
                 assert mock_cv2_normalize.call_count == fake_flow.shape[0]
@@ -118,12 +114,12 @@ def test_vector_magnitude_heatmaps(init_tiff):
             else:
                 mock_cv2_normalize.assert_not_called()
 
-            mock_linalg_norm_args, mock_linalg_norm_kwargs = mock_linalg_norm.call_args_list
+            mock_linalg_norm_args, mock_linalg_norm_kwargs = mock_linalg_norm.call_args
             assert np.array_equal(mock_linalg_norm_args[0], flowx)
             assert mock_linalg_norm_kwargs["axis"] == -1
 
             mock_linalg_norm.assert_called_once()
-            assert result.shape == (f, h, w)
+            assert result.shape == (flowx.shape[0], flowx.shape[1], flowx.shape[2])
             assert isinstance(result, np.ndarray)
             assert result.dtype == np.uint8
 
