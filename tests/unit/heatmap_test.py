@@ -40,5 +40,5 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
 
 def test_vector_magnitude_heatmaps()
     """
-    output is (frames, height, width) or (frames, height, width, 3) depending on ___
+    for flow input, maybe use dummy function or something. I know i made a dummy function or soemthing in past tests. i believe it's dummy_optical_flow in optical_flow_test.py
     """
