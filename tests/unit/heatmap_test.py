@@ -39,3 +39,6 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
 
 
 def test_vector_magnitude_heatmaps()
+    """
+    output is (frames, height, width) or (frames, height, width, 3) depending on ___
+    """
