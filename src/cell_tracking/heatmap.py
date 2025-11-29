@@ -10,11 +10,11 @@ def vector_magnitude_heatmaps(flow: np.ndarray, normalize=True):
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
     Args:
-        flow (np.ndarray): Array of shape (frames, height, width, 2) with (dx, dy) vectors.
+        flow (np.ndarray): Flow array of shape (frames, height, width, 2) with (dx, dy) vectors.
         normalize (bool): If True, normalizes magnitudes to 0-255 range for visualization.
 
     Returns:
-        heatmaps (np.ndarray): (frames, height, width) uint8
+        heatmaps (np.ndarray): Array of shape (frames, height, width), with type uint8.
     """
     magnitudes = np.linalg.norm(flow, axis=-1)
 
@@ -35,10 +35,10 @@ def save_heatmap_video(flow: np.ndarray, output_path="heatmap_video.mp4", fps=10
     Saves a heatmap video (MP4) from a flow array using matplotlib.
 
     Args:
-        flow (np.ndarray): Array of shape (frames, height, width, 2)
-        output_path (str): Path to save the MP4 video
-        fps (int): Frames per second of the output video
-        normalize (bool): Whether to normalize magnitudes per frame
+        flow (np.ndarray): Array of shape (frames, height, width, 2).
+        output_path (str): Path to save the MP4 video.
+        fps (int): Frames per second of the output video.
+        normalize (bool): Whether to normalize magnitudes per frame.
 
     Returns:
         None.
