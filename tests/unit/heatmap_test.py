@@ -101,6 +101,7 @@ def test_vector_magnitude_heatmaps(init_tiff):
 
             if normalizex:
                 #assert mock_cv2_normalize is called the right number of times
+                #note: cv2.normalize(frame, None, 0, 255, cv2.NORM_MINMAX) does NOT change the shape
                 #do more
 
             else:
