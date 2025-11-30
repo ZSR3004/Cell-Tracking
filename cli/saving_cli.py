@@ -1,7 +1,9 @@
 import os
 from pathlib import Path
 import sys
-import matplotlib
+import matplotlib.pyplot as plt
+import file_input_cli as fic
+
 # Add the project root (Cell-Tracking) to sys.path
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
 if ROOT_DIR not in sys.path:
@@ -44,20 +46,8 @@ def save_arr_cli(arr : np.array) -> None:
     """
     saving.save_arr(arr)
 
-def save_video_cli():
-    """
-    Saves the video to the desired path
 
-    Args:
-        Video to be saved
-        Path to save the video to
-    
-    Returns:
-        None, just saves the videos to the desired path
-    """
-    return NotImplementedError
-
-def save_original_video_cli(name: str, file_path: str) -> None:
+def save_original_video_cli(name: str, file_path: str, channel_idx: int) -> None:
     """
     Saves a video of image frames using matplotlib.
     Args:
@@ -72,7 +62,22 @@ def save_original_video_cli(name: str, file_path: str) -> None:
         Returns:
             None: Just saves the video to the specified path.
     """
-    return saving.save_original_video(name, file_path, )
+    my_tiff = fic.init_tiff_class(file_path)
+
+    image_stack = my_tiff.isolate_channel(channel_idx)
+
+    output_dir = Path.cwd()
+    output_path = output_dir / f"{name}.mp4"
+    i = 1
+    while output_path.exists():
+        output_path = output_dir / f"{name}_{i}.mp4"
+        i += 1
+    
+    fig, ax = plt.subplots()
+    im = ax.imshow(image_stack[0], cmap="gray")
+    ax.set_title("Frame" + str(channel_idx))
+
+    saving.save_original_video(name, str(output_path), im, image_stack, fig, ax)
 
 def save_vector_video_cli(name : str, flag : str, **kwargs) -> None:
     """

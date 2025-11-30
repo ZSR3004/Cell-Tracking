@@ -116,9 +116,8 @@ def main():
 
     full_path = get_video()
     tiff_name = os.path.basename(full_path)
+ 
     my_video = fic.init_tiff_class(full_path)
-
-    #s.save_original_video_cli(tiff_name, os.getcwd(), )
 
     if not os.path.exists(os.getcwd() + "/" + tiff_name):
         my_folders.create_tiff_dir(tiff_name)
@@ -145,11 +144,22 @@ def main():
     if vid_type == 'n':
         flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 0)
         flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
+
+        os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
+        s.save_original_video_cli("Original_Video_Left", full_path, 1)
+        s.save_original_video_cli("Original_Video_Right", full_path, 2)
+
+        os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
         answer = click.prompt("Do you want to calculate the combined flows of channels 1 and 2? [y/n]", 
                          type=click.Choice(['y', 'n'], case_sensitive=False))
             
         if answer.lower() == 'y':
             combined_flow = opt.calculate_combined_flow(my_video.arr)
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
+            s.save_original_video_cli("Original_Video_Combined", full_path, 0)
+
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+
             if "Raw Data" in outputs:
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
                 s.save_flow_cli("Combined_Flow", combined_flow, os.getcwd())
@@ -191,6 +201,11 @@ def main():
 
     elif vid_type == 'p':
         raft_flow = opt.calculate_raft_optical_flow(my_video)
+
+        os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
+        s.save_original_video_cli("Original_Video_Combined", full_path, 0)
+        s.save_original_video_cli("Original_Video_Left", full_path, 1)
+        s.save_original_video_cli("Original_Video_Right", full_path, 2)
 
         if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
