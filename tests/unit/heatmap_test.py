@@ -192,7 +192,26 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
+        with patch("src.cell_tracking.heatmap.vector_magnitude_heatmaps") as mock_vector_mag_heatmaps, \
+            patch("")
+            #CALL FUNCTION
+
+            mock_fig = MagicMock()
+            mock_ax = MagicMock()
         
+
+
+            """
+            Assert called and assert parameters:
+            vector_magnitude_heatmaps
+            plt.subplots()
+            ax.imshow
+            ax.axis
+            something with update(frame_idx) (i think i did something with this earlier)
+            animation.FuncAnimation
+            ani.save
+            plt.close
+            """
 
 
 
