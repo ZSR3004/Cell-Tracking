@@ -131,3 +131,7 @@ def test_vector_magnitude_heatmaps(init_tiff):
     test_case_x(flow1, False)
     test_case_x(flow2, True)
     test_case_x(flow2, False)
+
+
+def test_save_heatmap_video()
+    #get text from ziyad about parameter of output_path
