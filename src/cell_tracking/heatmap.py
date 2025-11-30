@@ -26,7 +26,7 @@ def vector_magnitude_heatmaps(flow: np.ndarray, normalize=True):
             heatmaps.append(norm)
         heatmaps = np.stack(heatmaps, axis=0)
     else:
-        heatmaps = magnitudes
+        heatmaps = magnitudes.astype(np.uint8)
     return heatmaps
 
 

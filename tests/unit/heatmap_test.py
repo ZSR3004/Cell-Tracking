@@ -97,6 +97,8 @@ def test_vector_magnitude_heatmaps(init_tiff):
             fake_flow = flowx[..., 0]
             mock_linalg_norm.return_value = fake_flow
 
+            mock_cv2_normalize.side_effect = lambda frame1, *args, **kwargs: frame1
+
             result = heatmap.vector_magnitude_heatmaps(flowx, normalizex)
 
             if normalizex:
