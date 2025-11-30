@@ -35,8 +35,8 @@ def save_heatmap_video(flow: np.ndarray, output_path: str, fps=10, normalize=Tru
     Saves a heatmap video (MP4) from a flow array using matplotlib.
 
     Args:
-        flow (np.ndarray): Array of shape (frames, height, width, 2).
-        output_path (str): Path to save the MP4 video.
+        flow (np.ndarray): Flow array of shape (frames, height, width, 2).
+        output_path (str): Path to save the MP4 video to.
         fps (int): Frames per second of the output video.
         normalize (bool): Whether to normalize magnitudes per frame.
 

@@ -38,7 +38,7 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     return (tiff.Tiff(path), info)
 
 
-def test_vector_magnitude_heatmaps(init_tiff):
+def test_vector_magnitude_heatmaps(init_tiff: tuple):
     """
     Tests whether the vector_magnitude_heatmaps function works correctly.
 
@@ -122,6 +122,7 @@ def test_vector_magnitude_heatmaps(init_tiff):
 
             mock_linalg_norm.assert_called_once()
             assert result.shape == (flowx.shape[0], flowx.shape[1], flowx.shape[2])
+            assert result.shape == (f-1, h, w)
             assert isinstance(result, np.ndarray)
             assert result.dtype == np.uint8
 
@@ -133,5 +134,66 @@ def test_vector_magnitude_heatmaps(init_tiff):
     test_case_x(flow2, False)
 
 
-def test_save_heatmap_video()
-    #get text from ziyad about parameter of output_path
+def test_save_heatmap_video(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the save_heatmap_video function works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Returns:
+        None.
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    def dummy_optical_flow(channel: int):
+        """
+        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
+        faster than calling flow.optical_flow (which is why it's perfect for testing).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+    
+    #flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    flow0 = dummy_optical_flow(0)
+    flow1 = dummy_optical_flow(1)
+    flow2 = dummy_optical_flow(2)
+
+    MAKE_THESE = tmp_path / "MAKE_THESE.mp4"
+
+    def test_case_x(flowx: np.ndarray, output_pathx: str, fpsx: int, normalizex: bool):
+        """
+        Tests whether the save_heatmap_video function works correctly on a specific test case.
+
+        Args:
+            flowx (np.ndarray): Flow array of shape (frames, height, width, 2).
+            output_pathx (str): Path to save the MP4 video to.
+            fpsx (int): Frames per second of the output video.
+            normalizex (bool): Whether to normalize magnitudes per frame.
+
+        Returns:
+            None.
+        """
+        
+
+
+
+    #IF THE INPUT ARRAYS ARE SHAPE (f-1, h, w, 2) (IF ZIYAD AND SHITAL SAY SO), THEN CHANGE ALL DOCSTRINGS (IN HEATMAP_TEST.PY AND HEATMAP.PY). IF NOT, CHANGE MY TESTS!
