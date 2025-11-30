@@ -10,7 +10,7 @@ import cv2, json, pytest, gc, xyz_py
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock, call
 import matplotlib
 import numpy as np
 from pathlib import Path
@@ -386,9 +386,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     img, info = init_tiff
     f, c, h, w = info
 
-    fig = MagicMock()
-    ax = MagicMock()
-    im = MagicMock()
+    mock_fig = MagicMock()
+    mock_ax = MagicMock()
+    mock_im = MagicMock()
 
     kwargs1 = {"T": 10, "fps": 20}
     kwargs2 = {"T": 40}
@@ -437,13 +437,13 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             mock_writer_instance = MagicMock()
             mock_ffmpegwriter.return_value = mock_writer_instance
 
-            save.save_original_video("Video_Name", stackx_kwargsx_path, im, image_stackx, fig, ax, **kwargsx)
+            save.save_original_video("Video_Name", stackx_kwargsx_path, mock_im, image_stackx, mock_fig, mock_ax, **kwargsx)
 
             T = kwargsx.get("T", image_stackx.shape[0])
             fps = kwargsx.get("fps", 10)
 
             args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
-            assert args_FuncAnimation[0] == fig
+            assert args_FuncAnimation[0] == mock_fig
             assert callable(args_FuncAnimation[1])
             assert kwargs_FuncAnimation["frames"] == T
             assert kwargs_FuncAnimation["interval"] == 1000 / fps
@@ -451,6 +451,12 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
 
             _, kwargs_FFMpegWriter = mock_ffmpegwriter.call_args
             assert kwargs_FFMpegWriter["fps"] == fps
+
+            assert mock_im.set_data.call_count == T
+            mock_im.set_data.assert_has_calls(call([image_stackx[frame]]) for frame in image_stackx)
+
+            assert mock_ax.set_title.call_count == T
+            mock_ax.set_title.assert_has_calls(call(f"Frame {frame}") for frame in image_stackx)
 
             mock_anim_instance.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
             mock_funcanimation.assert_called_once()
