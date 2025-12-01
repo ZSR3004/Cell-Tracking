@@ -216,8 +216,6 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
             assert args_ax_imshow[1] == 'jet'
             assert args_ax_imshow[2] == True
             
-            #PUT SOMETHING WITH update(frame_idx) (i did something with this earlier in test_save_original_video in saving.py) HERE!!
-
             args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
             assert args_FuncAnimation[0] == mock_fig
             assert callable(args_FuncAnimation[1])
@@ -233,12 +231,6 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
             mock_funcanimation.assert_called_once()
             mock_ani.save.assert_called_once_with(output_pathx, fps=fpsx, extra_args=['-vcodec', 'libx264'])
             mock_plt_close.assert_called_once_with(mock_fig)
-            
-
-            """
-            Assert called and assert parameters:
-            something with update(frame_idx) (i think i did something with this earlier)
-            """
 
     #CALL TEST_CASE_X MULTIPLE TIMES!
 
