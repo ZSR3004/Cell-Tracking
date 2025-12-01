@@ -99,7 +99,7 @@ def test_vector_magnitude_heatmaps(init_tiff: tuple):
 
             mock_cv2_normalize.side_effect = lambda frame1, *args, **kwargs: frame1
 
-            result = heatmap.vector_magnitude_heatmaps(flowx, normalizex)
+            result = heatmap.vector_magnitude_heatmaps(flowx, normalize=normalizex)
 
             if normalizex:
                 i = 0
@@ -177,7 +177,28 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
     flow1 = dummy_optical_flow(1)
     flow2 = dummy_optical_flow(2)
 
-    MAKE_THESE = tmp_path / "MAKE_THESE.mp4"
+    fps1 = 10
+    fps2 = 25
+    fps3 = 100
+
+    flow0_fps1_true_path = tmp_path / "flow0_fps1_true.mp4"
+    flow0_fps1_false_path = tmp_path / "flow0_fps1_false.mp4"
+    flow0_fps2_true_path = tmp_path / "flow0_fps2_true.mp4"
+    flow0_fps2_false_path = tmp_path / "flow0_fps2_false.mp4"
+    flow0_fps3_true_path = tmp_path / "flow0_fps3_true.mp4"
+    flow0_fps3_false_path = tmp_path / "flow0_fps3_false.mp4"
+    flow1_fps1_true_path = tmp_path / "flow1_fps1_true.mp4"
+    flow1_fps1_false_path = tmp_path / "flow1_fps1_false.mp4"
+    flow1_fps2_true_path = tmp_path / "flow1_fps2_true.mp4"
+    flow1_fps2_false_path = tmp_path / "flow1_fps2_false.mp4"
+    flow1_fps3_true_path = tmp_path / "flow1_fps3_true.mp4"
+    flow1_fps3_false_path = tmp_path / "flow1_fps3_false.mp4"
+    flow2_fps1_true_path = tmp_path / "flow2_fps1_true.mp4"
+    flow2_fps1_false_path = tmp_path / "flow2_fps1_false.mp4"
+    flow2_fps2_true_path = tmp_path / "flow2_fps2_true.mp4"
+    flow2_fps2_false_path = tmp_path / "flow2_fps2_false.mp4"
+    flow2_fps3_true_path = tmp_path / "flow2_fps3_true.mp4"
+    flow2_fps3_false_path = tmp_path / "flow2_fps3_false.mp4"
 
     def test_case_x(flowx: np.ndarray, output_pathx: str, fpsx: int, normalizex: bool):
         """
@@ -193,33 +214,37 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
             None.
         """
         with patch("src.cell_tracking.heatmap.vector_magnitude_heatmaps") as mock_vector_mag_heatmaps, \
-            patch("src.cell_tracking.heatmap.matplotlib.pyplot.subplots") as mock_plt_subplots, \
-            patch("src.cell_tracking.heatmap.matplotlib.pyplot.close") as mock_plt_close, \
+            patch("src.cell_tracking.heatmap.plt.subplots") as mock_plt_subplots, \
+            patch("src.cell_tracking.heatmap.plt.close") as mock_plt_close, \
             patch("src.cell_tracking.heatmap.animation.FuncAnimation") as mock_funcanimation:
             mock_ani = MagicMock()
             mock_fig = MagicMock()
             mock_ax = MagicMock()
             mock_im = MagicMock()
 
+            #This turns flowx from shape (f-1, h, w, 2) into shape (f-1, h, w)
+            flowx_no_dx_dy = flowx[..., 0] 
+
+            mock_vector_mag_heatmaps.return_value = flowx_no_dx_dy
             mock_funcanimation.return_value = mock_ani
             mock_plt_subplots.return_value = (mock_fig, mock_ax)
             mock_ax.imshow.return_value = mock_im
 
-            result = heatmap.save_heatmap_video(flowx, output_pathx, fpsx, normalizex)
+            heatmap.save_heatmap_video(flowx, output_pathx, fps=fpsx, normalize=normalizex)
 
-            args_vector_mag_heatmap, _ = mock_vector_mag_heatmaps.call_args
-            assert args_vector_mag_heatmap[0] == flowx
-            assert args_vector_mag_heatmap[1] == normalizex
+            args_vector_mag_heatmap, kwargs_vector_mag_heatmap = mock_vector_mag_heatmaps.call_args
+            assert np.array_equal(args_vector_mag_heatmap[0], flowx)
+            assert kwargs_vector_mag_heatmap["normalize"] == normalizex
 
-            args_ax_imshow, _ = mock_ax.imshow.call_args
-            assert args_ax_imshow[0] == result[0]
-            assert args_ax_imshow[1] == 'jet'
-            assert args_ax_imshow[2] == True
+            args_ax_imshow, kwargs_ax_imshow = mock_ax.imshow.call_args
+            assert np.array_equal(args_ax_imshow[0], flowx_no_dx_dy[0])
+            assert kwargs_ax_imshow["cmap"] == 'jet'
+            assert kwargs_ax_imshow["animated"] == True
             
             args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
             assert args_FuncAnimation[0] == mock_fig
             assert callable(args_FuncAnimation[1])
-            assert kwargs_FuncAnimation["frames"] == len(result)
+            assert kwargs_FuncAnimation["frames"] == len(flowx_no_dx_dy)
             assert kwargs_FuncAnimation["interval"] == 1000 / fpsx
             assert kwargs_FuncAnimation["blit"] == True
         
@@ -232,6 +257,21 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
             mock_ani.save.assert_called_once_with(output_pathx, fps=fpsx, extra_args=['-vcodec', 'libx264'])
             mock_plt_close.assert_called_once_with(mock_fig)
 
-    #CALL TEST_CASE_X MULTIPLE TIMES!
-
-    #IF THE INPUT ARRAYS ARE SHAPE (f-1, h, w, 2) (IF ZIYAD AND SHITAL SAY SO), THEN CHANGE ALL DOCSTRINGS (IN HEATMAP_TEST.PY AND HEATMAP.PY). IF NOT, CHANGE MY TESTS!
+    test_case_x(flow0, flow0_fps1_true_path, fps1, True)
+    test_case_x(flow0, flow0_fps1_false_path, fps1, False)
+    test_case_x(flow0, flow0_fps2_true_path, fps2, True)
+    test_case_x(flow0, flow0_fps2_false_path, fps2, False)
+    test_case_x(flow0, flow0_fps3_true_path, fps3, False)
+    test_case_x(flow0, flow0_fps3_false_path, fps3, False)
+    test_case_x(flow1, flow1_fps1_true_path, fps1, True)
+    test_case_x(flow1, flow1_fps1_false_path, fps1, False)
+    test_case_x(flow1, flow1_fps2_true_path, fps2, True)
+    test_case_x(flow1, flow1_fps2_false_path, fps2, False)
+    test_case_x(flow1, flow1_fps3_true_path, fps3, True)
+    test_case_x(flow1, flow1_fps3_false_path, fps3, False)
+    test_case_x(flow2, flow2_fps1_true_path, fps1, True)
+    test_case_x(flow2, flow2_fps1_false_path, fps1, False)
+    test_case_x(flow2, flow2_fps2_true_path, fps2, True)
+    test_case_x(flow2, flow2_fps2_false_path, fps2, False)
+    test_case_x(flow2, flow2_fps3_true_path, fps3, True)
+    test_case_x(flow2, flow2_fps3_false_path, fps3, False)
