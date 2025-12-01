@@ -6,6 +6,7 @@ import visualization_cli as v
 import saving_cli as s
 import questionary
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 import os
 import sys
@@ -78,7 +79,7 @@ def get_video_type() -> str:
     Returns: string of their answer
     """
 
-    my_video = click.prompt("Type in the type of video  you input (n for nuclei dyed, p for phase contrast)", type=str)
+    my_video = click.prompt("Type in the type of video you input (n for nuclei dyed, p for phase contrast)", type=str)
 
     return my_video
 
@@ -168,8 +169,8 @@ def main():
             if "Raw Data" in outputs:
                 #Change to raw data  directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-                s.save_arr("tiff_array_1", my_video, os.getcwd)
-                s.save_arr("tiff_array_2", my_video, os.getcwd)
+                s.save_arr_cli("tiff_array_1", my_video, Path(os.getcwd()))
+                s.save_arr_cli("tiff_array_2", my_video, Path(os.getcwd()))
 
             if "Heatmap" in outputs:
                 #Change to heatmap directory, save isolated flow data
@@ -194,7 +195,7 @@ def main():
         if "Raw Data" in outputs:
             #Change to raw data directory, save raw Tiff array
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr("tiff_array", my_video, os.getcwd())
+            s.save_arr_cli("tiff_array", my_video, Path(os.getcwd()))
 
         if "Heatmap" in outputs:
             #Change to heatmap directory, save combined heatmap video
@@ -222,7 +223,7 @@ def main():
         
         if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr("tiff_array", my_video, os.getcwd())
+            s.save_arr_cli("tiff_array", my_video, Path(os.getcwd()))
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")

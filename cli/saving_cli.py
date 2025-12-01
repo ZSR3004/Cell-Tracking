@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 import sys
 import matplotlib.pyplot as plt
+from src.cell_tracking import tiffclass
 import file_input_cli as fic
 
 # Add the project root (Cell-Tracking) to sys.path
@@ -34,7 +35,7 @@ def save_flow_cli(name: str,
     saving.save_optical_flow_as_matlab(name, opt_flow, main_path)
     saving.save_optical_flow_as_numpy(name, opt_flow, main_path)
 
-def save_arr_cli(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
+def save_arr_cli(name: str, tiff_instance: tiffclass.Tiff, main_path: str) -> None:
     """
     Saves a numpy array to a file.
     
