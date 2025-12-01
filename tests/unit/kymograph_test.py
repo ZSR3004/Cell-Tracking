@@ -243,16 +243,27 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
     threshold3 = 1.5
     threshold4 = 0.25
 
-    WRITE SAVE_PATHS HERE!
+    flow0_threshold1_path = tmp_path / "flow0_threshold1_path.png"
+    flow0_threshold2_path = tmp_path / "flow0_threshold2_path.png"
+    flow0_threshold3_path = tmp_path / "flow0_threshold3_path.png"
+    flow0_threshold4_path = tmp_path / "flow0_threshold4_path.png"
+    flow1_threshold1_path = tmp_path / "flow1_threshold1_path.png"
+    flow1_threshold2_path = tmp_path / "flow1_threshold2_path.png"
+    flow1_threshold3_path = tmp_path / "flow1_threshold3_path.png"
+    flow1_threshold4_path = tmp_path / "flow1_threshold4_path.png"
+    flow2_threshold1_path = tmp_path / "flow2_threshold1_path.png"
+    flow2_threshold2_path = tmp_path / "flow2_threshold2_path.png"
+    flow2_threshold3_path = tmp_path / "flow2_threshold3_path.png"
+    flow2_threshold4_path = tmp_path / "flow2_threshold4_path.png"
 
-    def test_case_x(flowx: np.ndarray, save_path_x: str, thresholdx: float):
+    def test_case_x(flowx: np.ndarray, thresholdx: float, save_path_x: str=None):
         """
         Tests whether the plot_basic_kymo function works correctly on a specific test case.
 
         Args:
             flowx (np.ndarray): Flow array of shape (frames-1, height, width, 2).
-            save_path_x (str): Path to save the plot. If None, the plot will be displayed instead of saved.
             thresholdx (float): Threshold value to mask the array.
+            save_path_x (str): Path to save the plot. If None, the plot will be displayed instead of saved.
 
         Returns:
             None.
@@ -293,7 +304,7 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             colors = ['black', custom_green, custom_magenta, custom_blue]
             cmap = mcolors.ListedColormap(colors)
 
-            kymograph.plot_basic_kymo(flowx, save_path_x, thresholdx)
+            kymograph.plot_basic_kymo(flowx, thresholdx, save_path_x)
 
             flowx_1 = flowx[:, 1, ...]
             flowx_2 = flowx[:, 2, ...]
@@ -310,39 +321,59 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
 
             args_imshow, kwargs_imshow = mock_imshow.call_args
             assert np.array_equal(args_imshow[0], combined_data)
-            
+            assert kwargs_imshow["aspect"] == "auto"
+            assert kwargs_imshow["cmap"] == cmap
+            assert kwargs_imshow["vmin"] == 0
+            assert kwargs_imshow["vmax"] == 3
 
-
-
-            #assert called
+            assert mock_flatten_arr.call_count == 2
+            assert mock_mask_line_arr.call_count == 2
             mock_zeros_like.assert_called_once_with(masked_line_arr1)
+            mock_figure.assert_called_once()
+            mock_imshow.assert_called_once()
+            mock_title.assert_called_once_with("Overlay: Left (Green), Right (Magenta), Overlap (Blue)")
+            mock_xlabel.assert_called_once_with('Position')
+            mock_ylabel.assert_called_once_with('Time')
 
-            """
-            Assert args:
-            DONE mask_line_arr
-            DONE flatten_arr
-            DONE zeros_like
-            DONE figure
-            imshow
-            title
-            xlabel
-            ylabel
-            savefig
-            close
-            show
+            if save_path_x is not None:
+                args_savefig, kwargs_savefig = mock_savefig.call_args
+                assert args_savefig[0] == save_path_x
+                assert kwargs_savefig["bbox_inches"] == "tight"
+                assert kwargs_savefig["dpi"] == 300
 
-            Assert called:
-            mask_line_arr (called twice) (or three times?)
-            flatten_arr (called twice) (or three times?)
-            DONE zeros_like
-            figure
-            imshow
-            title
-            xlabel
-            ylabel
-            savefig
-            close
-            show
-            """
+                mock_savefig.assert_called_once()
+                mock_close.assert_called_once_with()
+                mock_show.assert_not_called()
+            else:
+                mock_show.assert_called_once_with()
+                mock_savefig.assert_not_called()
+                mock_close.assert_not_called()
+
+    test_case_x(flow0, threshold1, flow0_threshold1_path)   #flow0, threshold1 save
+    test_case_x(flow0, threshold1, None)                    #flow0, threshold1 show
+    test_case_x(flow0, threshold2, flow0_threshold2_path)   #flow0, threshold2 save
+    test_case_x(flow0, threshold2, None)                    #flow0, threshold2 show
+    test_case_x(flow0, threshold3, flow0_threshold3_path)   #flow0, threshold3 save
+    test_case_x(flow0, threshold3, None)                    #flow0, threshold3 show
+    test_case_x(flow0, threshold4, flow0_threshold4_path)   #flow0, threshold4 save
+    test_case_x(flow0, threshold4, None)                    #flow0, threshold4 show
+    test_case_x(flow1, threshold1, flow1_threshold1_path)   #flow1, threshold1 save
+    test_case_x(flow1, threshold1, None)                    #flow0, threshold1 show
+    test_case_x(flow1, threshold2, flow1_threshold2_path)   #flow1, threshold2 save
+    test_case_x(flow1, threshold2, None)                    #flow1, threshold2 show
+    test_case_x(flow1, threshold3, flow1_threshold3_path)   #flow1, threshold3 save
+    test_case_x(flow1, threshold3, None)                    #flow1, threshold3 show
+    test_case_x(flow1, threshold4, flow1_threshold4_path)   #flow1, threshold4 save
+    test_case_x(flow1, threshold4, None)                    #flow1, threshold4 show
+    test_case_x(flow2, threshold1, flow2_threshold1_path)   #flow2, threshold1 save
+    test_case_x(flow2, threshold1, None)                    #flow2, threshold1 show
+    test_case_x(flow2, threshold2, flow2_threshold2_path)   #flow2, threshold2 save
+    test_case_x(flow2, threshold2, None)                    #flow2, threshold2 show
+    test_case_x(flow2, threshold3, flow2_threshold3_path)   #flow2, threshold3 save
+    test_case_x(flow2, threshold3, None)                    #flow2, threshold3 show
+    test_case_x(flow2, threshold4, flow2_threshold4_path)   #flow2, threshold4 save
+    test_case_x(flow2, threshold4, None)                    #flow2, threshold4 show
+
+            #change the if not nones here and in kymograph?
 
             #DON'T need to assert if it was saved
