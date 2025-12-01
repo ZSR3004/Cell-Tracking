@@ -193,24 +193,51 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
             None.
         """
         with patch("src.cell_tracking.heatmap.vector_magnitude_heatmaps") as mock_vector_mag_heatmaps, \
-            patch("")
-            #CALL FUNCTION
-
+            patch("src.cell_tracking.heatmap.matplotlib.pyplot.subplots") as mock_plt_subplots, \
+            patch("src.cell_tracking.heatmap.matplotlib.pyplot.close") as mock_plt_close, \
+            patch("src.cell_tracking.heatmap.animation.FuncAnimation") as mock_funcanimation:
+            mock_ani = MagicMock()
             mock_fig = MagicMock()
             mock_ax = MagicMock()
-        
+            mock_im = MagicMock()
 
+            mock_funcanimation.return_value = mock_ani
+            mock_plt_subplots.return_value = (mock_fig, mock_ax)
+            mock_ax.imshow.return_value = mock_im
+
+            result = heatmap.save_heatmap_video(flowx, output_pathx, fpsx, normalizex)
+
+            args_vector_mag_heatmap, _ = mock_vector_mag_heatmaps.call_args
+            assert args_vector_mag_heatmap[0] == flowx
+            assert args_vector_mag_heatmap[1] == normalizex
+
+            args_ax_imshow, _ = mock_ax.imshow.call_args
+            assert args_ax_imshow[0] == result[0]
+            assert args_ax_imshow[1] == 'jet'
+            assert args_ax_imshow[2] == True
+            
+            #PUT SOMETHING WITH update(frame_idx) (i did something with this earlier in test_save_original_video in saving.py) HERE!!
+
+            args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
+            assert args_FuncAnimation[0] == mock_fig
+            assert callable(args_FuncAnimation[1])
+            assert kwargs_FuncAnimation["frames"] == len(result)
+            assert kwargs_FuncAnimation["interval"] == 1000 / fpsx
+            assert kwargs_FuncAnimation["blit"] == True
+        
+            #ASSERTING CALLED ONCE
+            mock_vector_mag_heatmaps.assert_called_once()
+            mock_plt_subplots.assert_called_once_with()
+            mock_ax.imshow.assert_called_once()
+            mock_ax.axis.assert_called_once_with('off')
+            mock_funcanimation.assert_called_once()
+            mock_ani.save.assert_called_once_with(output_pathx, fps=fpsx, extra_args=['-vcodec', 'libx264'])
+            mock_plt_close.assert_called_once_with(mock_fig)
+            
 
             """
             Assert called and assert parameters:
-            vector_magnitude_heatmaps
-            plt.subplots()
-            ax.imshow
-            ax.axis
             something with update(frame_idx) (i think i did something with this earlier)
-            animation.FuncAnimation
-            ani.save
-            plt.close
             """
 
 
