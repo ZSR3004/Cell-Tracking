@@ -152,7 +152,7 @@ def main():
                          type=click.Choice(['y', 'n'], case_sensitive=False))
             
         if answer.lower() == 'y':
-            flow_channel_1 = opt.calculate_nuclei_optical__flow(my_video.arr, 1)
+            flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
             flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 2)
 
             s.save_original_video_cli("Original_Video_Left", full_path, 1)
