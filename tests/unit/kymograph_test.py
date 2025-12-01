@@ -8,7 +8,7 @@ if ROOT_DIR not in sys.path:
 
 import pytest
 import numpy as np
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock, call
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from src.cell_tracking import tiffclass as tiff
@@ -95,7 +95,7 @@ def test_flatten_arr(init_tiff: tuple):
             fake_flow = flowx[..., 0]
             mock_linalg_norm.return_value = fake_flow
             #mock_median.side_effect returns an array of shape (w), which is the same shape as np.median(mag_per_frame[i, :, :], axis=0) (note: the shape of mag_per_frame[i, :, :] is (h, w))
-            mock_median.side_effect = lambda arr1, axis1: arr1[0, :]
+            mock_median.side_effect = lambda arr1, **axis1: arr1[0, :]
 
             result = kymograph.flatten_arr(flowx)
 
@@ -103,7 +103,10 @@ def test_flatten_arr(init_tiff: tuple):
             assert np.array_equal(args_linalg_norm[0], flowx)
             assert kwargs_linalg_norm["axis"] == -1
 
-            assert mock_median.call_args_list == [(fake_flow, {"axis": 0}) * flowx.shape[0]]
+            for i, call_args_kwargs in enumerate(mock_median.call_args_list):
+                args_median, kwargs_median = call_args_kwargs
+                assert np.array_equal(args_median[0], fake_flow[i, :, :])
+                assert kwargs_median["axis"] == 0
 
             mock_linalg_norm.assert_called_once()
             assert mock_median.call_count == flowx.shape[0]
@@ -114,6 +117,11 @@ def test_flatten_arr(init_tiff: tuple):
     test_case_x(flow0)
     test_case_x(flow1)
     test_case_x(flow2)
+
+    """
+    Continue debugging. I asked this question because this function doesn't work:
+    - I figured out this returns the shape (frames-1, w). So either the function or docstring is wrong
+    """
 
 
 """
