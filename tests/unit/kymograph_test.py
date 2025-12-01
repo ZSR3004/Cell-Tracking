@@ -194,11 +194,66 @@ def test_mask_line_arr(init_tiff: tuple):
     test_case_x(flow2, threshold3)
     test_case_x(flow2, threshold4)
 
-"""
-Write test_mask_line_arr
-"""
-#I finished test_flatten_arr
 
-"""
-Write test_plot_basic_kymo
-"""
+def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the plot_basic_kymo function works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Returns:
+        None.
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    def dummy_optical_flow(channel: int):
+        """
+        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
+        faster than calling flow.optical_flow (which is why it's perfect for testing).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    #flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    flow0 = dummy_optical_flow(0)
+    flow1 = dummy_optical_flow(1)
+    flow2 = dummy_optical_flow(2)
+
+    threshold1 = 0.5
+    threshold2 = 0.0
+    threshold3 = 1.5
+    threshold4 = 0.25
+
+    WRITE SAVE_PATHS HERE!
+
+    def test_case_x(flowx: np.ndarray, save_path_x: str, thresholdx: float):
+        """
+        Tests whether the plot_basic_kymo function works correctly on a specific test case.
+
+        Args:
+            flowx (np.ndarray): Flow array of shape (frames-1, height, width, 2).
+            save_path_x (str): Path to save the plot. If None, the plot will be displayed instead of saved.
+            thresholdx (float): Threshold value to mask the array.
+
+        Returns:
+            None.
+        """

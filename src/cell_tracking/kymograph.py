@@ -46,7 +46,7 @@ def plot_basic_kymo(arr: np.ndarray, save_path: str, threshold: float=0.5):
 
     Args:
         arr (np.ndarray): Input array of shape (frames-1, height, width, 2), where the last dimension contains the flow vectors (dx, dy).
-        save_path (str): Path to save the plot. If None, the plot will be displayed instead of saved. Defaults to current working directory.
+        save_path (str): Path to save the plot. If None, the plot will be displayed instead of saved.
         threshold (float, optional): Threshold value to mask the array. Defaults to 0.5.
     
     Returns:
@@ -56,7 +56,7 @@ def plot_basic_kymo(arr: np.ndarray, save_path: str, threshold: float=0.5):
               in magenta, and the overlap in blue.
               The plot is saved to the specified path or displayed if no path is provided.
     """
-    def mask_boundary (channel_arr: np.ndarray, threshold: float=0.5):
+    def mask_boundary(channel_arr: np.ndarray, threshold: float=0.5):
         return mask_line_arr(flatten_arr(channel_arr))
 
     masked_line_arr1 = mask_boundary(arr[:, 1, ...], threshold=threshold)
