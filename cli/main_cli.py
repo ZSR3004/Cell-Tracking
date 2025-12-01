@@ -168,8 +168,8 @@ def main():
             if "Raw Data" in outputs:
                 #Change to raw data  directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-                s.save_arr_cli(my_video.arr[:,1,:,:])
-                s.save_arr_cli(my_video.arr[:,2,:,:])
+                s.save_arr("tiff_array_1", my_video, os.getcwd)
+                s.save_arr("tiff_array_2", my_video, os.getcwd)
 
             if "Heatmap" in outputs:
                 #Change to heatmap directory, save isolated flow data
@@ -194,7 +194,7 @@ def main():
         if "Raw Data" in outputs:
             #Change to raw data directory, save raw Tiff array
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr_cli(my_video.arr[:,0,:,:])
+            s.save_arr("tiff_array", my_video, os.getcwd())
 
         if "Heatmap" in outputs:
             #Change to heatmap directory, save combined heatmap video
@@ -222,7 +222,7 @@ def main():
         
         if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr_cli(my_video.arr)
+            s.save_arr("tiff_array", my_video, os.getcwd())
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")

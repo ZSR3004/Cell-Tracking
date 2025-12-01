@@ -34,7 +34,7 @@ def save_flow_cli(name: str,
     saving.save_optical_flow_as_matlab(name, opt_flow, main_path)
     saving.save_optical_flow_as_numpy(name, opt_flow, main_path)
 
-def save_arr_cli(arr : np.array) -> None:
+def save_arr_cli(name: str, tiff_instance: tiff.Tiff, main_path: str) -> None:
     """
     Saves a numpy array to a file.
     
@@ -44,7 +44,7 @@ def save_arr_cli(arr : np.array) -> None:
     Returns:
         None: Just saves the array to a file.
     """
-    saving.save_arr(arr)
+    saving.save_arr(name, tiff_instance, main_path)
 
 
 def save_original_video_cli(name: str, file_path: str, channel_idx: int) -> None:
