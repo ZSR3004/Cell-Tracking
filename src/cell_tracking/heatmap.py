@@ -7,14 +7,14 @@ import matplotlib.colors as colors
 
 def vector_magnitude_heatmaps(flow: np.ndarray, normalize=True):
     """
-    Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
+    Computes magnitude heatmaps from a flow array of shape (frames-1, height, width, 2).
 
     Args:
-        flow (np.ndarray): Flow array of shape (frames, height, width, 2) with (dx, dy) vectors.
+        flow (np.ndarray): Flow array of shape (frames-1, height, width, 2) with (dx, dy) vectors.
         normalize (bool): If True, normalizes magnitudes to 0-255 range for visualization.
 
     Returns:
-        heatmaps (np.ndarray): Array of shape (frames, height, width), with type uint8.
+        heatmaps (np.ndarray): Array of shape (frames-1, height, width), with type uint8.
     """
     magnitudes = np.linalg.norm(flow, axis=-1)
 
@@ -35,7 +35,7 @@ def save_heatmap_video(flow: np.ndarray, output_path: str, fps=10, normalize=Tru
     Saves a heatmap video (MP4) from a flow array using matplotlib.
 
     Args:
-        flow (np.ndarray): Flow array of shape (frames, height, width, 2).
+        flow (np.ndarray): Flow array of shape (frames-1, height, width, 2).
         output_path (str): Path to save the MP4 video to.
         fps (int): Frames per second of the output video.
         normalize (bool): Whether to normalize magnitudes per frame.

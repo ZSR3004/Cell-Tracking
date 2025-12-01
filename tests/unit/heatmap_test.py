@@ -85,7 +85,7 @@ def test_vector_magnitude_heatmaps(init_tiff: tuple):
         Tests whether the vector_magnitude_heatmaps function works correctly on a specific test case.
 
         Args:
-            flowx (np.ndarray): Flow array of shape (frames, height, width, 2).
+            flowx (np.ndarray): Flow array of shape (frames-1, height, width, 2).
             normalizex (bool): If True, normalizes magnitudes to 0-255 range for visualization.
 
         Returns:
@@ -184,7 +184,7 @@ def test_save_heatmap_video(init_tiff: tuple, tmp_path):
         Tests whether the save_heatmap_video function works correctly on a specific test case.
 
         Args:
-            flowx (np.ndarray): Flow array of shape (frames, height, width, 2).
+            flowx (np.ndarray): Flow array of shape (frames-1, height, width, 2).
             output_pathx (str): Path to save the MP4 video to.
             fpsx (int): Frames per second of the output video.
             normalizex (bool): Whether to normalize magnitudes per frame.
