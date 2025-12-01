@@ -111,18 +111,14 @@ def test_flatten_arr(init_tiff: tuple):
             mock_linalg_norm.assert_called_once()
             assert mock_median.call_count == flowx.shape[0]
 
-            assert result.shape == (f-1, h, w)
+            assert result.shape == (f-1, w)
             assert isinstance(result, np.ndarray)
 
     test_case_x(flow0)
     test_case_x(flow1)
     test_case_x(flow2)
 
-    """
-    Continue debugging. I asked this question because this function doesn't work:
-    - I figured out this returns the shape (frames-1, w). So either the function or docstring is wrong
-    """
-
+#I finished test_flatten_arr
 
 """
 Write test_mask_line_arr after i get answers to questions I asked the group chat.

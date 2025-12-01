@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import os
 
-def flatten_arr(arr : np.ndarray) -> np.ndarray:
+def flatten_arr(arr: np.ndarray):
     """
     Flattens the input array along the last axis and returns a 2D array.
     The input array is expected to have a shape of (frames-1, height, width, 2),
@@ -13,13 +13,13 @@ def flatten_arr(arr : np.ndarray) -> np.ndarray:
         arr (np.ndarray): Input array of shape (frames-1, height, width, 2).
 
     Returns:
-        np.ndarray: Flattened 2D array of shape (frames-1, height, width).
+        np.ndarray: Flattened 2D array of shape (frames-1, width).
     """
     mag_per_frame = np.linalg.norm(arr, axis=-1)
     mag_arr = np.array([np.median(mag_per_frame[i, :, :], axis=0) for i in range(arr.shape[0])])
     return mag_arr
 
-def mask_line_arr(line_arr : np.ndarray, threshold : int = 0.5) -> np.ndarray:
+def mask_line_arr(line_arr: np.ndarray, threshold: int = 0.5):
     """
     Masks the input array by setting values below a threshold to zero and
     keeping the maximum value in the array. This is useful for visualizing
@@ -37,7 +37,7 @@ def mask_line_arr(line_arr : np.ndarray, threshold : int = 0.5) -> np.ndarray:
     masked_line_arr = np.where(line_arr > threshold, max_val, 0)
     return masked_line_arr
 
-def plot_basic_kymo(arr: np.ndarray, threshold=0.5, save_path=os.getcwd()) -> None:
+def plot_basic_kymo(arr: np.ndarray, threshold=0.5, save_path=os.getcwd()):
     """
     Plots a kymograph from the input array, which is expected to be a 4D array
     with shape (frames, height, width, 2). The kymograph visualizes
