@@ -12,7 +12,7 @@ from unittest.mock import patch, Mock, MagicMock, call
 import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from src.cell_tracking import tiffclass as tiff
-from src.cell_tracking import kymograph
+from src.cell_tracking import kymograph as kymo
 
 TIFF_PATHS = [
     (
@@ -97,7 +97,7 @@ def test_flatten_arr(init_tiff: tuple):
             #mock_median.side_effect returns an array of shape (w), which is the same shape as np.median(mag_per_frame[i, :, :], axis=0) (note: the shape of mag_per_frame[i, :, :] is (h, w))
             mock_median.side_effect = lambda arr1, **axis1: arr1[0, :]
 
-            result = kymograph.flatten_arr(flowx)
+            result = kymo.flatten_arr(flowx)
 
             args_linalg_norm, kwargs_linalg_norm = mock_linalg_norm.call_args
             assert np.array_equal(args_linalg_norm[0], flowx)
@@ -164,7 +164,7 @@ def test_mask_line_arr(init_tiff: tuple):
             mock_max.side_effect = lambda x: x[0, 0, 0]
             mock_where.return_value = flowx
 
-            result = kymograph.mask_line_arr(flowx, thresholdx)
+            result = kymo.mask_line_arr(flowx, thresholdx)
 
             args_max, _ = mock_max.call_args
             assert np.array_equal(args_max[0], flowx)
@@ -289,7 +289,7 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
                 """
                 Function that's inside plot_basic_kymo. This function is needed to create masked_line_arr1 and masked_line_arr2.
                 """
-                return kymograph.mask_line_arr(kymograph.flatten_arr(channel_arr))
+                return kymo.mask_line_arr(kymo.flatten_arr(channel_arr))
 
             masked_line_arr1 = mask_boundary(flowx[:, 1, ...], threshold=thresholdx)
             masked_line_arr2 = mask_boundary(flowx[:, 2, ...], threshold=thresholdx)
@@ -304,17 +304,20 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             colors = ['black', custom_green, custom_magenta, custom_blue]
             cmap = mcolors.ListedColormap(colors)
 
-            kymograph.plot_basic_kymo(flowx, thresholdx, save_path_x)
+            kymo.plot_basic_kymo(flowx, thresholdx, save_path_x)
 
             flowx_1 = flowx[:, 1, ...]
             flowx_2 = flowx[:, 2, ...]
 
-            assert np.array_equal(mock_flatten_arr.call_args_list, np.array([call(flowx_1, None), call(flowx_2, None)]))
+            for i, flowx_x in enumerate([flowx_1, flowx_2]):
+                assert np.array_equal(mock_flatten_arr.call_args_list[i][0][0], flowx_x)
 
-            flowx_1_flatten = kymograph.flatten_arr(flowx_1)
-            flowx_2_flatten = kymograph.flatten_arr(flowx_2)
+            flowx_1_flatten = kymo.flatten_arr(flowx_1)
+            flowx_2_flatten = kymo.flatten_arr(flowx_2)
 
-            assert np.array_equal(mock_mask_line_arr.call_args_list, np.array([call(flowx_1_flatten, None), call(flowx_2_flatten, None)]))
+            for i, flowx_x_flatten in enumerate([flowx_1_flatten, flowx_2_flatten]):
+                assert np.array_equal(mock_mask_line_arr.call_args_list[i][0][0], flowx_x_flatten)
+                assert mock_mask_line_arr.call_args_list[i][1]["threshold"] == None
             
             _, kwargs_figure = mock_figure.call_args
             assert kwargs_figure["figsize"] == (10, 5)
