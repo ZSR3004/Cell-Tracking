@@ -118,16 +118,87 @@ def test_flatten_arr(init_tiff: tuple):
     test_case_x(flow1)
     test_case_x(flow2)
 
+
+def test_mask_line_arr(init_tiff: tuple):
+    """
+    Tests whether the mask_line_arr function works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+
+    Returns:
+        None.
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    #flow0, flow1, and flow2 have shape (f, h, w)
+    flow0 = tiff_arr[:, 0, :, :]
+    flow1 = tiff_arr[:, 1, :, :]
+    flow2 = tiff_arr[:, 2, :, :]
+
+    threshold1 = 0.5
+    threshold2 = 0.0
+    threshold3 = 1.5
+    threshold4 = 0.25
+
+    def test_case_x(flowx: np.ndarray, thresholdx: float):
+        """
+        Tests whether the mask_line_arr function works correctly on a specific test case.
+
+        Args:
+            flowx (np.ndarray): Flow array of shape (frames, height, width).
+            thresholdx (float): Threshold value to mask the array.
+
+        Returns:
+            None.
+        """
+        with patch("numpy.max") as mock_max, \
+            patch("numpy.where") as mock_where:
+            mock_max.side_effect = lambda x: x[0, 0, 0]
+            mock_where.side_effect = lambda x: x
+
+            result = kymograph.mask_line_arr(flowx, thresholdx)
+
+            args_max, _ = mock_max.call_args
+            assert np.array_equal(args_max[0], flowx)
+
+            args_where, _ = mock_where.call_args
+            assert args_where[0] == flowx > thresholdx
+            assert np.array_equal(args_where[1], flowx[0, 0, 0])
+            assert args_where[2] == 0
+
+            mock_max.assert_called_once()
+            mock_where.assert_called_once()
+
+            assert result.shape == (f, h, w)
+            assert result.shape == flowx.shape
+            assert isinstance(result, np.ndarray)
+
+    test_case_x(flow0, threshold1)
+    test_case_x(flow0, threshold2)
+    test_case_x(flow0, threshold3)
+    test_case_x(flow0, threshold4)
+    test_case_x(flow1, threshold1)
+    test_case_x(flow1, threshold2)
+    test_case_x(flow1, threshold3)
+    test_case_x(flow1, threshold4)
+    test_case_x(flow2, threshold1)
+    test_case_x(flow2, threshold2)
+    test_case_x(flow2, threshold3)
+    test_case_x(flow2, threshold4)
+
+"""
+Write test_mask_line_arr
+"""
 #I finished test_flatten_arr
 
 """
-Write test_mask_line_arr after i get answers to questions I asked the group chat.
-Questions: 
-none
-"""
-
-"""
-Write test_plot_basic_kymo after i get answers to questions I asked the group chat.
-Questions: 
-- why does save_path default to current working directory? Personally I think it shouldn't default to anything
+Write test_plot_basic_kymo
 """

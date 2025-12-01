@@ -19,7 +19,7 @@ def flatten_arr(arr: np.ndarray):
     mag_arr = np.array([np.median(mag_per_frame[i, :, :], axis=0) for i in range(arr.shape[0])])
     return mag_arr
 
-def mask_line_arr(line_arr: np.ndarray, threshold: int = 0.5):
+def mask_line_arr(line_arr: np.ndarray, threshold: int=0.5):
     """
     Masks the input array by setting values below a threshold to zero and
     keeping the maximum value in the array. This is useful for visualizing
@@ -30,8 +30,8 @@ def mask_line_arr(line_arr: np.ndarray, threshold: int = 0.5):
         threshold (int, optional): Threshold value to mask the array. Defaults to 0.5.
 
     Returns:
-        np.ndarray: Masked array where values below the threshold are set to zero,
-                    and the maximum value in the array is retained.
+        np.ndarray: Masked array where values below the threshold are set to zero, and the 
+                    maximum value in the array is retained. Shape is (frames, height, width).
     """
     max_val = np.max(line_arr)
     masked_line_arr = np.where(line_arr > threshold, max_val, 0)
