@@ -18,7 +18,7 @@ if ROOT_DIR not in sys.path:
 from src.cell_tracking.memory import MemoryManager
 
 OUTPUT_OPTIONS = [
-    "Optical Flow Video",
+    "Optical Flow Data",
     "Heatmap",
     "Kymograph",
     "Raw Data"
@@ -138,66 +138,75 @@ def main():
     outputs = desired_outputs()
 
     #Ask user what kind of video they input, do optical flow calculation
-    os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
     vid_type = get_video_type()
         
     if vid_type == 'n':
-        flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 0)
-        flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
+        combined_flow = opt.calculate_combined_flow(my_video.arr)
 
+        #Change to Tiff specific directory
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
-        s.save_original_video_cli("Original_Video_Left", full_path, 1)
-        s.save_original_video_cli("Original_Video_Right", full_path, 2)
 
-        os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
-        answer = click.prompt("Do you want to calculate the combined flows of channels 1 and 2? [y/n]", 
+        s.save_original_video_cli("Original_Video_Combined", full_path, 0)
+
+        answer = click.prompt("Do you want to calculate the isolated flows of channels 1 and 2? [y/n]", 
                          type=click.Choice(['y', 'n'], case_sensitive=False))
             
         if answer.lower() == 'y':
-            combined_flow = opt.calculate_combined_flow(my_video.arr)
-            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
-            s.save_original_video_cli("Original_Video_Combined", full_path, 0)
+            flow_channel_1 = opt.calculate_nuclei_optical__flow(my_video.arr, 1)
+            flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 2)
 
-            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+            s.save_original_video_cli("Original_Video_Left", full_path, 1)
+            s.save_original_video_cli("Original_Video_Right", full_path, 2)
+
+            #all the procedures for isolated flow
+            if "Optical Flow Data" in outputs:
+                #Change to opt flow directory, save isolated flow data
+                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+                s.save_flow_cli("Channel_1", flow_channel_1, os.getcwd())
+                s.save_flow_cli("Channel_2", flow_channel_2, os.getcwd())
 
             if "Raw Data" in outputs:
+                #Change to raw data  directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-                s.save_flow_cli("Combined_Flow", combined_flow, os.getcwd())
-                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
-
-            
-            if "Optical Flow Video" in outputs:
-                #call save vector video here
-                pass
+                s.save_arr_cli(my_video.arr[:,1,:,:])
+                s.save_arr_cli(my_video.arr[:,2,:,:])
 
             if "Heatmap" in outputs:
+                #Change to heatmap directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-                v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "/heatmap_combined_flow"))
+                v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "/heatmap_channel_1"))
+                v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"/heatmap_channel_2"))
                 
             if "Kymograph" in outputs:
+                #Change to kymograph directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-                v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "/kymo_combined_flow"))
+                v.plot_basic_kymo_cli(flow_channel_1, os.path.join(os.getcwd(), "/kymo_channel_1"))
+                v.plot_basic_kymo_cli(flow_channel_2, os.path.join(os.getcwd(), "/kymo_channel_2"))
 
+
+        #all the procedures for combined flow
+        if "Optical Flow Data" in outputs:
+            #Change to opt flow directory, save combined flow data
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+            s.save_flow_cli("Combined_Flow", combined_flow, os.getcwd())
+
+            
         if "Raw Data" in outputs:
+            #Change to raw data directory, save raw Tiff array
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_flow_cli("Channel_1", flow_channel_1, os.getcwd())
-            s.save_flow_cli("Channel_2", flow_channel_2, os.getcwd())
-        
-        if "Optical Flow Video" in outputs:
-                #call save vector video here
-                pass
+            s.save_arr_cli(my_video.arr[:,0,:,:])
 
         if "Heatmap" in outputs:
+            #Change to heatmap directory, save combined heatmap video
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-            v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "/heatmap_channel_1"))
-            v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"/heatmap_channel_2"))
+            v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "/heatmap_combined_flow"))
                 
         if "Kymograph" in outputs:
+            #Change to kymograph directory, save combined kymograph
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            v.plot_basic_kymo_cli(flow_channel_1, os.path.join(os.getcwd(), "/kymo_channel_1"))
-            v.plot_basic_kymo_cli(flow_channel_2, os.path.join(os.getcwd(), "/kymo_channel_2"))
+            v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "/kymo_combined_flow"))
 
-        os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+
 
     elif vid_type == 'p':
         raft_flow = opt.calculate_raft_optical_flow(my_video)
@@ -207,14 +216,13 @@ def main():
         s.save_original_video_cli("Original_Video_Left", full_path, 1)
         s.save_original_video_cli("Original_Video_Right", full_path, 2)
 
+        if "Optical Flow Data" in outputs:
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+            s.save_flow_cli("Flow", raft_flow, os.getcwd())
+        
         if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_flow_cli("Flow", raft_flow, os.getcwd())
-            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
-        
-        if "Optical Flow Video" in outputs:
-            #call save vector video here
-            pass
+            s.save_arr_cli(my_video.arr)
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
