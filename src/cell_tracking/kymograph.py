@@ -6,14 +6,14 @@ import os
 def flatten_arr(arr : np.ndarray) -> np.ndarray:
     """
     Flattens the input array along the last axis and returns a 2D array.
-    The input array is expected to have a shape of (frames, height, width 2),
-    where the last dimension contains the x and y components of flow vectors.
+    The input array is expected to have a shape of (frames-1, height, width, 2),
+    where the last dimension contains the flow vectors (dx, dy).
 
     Args:
-        arr (np.ndarray): Input array of shape (frames, height, width, 2).
+        arr (np.ndarray): Input array of shape (frames-1, height, width, 2).
 
     Returns:
-        np.ndarray: Flattened 2D array of shape (frames, height, width),
+        np.ndarray: Flattened 2D array of shape (frames-1, height, width).
     """
     mag_per_frame = np.linalg.norm(arr, axis=-1)
     mag_arr = np.array([np.median(mag_per_frame[i, :, :], axis=0) for i in range(arr.shape[0])])
@@ -37,7 +37,7 @@ def mask_line_arr(line_arr : np.ndarray, threshold : int = 0.5) -> np.ndarray:
     masked_line_arr = np.where(line_arr > threshold, max_val, 0)
     return masked_line_arr
 
-def plot_basic_kymo(arr:np.ndarray, threshold=0.5, save_path = os.getcwd()) -> None:
+def plot_basic_kymo(arr: np.ndarray, threshold=0.5, save_path=os.getcwd()) -> None:
     """
     Plots a kymograph from the input array, which is expected to be a 4D array
     with shape (frames, height, width, 2). The kymograph visualizes
@@ -58,7 +58,7 @@ def plot_basic_kymo(arr:np.ndarray, threshold=0.5, save_path = os.getcwd()) -> N
               The plot is saved to the specified path or displayed if no path is provided.
     """
     def mask_boundary (channel_arr: np.ndarray, threshold: float = 0.5) -> np.ndarray:
-        return  mask_line_arr(flatten_arr(channel_arr))
+        return mask_line_arr(flatten_arr(channel_arr))
 
     masked_line_arr1 = mask_boundary(arr[:, 1, ...], threshold=threshold)
     masked_line_arr2 = mask_boundary(arr[:, 2, ...], threshold=threshold)
