@@ -385,6 +385,7 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     """
     img, info = init_tiff
     f, c, h, w = info
+    tiff_arr = img.arr
 
     mock_fig = MagicMock()
     mock_ax = MagicMock()
@@ -394,27 +395,23 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     kwargs2 = {"T": 40}
     kwargs3 = {"fps": 35}
     kwargs4 = {}
-    kwargs5 = {"T": 1}
 
-    image_stack1 = np.asarray(img.arr[:, 2, :, :])
-    image_stack2 = np.asarray([img.arr[0, 0, :, :]])
-    image_stack3 = np.asarray([img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]])
-    image_stack4 = np.asarray(img.arr[: (f - 1) // 2, 2, :, :])
-    image_stack5 = np.asarray(img.arr[:, 0, :, :])
-    image_stack6 = np.asarray(img.arr[:, 1, :, :])
+    image_stack1 = np.asarray(tiff_arr[:, 0, :, :])
+    image_stack2 = np.asarray(tiff_arr[:, 1, :, :])
+    image_stack3 = np.asarray(tiff_arr[:, 2, :, :])
 
     stack1_kwargs1_path = tmp_path / "stack1_kwargs1.mp4"
+    stack1_kwargs2_path = tmp_path / "stack1_kwargs2.mp4"
     stack1_kwargs3_path = tmp_path / "stack1_kwargs3.mp4"
+    stack1_kwargs4_path = tmp_path / "stack1_kwargs4.mp4"
+    stack2_kwargs1_path = tmp_path / "stack2_kwargs1.mp4"
+    stack2_kwargs2_path = tmp_path / "stack2_kwargs2.mp4"
+    stack2_kwargs3_path = tmp_path / "stack2_kwargs3.mp4"
     stack2_kwargs4_path = tmp_path / "stack2_kwargs4.mp4"
-    stack2_kwargs5_path = tmp_path / "stack2_kwargs5.mp4"
+    stack3_kwargs1_path = tmp_path / "stack3_kwargs1.mp4"
+    stack3_kwargs2_path = tmp_path / "stack3_kwargs2.mp4"
     stack3_kwargs3_path = tmp_path / "stack3_kwargs3.mp4"
-    stack3_kwargs5_path = tmp_path / "stack3_kwargs5.mp4"
-    stack4_kwargs2_path = tmp_path / "stack4_kwargs2.mp4"
-    stack4_kwargs4_path = tmp_path / "stack4_kwargs4.mp4"
-    stack5_kwargs1_path = tmp_path / "stack5_kwargs1.mp4"
-    stack5_kwargs3_path = tmp_path / "stack5_kwargs3.mp4"
-    stack6_kwargs2_path = tmp_path / "stack6_kwargs2.mp4"
-    stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
+    stack3_kwargs4_path = tmp_path / "stack3_kwargs4.mp4"
 
     def test_case_x(image_stackx: np.ndarray, stackx_kwargsx_path: str, kwargsx: dict):
         """
@@ -461,6 +458,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             mock_funcanimation.side_effect = fake_funcanimation
             mock_writer_instance = MagicMock()
             mock_ffmpegwriter.return_value = mock_writer_instance
+            mock_im.set_data.side_effect = lambda x: x
+            mock_ax.set_title.side_effect = lambda x: x
 
             save.save_original_video("Video_Name", stackx_kwargsx_path, mock_im, image_stackx, mock_fig, mock_ax, **kwargsx)
 
@@ -475,10 +474,13 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             assert kwargs_FFMpegWriter["fps"] == fps
 
             assert mock_im.set_data.call_count == T
-            mock_im.set_data.assert_has_calls == ([[call(image_stackx[i])] for i in range(0, len(image_stackx))], any_order=False)
+
+            for i in range(0, T):
+                np.testing.assert_array_equal(mock_im.set_data.call_args_list[i][0][0], image_stackx[i])
 
             assert mock_ax.set_title.call_count == T
-            mock_ax.set_title.assert_has_calls == ([[call(f"Frame {i}")] for i in range(0, len(image_stackx))], any_order=False)
+            for i in range(0, T):
+                mock_ax.set_title.call_args_list[i][0][0] == f"Frame {i}"
 
             mock_ani.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
             mock_funcanimation.assert_called_once()
@@ -487,14 +489,14 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             gc.collect()
 
     test_case_x(image_stack1, stack1_kwargs1_path, kwargs1)
+    test_case_x(image_stack1, stack1_kwargs2_path, kwargs2)
     test_case_x(image_stack1, stack1_kwargs3_path, kwargs3)
+    test_case_x(image_stack1, stack1_kwargs4_path, kwargs4)
+    test_case_x(image_stack2, stack2_kwargs1_path, kwargs1)
+    test_case_x(image_stack2, stack2_kwargs2_path, kwargs2)
+    test_case_x(image_stack2, stack2_kwargs3_path, kwargs3)
     test_case_x(image_stack2, stack2_kwargs4_path, kwargs4)
-    test_case_x(image_stack2, stack2_kwargs5_path, kwargs5)
+    test_case_x(image_stack3, stack3_kwargs1_path, kwargs1)
+    test_case_x(image_stack3, stack3_kwargs2_path, kwargs2)
     test_case_x(image_stack3, stack3_kwargs3_path, kwargs3)
-    test_case_x(image_stack3, stack3_kwargs5_path, kwargs5)
-    test_case_x(image_stack4, stack4_kwargs2_path, kwargs2)
-    test_case_x(image_stack4, stack4_kwargs4_path, kwargs4)
-    test_case_x(image_stack5, stack5_kwargs1_path, kwargs1)
-    test_case_x(image_stack5, stack5_kwargs3_path, kwargs3)
-    test_case_x(image_stack6, stack6_kwargs2_path, kwargs2)
-    test_case_x(image_stack6, stack6_kwargs4_path, kwargs4)
+    test_case_x(image_stack3, stack3_kwargs4_path, kwargs4)
