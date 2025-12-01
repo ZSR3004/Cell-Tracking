@@ -91,9 +91,9 @@ def test_flatten_arr(init_tiff: tuple):
         """
         with patch("numpy.linalg.norm") as mock_linalg_norm, \
             patch("numpy.median") as mock_median:
-            #fake_flow has shape (f-1, h, w), which is the same shape as np.linalg.norm(flowx, axis=-1)
-            fake_flow = flowx[..., 0]
-            mock_linalg_norm.return_value = fake_flow
+            #mock_linalg_norm_flow has shape (f-1, h, w), which is the same shape as np.linalg.norm(flowx, axis=-1)
+            mock_linalg_norm_flow = flowx[..., 0]
+            mock_linalg_norm.return_value = mock_linalg_norm_flow
             #mock_median.side_effect returns an array of shape (w), which is the same shape as np.median(mag_per_frame[i, :, :], axis=0) (note: the shape of mag_per_frame[i, :, :] is (h, w))
             mock_median.side_effect = lambda arr1, **axis1: arr1[0, :]
 
@@ -105,7 +105,7 @@ def test_flatten_arr(init_tiff: tuple):
 
             for i, call_args_kwargs in enumerate(mock_median.call_args_list):
                 args_median, kwargs_median = call_args_kwargs
-                assert np.array_equal(args_median[0], fake_flow[i, :, :])
+                assert np.array_equal(args_median[0], mock_linalg_norm_flow[i, :, :])
                 assert kwargs_median["axis"] == 0
 
             mock_linalg_norm.assert_called_once()
@@ -257,3 +257,92 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
+        with patch("src.cell_tracking.kymograph.flatten_arr") as mock_flatten_arr, \
+            patch("src.cell_tracking.kymograph.mask_line_arr") as mock_mask_line_arr, \
+            patch("numpy.zeros_like") as mock_zeros_like, \
+            patch("matplotlib.pyplot.figure") as mock_figure, \
+            patch("matplotlib.pyplot.imshow") as mock_imshow, \
+            patch("matplotlib.pyplot.title") as mock_title, \
+            patch("matplotlib.pyplot.xlabel") as mock_xlabel, \
+            patch("matplotlib.pyplot.ylabel") as mock_ylabel, \
+            patch("matplotlib.pyplot.savefig") as mock_savefig, \
+            patch("matplotlib.pyplot.close") as mock_close, \
+            patch("matplotlib.pyplot.show") as mock_show:
+            #mock_flatten_arr_flow has shape (f-1, w), which is the same shape as kymograph.flatten_arr(flowx)
+            mock_flatten_arr_flow = flowx[:, 0, :, 0]
+            mock_flatten_arr.return_value = mock_flatten_arr_flow
+            #mock_mask_line_arr_flow returns an array of shape (f, h, w), which is the same shape as kymograph.flatten_arr(arr1) (where arr1 is an array of shape (f, h, w))
+            mock_mask_line_arr.side_effect = lambda x: x
+
+            def mask_boundary(channel_arr: np.ndarray, threshold: float=0.5):
+                """
+                Function that's inside plot_basic_kymo. This function is needed to create masked_line_arr1 and masked_line_arr2.
+                """
+                return kymograph.mask_line_arr(kymograph.flatten_arr(channel_arr))
+
+            masked_line_arr1 = mask_boundary(flowx[:, 1, ...], threshold=thresholdx)
+            masked_line_arr2 = mask_boundary(flowx[:, 2, ...], threshold=thresholdx)
+
+            combined_data = np.zeros_like(masked_line_arr1)
+            combined_data[masked_line_arr1 != 0] += 1
+            combined_data[masked_line_arr2 != 0] += 2
+
+            custom_green = (119/255, 237/255, 130/255)
+            custom_magenta = (201/255, 107/255, 232/255)
+            custom_blue = (18/255, 105/255, 204/255)
+            colors = ['black', custom_green, custom_magenta, custom_blue]
+            cmap = mcolors.ListedColormap(colors)
+
+            kymograph.plot_basic_kymo(flowx, save_path_x, thresholdx)
+
+            flowx_1 = flowx[:, 1, ...]
+            flowx_2 = flowx[:, 2, ...]
+
+            assert np.array_equal(mock_flatten_arr.call_args_list, np.array([call(flowx_1, None), call(flowx_2, None)]))
+
+            flowx_1_flatten = kymograph.flatten_arr(flowx_1)
+            flowx_2_flatten = kymograph.flatten_arr(flowx_2)
+
+            assert np.array_equal(mock_mask_line_arr.call_args_list, np.array([call(flowx_1_flatten, None), call(flowx_2_flatten, None)]))
+            
+            _, kwargs_figure = mock_figure.call_args
+            assert kwargs_figure["figsize"] == (10, 5)
+
+            args_imshow, kwargs_imshow = mock_imshow.call_args
+            assert np.array_equal(args_imshow[0], combined_data)
+            
+
+
+
+            #assert called
+            mock_zeros_like.assert_called_once_with(masked_line_arr1)
+
+            """
+            Assert args:
+            DONE mask_line_arr
+            DONE flatten_arr
+            DONE zeros_like
+            DONE figure
+            imshow
+            title
+            xlabel
+            ylabel
+            savefig
+            close
+            show
+
+            Assert called:
+            mask_line_arr (called twice) (or three times?)
+            flatten_arr (called twice) (or three times?)
+            DONE zeros_like
+            figure
+            imshow
+            title
+            xlabel
+            ylabel
+            savefig
+            close
+            show
+            """
+
+            #DON'T need to assert if it was saved
