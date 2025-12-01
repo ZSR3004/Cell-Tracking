@@ -123,14 +123,11 @@ def test_flatten_arr(init_tiff: tuple):
 """
 Write test_mask_line_arr after i get answers to questions I asked the group chat.
 Questions: 
-- in the docstring it says threshold defaults to 0, but in the parameters it looks like it defaults to 0.5. Which is right?
+none
 """
 
 """
 Write test_plot_basic_kymo after i get answers to questions I asked the group chat.
 Questions: 
-- in the docstring it says threshold defaults to 0, but in the parameters it looks like it defaults to 0.5. Which is right?
-- if the input array (arr) has shape (frames, height, width, 2), shouldn't it actually have the shape (frames-1, height, width, 2)? 
-- Also does the last dimension contain the flow vectors (dx, dy)? 
 - why does save_path default to current working directory? Personally I think it shouldn't default to anything
 """
