@@ -391,6 +391,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     mock_ax = MagicMock()
     mock_im = MagicMock()
 
+    mock_im.set_data = MagicMock()
+    mock_ax.set_title = MagicMock()
+
     kwargs1 = {"T": 10, "fps": 20}
     kwargs2 = {"T": 40}
     kwargs3 = {"fps": 35}
@@ -427,41 +430,17 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
-        T = kwargsx.get("T", image_stackx.shape[0])
-        fps = kwargsx.get("fps", 10)
-
-        def fake_funcanimation(fig, update, frames=T, interval=1000 / fps, blit=False):
-            """
-            A fake version of the animation.FuncAnimation function in save_original_video. This fake_funcanimation function 
-            was created to be the side effect for mock_funcanimation and simulates calling the update function for each frame.
-
-            Args:
-                fig (matplotlib.figure.Figure): Matplotlib figure object for the plot.
-                update (callable): The function called once per frame.
-                frames (int): Determines the number of frames passed to update.
-                interval (int): Delay between frames in milliseconds.
-                blit (bool): If True, only redraws parts of the figure that have changed (more efficient). 
-                             If False, redraws the whole figure for every frame.
-
-            Returns:
-                mock_ani (mock.MagicMock): A mock animation object that simulates an instance of matplotlib.animation.FuncAnimation.
-            """
-            for frame in range(0, frames):
-                mock_im.set_data(image_stackx[frame])
-                mock_ax.set_title(f"Frame {frame}")
-            return mock_ani
-
         with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter, \
             patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation:
             mock_ani = MagicMock()
             mock_funcanimation.return_value = mock_ani
-            mock_funcanimation.side_effect = fake_funcanimation
             mock_writer_instance = MagicMock()
             mock_ffmpegwriter.return_value = mock_writer_instance
-            mock_im.set_data.side_effect = lambda x: x
-            mock_ax.set_title.side_effect = lambda x: x
 
             save.save_original_video("Video_Name", stackx_kwargsx_path, mock_im, image_stackx, mock_fig, mock_ax, **kwargsx)
+
+            T = kwargsx.get("T", image_stackx.shape[0])
+            fps = kwargsx.get("fps", 10)
 
             args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
             assert args_FuncAnimation[0] == mock_fig
@@ -472,15 +451,6 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
 
             _, kwargs_FFMpegWriter = mock_ffmpegwriter.call_args
             assert kwargs_FFMpegWriter["fps"] == fps
-
-            assert mock_im.set_data.call_count == T
-
-            for i in range(0, T):
-                np.testing.assert_array_equal(mock_im.set_data.call_args_list[i][0][0], image_stackx[i])
-
-            assert mock_ax.set_title.call_count == T
-            for i in range(0, T):
-                mock_ax.set_title.call_args_list[i][0][0] == f"Frame {i}"
 
             mock_ani.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
             mock_funcanimation.assert_called_once()
