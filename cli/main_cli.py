@@ -7,6 +7,7 @@ import saving_cli as s
 import questionary
 import matplotlib.pyplot as plt
 from pathlib import Path
+import numpy as np
 
 import os
 import sys
@@ -70,16 +71,16 @@ def desired_outputs() -> tuple:
     
     return outputs
 
-def get_video_type() -> str:
+def get_output_type() -> str:
     """
-    Asks user what type of video they input
+    Asks user what type of calculation they want to do
 
     Args: None
 
     Returns: string of their answer
     """
 
-    my_video = click.prompt("Type in the type of video you input (n for nuclei dyed, p for phase contrast)", type=str)
+    my_video = click.prompt("Type in the type of optical flow you want to calculate (f for farneback, r for raft):", type=str)
 
     return my_video
 
@@ -139,9 +140,9 @@ def main():
     outputs = desired_outputs()
 
     #Ask user what kind of video they input, do optical flow calculation
-    vid_type = get_video_type()
+    output_type = get_output_type()
         
-    if vid_type == 'n':
+    if output_type == 'f':
         combined_flow = opt.calculate_combined_flow(my_video.arr)
 
         #Change to Tiff specific directory
@@ -175,63 +176,62 @@ def main():
             if "Heatmap" in outputs:
                 #Change to heatmap directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-                v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "/heatmap_channel_1"))
-                v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"/heatmap_channel_2"))
+                v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "heatmap_channel_1.mp4"))
+                v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"heatmap_channel_2.mp4"))
                 
             if "Kymograph" in outputs:
                 #Change to kymograph directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-                v.plot_basic_kymo_cli(flow_channel_1, os.path.join(os.getcwd(), "/kymo_channel_1"))
-                v.plot_basic_kymo_cli(flow_channel_2, os.path.join(os.getcwd(), "/kymo_channel_2"))
+                v.plot_basic_kymo_cli(flow_channel_1, os.path.join(os.getcwd(), "kymo_channel_1.tif"))
+                v.plot_basic_kymo_cli(flow_channel_2, os.path.join(os.getcwd(), "kymo_channel_2.tif"))
 
 
         #all the procedures for combined flow
         if "Optical Flow Data" in outputs:
             #Change to opt flow directory, save combined flow data
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
-            s.save_flow_cli("Combined_Flow", combined_flow, os.getcwd())
+            s.save_flow_cli("farneback_flow", combined_flow, os.getcwd())
 
             
         if "Raw Data" in outputs:
             #Change to raw data directory, save raw Tiff array
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr_cli("tiff_array", my_video, Path(os.getcwd()))
+            s.save_arr_cli("farneback_tiff_array", my_video, Path(os.getcwd()))
 
         if "Heatmap" in outputs:
             #Change to heatmap directory, save combined heatmap video
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-            v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "/heatmap_combined_flow"))
+            combined_flow = combined_flow.mean(axis=1)
+            v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "heatmap_nuclei_dyed_flow.mp4"))
                 
         if "Kymograph" in outputs:
             #Change to kymograph directory, save combined kymograph
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "/kymo_combined_flow"))
+            v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "kymo_nuclei_dyed_flow.tif"))
 
 
 
-    elif vid_type == 'p':
+    elif output_type == 'r':
         raft_flow = opt.calculate_raft_optical_flow(my_video)
 
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
         s.save_original_video_cli("Original_Video_Combined", full_path, 0)
-        s.save_original_video_cli("Original_Video_Left", full_path, 1)
-        s.save_original_video_cli("Original_Video_Right", full_path, 2)
 
         if "Optical Flow Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
-            s.save_flow_cli("Flow", raft_flow, os.getcwd())
+            s.save_flow_cli("raft_flow", raft_flow, os.getcwd())
         
         if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr_cli("tiff_array", my_video, Path(os.getcwd()))
+            s.save_arr_cli("raft_tiff_array", my_video, Path(os.getcwd()))
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-            v.save_heatmap_video_cli(raft_flow, os.path.join(os.getcwd(), "/heatmap_phase_contrast"))
+            v.save_heatmap_video_cli(raft_flow, os.path.join(os.getcwd(), "heatmap_phase_contrast.mp4"))
         
         if "Kymograph" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "/kymo_phase_contrast"))
+            v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "kymo_phase_contrast.mp4"))
 
     os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
