@@ -82,8 +82,15 @@ def get_raft_optical_flow(
     """
 
     Args:
+        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2),
+                 each of shape (f, 3, h, w).
+        model_size (ModelSize): Which RAFT variant to use (SMALL or LARGE).
+        model_weights (dict | None): A loaded state_dict for the model, or None
+                       to use default pretrained weights.
+        gpu_flag (bool): If True, use CUDA when available; else CPU.
 
     Returns:
+        (torch.Tensor): The torch.Tensor representation of optical flow. The shape is (f, 2, h, w).
     """
     device = torch.device("cuda" if gpu_flag and torch.cuda.is_available() else "cpu")
 
@@ -125,7 +132,7 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
 
     Args:
         flow (torch.Tensor): The torch.Tensor representation of optical flow.
-            The shape is (f, 2, h, w)
+            The shape is (f, 2, h, w).
 
     Returns:
         np.ndarray: The same representation, but as an np.ndarray.
