@@ -37,7 +37,7 @@ def mask_line_arr(line_arr: np.ndarray, threshold: int=0.5):
     masked_line_arr = np.where(line_arr > threshold, max_val, 0)
     return masked_line_arr
 
-def plot_basic_kymo(arr: np.ndarray, save_path: str, threshold: float=0.5):
+def plot_basic_kymo(arr: np.ndarray, save_path: str=None, threshold: float=0.5):
     """
     Plots a kymograph from the input array, which is expected to be a 4D array
     with shape (frames-1, height, width, 2). The kymograph visualizes
