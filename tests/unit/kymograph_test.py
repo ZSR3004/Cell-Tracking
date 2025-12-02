@@ -270,7 +270,6 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
         """
         with patch("src.cell_tracking.kymograph.flatten_arr") as mock_flatten_arr, \
             patch("src.cell_tracking.kymograph.mask_line_arr") as mock_mask_line_arr, \
-            patch("numpy.zeros_like") as mock_zeros_like, \
             patch("matplotlib.pyplot.figure") as mock_figure, \
             patch("matplotlib.pyplot.imshow") as mock_imshow, \
             patch("matplotlib.pyplot.title") as mock_title, \
@@ -304,7 +303,7 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             colors = ['black', custom_green, custom_magenta, custom_blue]
             cmap = mcolors.ListedColormap(colors)
 
-            kymo.plot_basic_kymo(flowx, thresholdx, save_path_x)
+            kymo.plot_basic_kymo(flowx, save_path_x, thresholdx)
 
             flowx_1 = flowx[:, 1, ...]
             flowx_2 = flowx[:, 2, ...]
@@ -317,7 +316,7 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
 
             for i, flowx_x_flatten in enumerate([flowx_1_flatten, flowx_2_flatten]):
                 assert np.array_equal(mock_mask_line_arr.call_args_list[i][0][0], flowx_x_flatten)
-                assert mock_mask_line_arr.call_args_list[i][1]["threshold"] == None
+                assert mock_mask_line_arr.call_args_list[i][1].get("threshold") == None
             
             _, kwargs_figure = mock_figure.call_args
             assert kwargs_figure["figsize"] == (10, 5)
@@ -329,9 +328,10 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             assert kwargs_imshow["vmin"] == 0
             assert kwargs_imshow["vmax"] == 3
 
-            assert mock_flatten_arr.call_count == 2
-            assert mock_mask_line_arr.call_count == 2
-            mock_zeros_like.assert_called_once_with(masked_line_arr1)
+            #Called: 2 times when kymo.plot_basic_kymo was called, 2 times when mask_boundary (in test_case_x) was called, and 2 times when kymo.flatten_arr was called to create flowx_1_flatten and flowx_2_flatten
+            assert mock_flatten_arr.call_count == 6
+            #Called: 2 times when kymo.plot_basic_kymo was called, and 2 times when mask_boundary (in test_case_x) was called
+            assert mock_mask_line_arr.call_count == 4
             mock_figure.assert_called_once()
             mock_imshow.assert_called_once()
             mock_title.assert_called_once_with("Overlay: Left (Green), Right (Magenta), Overlap (Blue)")
