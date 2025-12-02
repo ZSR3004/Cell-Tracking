@@ -167,47 +167,22 @@ def main():
                 s.save_flow_cli("Channel_1", flow_channel_1, os.getcwd())
                 s.save_flow_cli("Channel_2", flow_channel_2, os.getcwd())
 
-            if "Raw Data" in outputs:
-                #Change to raw data  directory, save isolated flow data
-                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-                s.save_arr_cli("tiff_array_1", my_video, Path(os.getcwd()))
-                s.save_arr_cli("tiff_array_2", my_video, Path(os.getcwd()))
-
-            if "Heatmap" in outputs:
-                #Change to heatmap directory, save isolated flow data
-                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-                v.save_heatmap_video_cli(flow_channel_1, os.path.join(os.getcwd(), "heatmap_channel_1.mp4"))
-                v.save_heatmap_video_cli(flow_channel_2, os.path.join(os.getcwd(),"heatmap_channel_2.mp4"))
-                
-            if "Kymograph" in outputs:
-                #Change to kymograph directory, save isolated flow data
-                os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-                v.plot_basic_kymo_cli(flow_channel_1, os.path.join(os.getcwd(), "kymo_channel_1.tif"))
-                v.plot_basic_kymo_cli(flow_channel_2, os.path.join(os.getcwd(), "kymo_channel_2.tif"))
-
-
         #all the procedures for combined flow
         if "Optical Flow Data" in outputs:
             #Change to opt flow directory, save combined flow data
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
             s.save_flow_cli("farneback_flow", combined_flow, os.getcwd())
 
-            
-        if "Raw Data" in outputs:
-            #Change to raw data directory, save raw Tiff array
-            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr_cli("farneback_tiff_array", my_video, Path(os.getcwd()))
-
         if "Heatmap" in outputs:
             #Change to heatmap directory, save combined heatmap video
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-            combined_flow = combined_flow.mean(axis=1)
-            v.save_heatmap_video_cli(combined_flow, os.path.join(os.getcwd(), "heatmap_nuclei_dyed_flow.mp4"))
+            v.plot_heatmap_cli(combined_flow, "Nuclei Dyed Heatmap", os.path.join(os.getcwd(), "heatmap_nuclei_dyed_flow.mp4"))
                 
         if "Kymograph" in outputs:
             #Change to kymograph directory, save combined kymograph
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "kymo_nuclei_dyed_flow.tif"))
+            #v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "kymo_nuclei_dyed_flow.tif"))
+            print("Kymograph in progress")
 
 
 
@@ -220,22 +195,21 @@ def main():
         if "Optical Flow Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
             s.save_flow_cli("raft_flow", raft_flow, os.getcwd())
-        
-        if "Raw Data" in outputs:
-            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
-            s.save_arr_cli("raft_tiff_array", my_video, Path(os.getcwd()))
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
-            v.save_heatmap_video_cli(raft_flow, os.path.join(os.getcwd(), "heatmap_phase_contrast.mp4"))
+            v.plot_heatmap_cli(raft_flow, "Phase Contrast Heatmap", os.path.join(os.getcwd(), "heatmap_phase_contrast.mp4"))
         
         if "Kymograph" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "kymo_phase_contrast.mp4"))
-
+            #v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "kymo_phase_contrast.mp4"))
+            print("Kymograph in progress")
+    
     os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
-
+    if "Raw Data" in outputs:
+            os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
+            s.save_arr_cli("tiff_array", my_video, Path(os.getcwd()))
 
 if __name__ == "__main__":
     main()

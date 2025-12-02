@@ -5,7 +5,7 @@ from src.cell_tracking import kymograph as kg
 from src.cell_tracking import tiffclass as tiff
 import optical_flow_cli as ofc
 
-def save_heatmap_video_cli(flow, output_path, normalize=True):
+def plot_heatmap_cli(flow, title, output_path):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
 
@@ -17,7 +17,7 @@ def save_heatmap_video_cli(flow, output_path, normalize=True):
     Returns:
         None, just visualizes the heatmap
     """
-    hm.save_heatmap_video(flow, output_path)
+    hm.plot_heatmap(flow, title, output_path)
 
 
 def plot_basic_kymo_cli(arr:np.ndarray, threshold=0.5, save_path = os.getcwd()):
