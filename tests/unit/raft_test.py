@@ -165,7 +165,11 @@ class TestPadToMultipleOf8(TensorHelpers):
         self._check_preserved_values(ten, pad_ten)
         self._check_idempotence(pad_ten)
 
-        assert pad_ten.shape == (ten.shape[2], ten.shape[3])
+        B, C, H, W = ten.shape
+        pad_h = (8 - H % 8) % 8
+        pad_w = (8 - W % 8) % 8
+
+        assert pad_ten.shape == (B, C, H+pad_h, W+pad_w)
 
 
 class TestPreprocessTensor(TensorHelpers):
