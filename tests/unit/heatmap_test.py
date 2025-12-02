@@ -32,7 +32,12 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
         request (pytest.FixtureRequest): The paths to generate Tiff instances from.
 
     Returns:
-        (tiff.Tiff): Tiff class instance of the path.
+        (tiff.Tiff): A tuple containing information about the TIFF file.
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
     """
     path, info = request.param
     return (tiff.Tiff(path), info)

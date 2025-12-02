@@ -29,7 +29,12 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
         request (pytest.FixtureRequest): The paths to generate Tiff instances from.
 
     Returns:
-        (tiff.Tiff): Tiff class instance of the path.
+        (tiff.Tiff): A tuple containing information about the TIFF file.
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
     """
     path, info = request.param
     return (tiff.Tiff(path), info)
@@ -45,7 +50,7 @@ def init_torch_tensor(request: pytest.FixtureRequest) -> torch.Tensor:
         request (pytest.FixtureRequest): The paths to generate Tiff instances from.
 
     Returns:
-        (torch.Tensor): tensor representation of the tiff file.
+        (torch.Tensor): Tensor representation of the tiff file.
     """
     path, info = request.param
     tiff_file = tiff.Tiff(path)
@@ -59,8 +64,12 @@ class TensorHelpers:
     def _check_if_float32_tensor(self, ten: torch.Tensor) -> None:
         """
         Checks if the tensor is of type float32.
+
         Args:
-            ten (torch.Tensor): tensor to check.
+            ten (torch.Tensor): Tensor to check.
+
+        Returns:
+            None.
         """
         assert ten.dtype == torch.float32
 
@@ -69,8 +78,11 @@ class TensorHelpers:
         Checks if the tensor has the expected shape.
 
         Args:
-            ten (torch.Tensor): tensor to check.
-            expected_shape (tuple[int, ...]): expected shape of the tensor.
+            ten (torch.Tensor): Tensor to check.
+            expected_shape (tuple[int, ...]): Expected shape of the tensor.
+
+        Returns:
+            None.
         """
         assert ten.shape == expected_shape
 
@@ -79,7 +91,10 @@ class TensorHelpers:
         Checks if the tensor values are within the range [0, 255].
 
         Args:
-            ten (torch.Tensor): tensor to check.
+            ten (torch.Tensor): Tensor to check.
+
+        Returns:
+            None.
         """
         assert torch.all((ten >= 0) & (ten <= 255))
 
@@ -90,7 +105,10 @@ class NdarrayHelpers:
         Checks if the numpy array is of type float32.
 
         Args:
-            arr (np.ndarray): array to check.
+            arr (np.ndarray): Array to check.
+
+        Returns:
+            None.
         """
         assert arr.dtype == np.float32
 
@@ -99,8 +117,11 @@ class NdarrayHelpers:
         Checks if the numpy array has the expected shape.
 
         Args:
-            arr (np.ndarray): array to check.
-            expected_shape (tuple[int, ...]): expected shape of the array.
+            arr (np.ndarray): Array to check.
+            expected_shape (tuple[int, ...]): Expected shape of the array.
+
+        Returns:
+            None.
         """
         assert arr.shape == expected_shape
 
@@ -109,7 +130,10 @@ class NdarrayHelpers:
         Checks if the numpy array values are within the range [0, 255].
 
         Args:
-            arr (np.ndarray): array to check.
+            arr (np.ndarray): Array to check.
+
+        Returns:
+            None.
         """
         assert np.all((arr >= 0) & (arr <= 255))
 
@@ -120,7 +144,10 @@ class TestPadToMultipleOf8(TensorHelpers):
         Checks if all dimensions of the tensor are divisible by 8.
 
         Args:
-            ten (torch.Tensor): tensor to check.
+            ten (torch.Tensor): Tensor to check.
+
+        Returns:
+            None.
         """
         assert ten.shape[2] % 8 == 0
         assert ten.shape[3] % 8 == 0
@@ -130,8 +157,11 @@ class TestPadToMultipleOf8(TensorHelpers):
         Checks if the original tensor values are preserved in the padded tensor.
 
         Args:
-            ten (torch.Tensor): original tensor.
-            pad_ten (torch.Tensor): padded tensor.
+            ten (torch.Tensor): Original tensor.
+            pad_ten (torch.Tensor): Padded tensor.
+
+        Returns:
+            None.
         """
         og_shape = ten.shape
         pad_ten_og_dims = pad_ten[
@@ -144,7 +174,10 @@ class TestPadToMultipleOf8(TensorHelpers):
         Checks if padding an already padded tensor does not change it.
 
         Args:
-            ten (torch.Tensor): padded tensor.
+            ten (torch.Tensor): Padded tensor.
+
+        Returns:
+            None.
         """
         ten2 = raft.pad_to_multiple_of_8(ten)
         ten3 = raft.pad_to_multiple_of_8(ten)
@@ -157,6 +190,12 @@ class TestPadToMultipleOf8(TensorHelpers):
     def test_pad_to_multiple_of_8(self, init_torch_tensor: torch.Tensor) -> None:
         """
         Tests the pad_to_multiple_of_8 function.
+
+        Args:
+            init_torch_tensor (torch.Tensor): Tensor representation of the tiff file.
+
+        Returns:
+            None.
         """
         ten = init_torch_tensor
         pad_ten = raft.pad_to_multiple_of_8(ten)
@@ -178,6 +217,18 @@ class TestPreprocessTensor(TensorHelpers):
     ) -> None:
         """
         Tests the preprocess_tensor function.
+
+        Args:
+            init_tiff (tuple): A tuple containing information about the TIFF file.
+                - img (str): A TIFF instance.
+                - f (int): Number of frames.
+                - c (int): Number of channels.
+                - h (int): Height.
+                - w (int): Width.
+            init_torch_tensor (torch.Tensor): Tensor representation of the tiff file.
+
+        Returns:
+            None.
         """
         tiff_file, info = init_tiff
         f, c, h, w = info
@@ -197,6 +248,12 @@ class TestBatchFrames(TensorHelpers):
     def test_batch_frames(self, init_torch_tensor: torch.Tensor) -> None:
         """
         Tests the batch_frames function.
+
+        Args:
+            init_torch_tensor (torch.Tensor): Tensor representation of the tiff file.
+
+        Returns:
+            None.
         """
         ten = init_torch_tensor
         batch1, batch2 = raft.batch_frames(ten)
@@ -218,7 +275,10 @@ class TestGetRAFTOpticalFlow:
         Checks if the RAFT model size selection logic is correct.
 
         Args:
-            ten (torch.Tensor): tensor to check.
+            ten (torch.Tensor): Tensor to check.
+
+        Returns:
+            None.
         """
         if ten.shape[0] >= 2:
             batch_1 = ten[:2]
@@ -273,7 +333,10 @@ class TestGetRAFTOpticalFlow:
         Checks if custom weights are used in the RAFT model.
 
         Args:
-            ten (torch.Tensor): tensor to check.
+            ten (torch.Tensor): Tensor to check.
+
+        Returns:
+            None.
         """
         if ten.shape[0] >= 2:
             batch_1 = ten[:2]
@@ -320,7 +383,10 @@ class TestGetRAFTOpticalFlow:
         Checks if GPU is used in the RAFT model.
 
         Args:
-            ten (torch.Tensor): tensor to check.
+            ten (torch.Tensor): Tensor to check.
+
+        Returns:
+            None.
         """
         if not torch.cuda.is_available():
             return None
@@ -386,6 +452,12 @@ class TestGetRAFTOpticalFlow:
     def test_get_raft_optical_flow(self, init_torch_tensor: torch.Tensor) -> None:
         """
         Tests the get_raft_optical_flow function.
+
+        Args:
+            init_torch_tensor (torch.Tensor): Tensor representation of the tiff file.
+
+        Returns:
+            None.
         """
         ten = init_torch_tensor
 
@@ -438,6 +510,12 @@ class TestMakeRAFTOutputArray(NdarrayHelpers):
     def test_make_raft_output_array(self) -> None:
         """
         Tests the make_raft_output_array function using synthetic flow data.
+
+        Args:
+            None.
+
+        Returns:
+            None.
         """
         flow = torch.randn(5, 2, 128, 256)
 
@@ -452,6 +530,12 @@ class TestMakeRAFTOutputArray(NdarrayHelpers):
     def test_make_raft_output_array_single_frame(self) -> None:
         """
         Tests with a single frame.
+
+        Args:
+            None.
+
+        Returns:
+            None.
         """
         flow = torch.randn(1, 2, 64, 64)
         arr = raft.make_raft_output_array(flow)
@@ -461,7 +545,13 @@ class TestMakeRAFTOutputArray(NdarrayHelpers):
 
     def test_make_raft_output_array_dimension_order(self) -> None:
         """
-        Tests that dimensions are correctly transposed from [f, 2, h, w] to [f, h, w, 2].
+        Tests that dimensions are correctly transposed from (f, 2, h, w) to (f, h, w, 2).
+
+        Args:
+            None.
+
+        Returns:
+            None.
         """
         flow = torch.arange(2 * 2 * 3 * 4).reshape(2, 2, 3, 4).float()
         arr = raft.make_raft_output_array(flow)
@@ -475,6 +565,17 @@ class TestCalcOpticalFlowRAFT:
     def test_calcOpticalFlowRAFT(self, init_tiff: tiff.Tiff) -> None:
         """
         Tests the calcOpticalFlowRAFT function.
+
+        Args:
+            init_tiff (tuple): A tuple containing information about the TIFF file.
+                - img (str): A TIFF instance.
+                - f (int): Number of frames.
+                - c (int): Number of channels.
+                - h (int): Height.
+                - w (int): Width.
+
+        Returns: 
+            None.
         """
         tiff_file, info = init_tiff
         f, c, h, w = info
@@ -521,6 +622,17 @@ class TestCalcOpticalFlowRAFT:
     def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
         """
         Tests calcOpticalFlowRAFT with custom parameters.
+
+        Args:
+            init_tiff (tuple): A tuple containing information about the TIFF file.
+                - img (str): A TIFF instance.
+                - f (int): Number of frames.
+                - c (int): Number of channels.
+                - h (int): Height.
+                - w (int): Width.
+
+        Returns:
+            None.
         """
         tiff_file, info = init_tiff
         f, c, h, w = info
