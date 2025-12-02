@@ -10,7 +10,7 @@ import cv2, json, pytest, gc, xyz_py
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
-from unittest.mock import patch, Mock, MagicMock
+from unittest.mock import patch, Mock, MagicMock, call
 import matplotlib
 import numpy as np
 from pathlib import Path
@@ -385,36 +385,36 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     """
     img, info = init_tiff
     f, c, h, w = info
+    tiff_arr = img.arr
 
-    fig = MagicMock()
-    ax = MagicMock()
-    im = MagicMock()
+    mock_fig = MagicMock()
+    mock_ax = MagicMock()
+    mock_im = MagicMock()
+
+    mock_im.set_data = MagicMock()
+    mock_ax.set_title = MagicMock()
 
     kwargs1 = {"T": 10, "fps": 20}
     kwargs2 = {"T": 40}
     kwargs3 = {"fps": 35}
     kwargs4 = {}
-    kwargs5 = {"T": 1}
 
-    image_stack1 = np.asarray(img.arr[:, 2, :, :])
-    image_stack2 = np.asarray([img.arr[0, 0, :, :]])
-    image_stack3 = np.asarray([img.arr[0, 2, :, :], img.arr[(f - 1) // 2, 1, :, :], img.arr[f - 1, 0, :, :]])
-    image_stack4 = np.asarray(img.arr[: (f - 1) // 2, 2, :, :])
-    image_stack5 = np.asarray(img.arr[:, 0, :, :])
-    image_stack6 = np.asarray(img.arr[:, 1, :, :])
+    image_stack1 = np.asarray(tiff_arr[:, 0, :, :])
+    image_stack2 = np.asarray(tiff_arr[:, 1, :, :])
+    image_stack3 = np.asarray(tiff_arr[:, 2, :, :])
 
     stack1_kwargs1_path = tmp_path / "stack1_kwargs1.mp4"
+    stack1_kwargs2_path = tmp_path / "stack1_kwargs2.mp4"
     stack1_kwargs3_path = tmp_path / "stack1_kwargs3.mp4"
+    stack1_kwargs4_path = tmp_path / "stack1_kwargs4.mp4"
+    stack2_kwargs1_path = tmp_path / "stack2_kwargs1.mp4"
+    stack2_kwargs2_path = tmp_path / "stack2_kwargs2.mp4"
+    stack2_kwargs3_path = tmp_path / "stack2_kwargs3.mp4"
     stack2_kwargs4_path = tmp_path / "stack2_kwargs4.mp4"
-    stack2_kwargs5_path = tmp_path / "stack2_kwargs5.mp4"
+    stack3_kwargs1_path = tmp_path / "stack3_kwargs1.mp4"
+    stack3_kwargs2_path = tmp_path / "stack3_kwargs2.mp4"
     stack3_kwargs3_path = tmp_path / "stack3_kwargs3.mp4"
-    stack3_kwargs5_path = tmp_path / "stack3_kwargs5.mp4"
-    stack4_kwargs2_path = tmp_path / "stack4_kwargs2.mp4"
-    stack4_kwargs4_path = tmp_path / "stack4_kwargs4.mp4"
-    stack5_kwargs1_path = tmp_path / "stack5_kwargs1.mp4"
-    stack5_kwargs3_path = tmp_path / "stack5_kwargs3.mp4"
-    stack6_kwargs2_path = tmp_path / "stack6_kwargs2.mp4"
-    stack6_kwargs4_path = tmp_path / "stack6_kwargs4.mp4"
+    stack3_kwargs4_path = tmp_path / "stack3_kwargs4.mp4"
 
     def test_case_x(image_stackx: np.ndarray, stackx_kwargsx_path: str, kwargsx: dict):
         """
@@ -432,18 +432,18 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         """
         with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter, \
             patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation:
-            mock_anim_instance = MagicMock()
-            mock_funcanimation.return_value = mock_anim_instance
+            mock_ani = MagicMock()
+            mock_funcanimation.return_value = mock_ani
             mock_writer_instance = MagicMock()
             mock_ffmpegwriter.return_value = mock_writer_instance
 
-            save.save_original_video("Video_Name", stackx_kwargsx_path, im, image_stackx, fig, ax, **kwargsx)
+            save.save_original_video("Video_Name", stackx_kwargsx_path, mock_im, image_stackx, mock_fig, mock_ax, **kwargsx)
 
             T = kwargsx.get("T", image_stackx.shape[0])
             fps = kwargsx.get("fps", 10)
 
             args_FuncAnimation, kwargs_FuncAnimation = mock_funcanimation.call_args
-            assert args_FuncAnimation[0] == fig
+            assert args_FuncAnimation[0] == mock_fig
             assert callable(args_FuncAnimation[1])
             assert kwargs_FuncAnimation["frames"] == T
             assert kwargs_FuncAnimation["interval"] == 1000 / fps
@@ -452,21 +452,21 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             _, kwargs_FFMpegWriter = mock_ffmpegwriter.call_args
             assert kwargs_FFMpegWriter["fps"] == fps
 
-            mock_anim_instance.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
+            mock_ani.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
             mock_funcanimation.assert_called_once()
             mock_ffmpegwriter.assert_called_once()
 
             gc.collect()
 
     test_case_x(image_stack1, stack1_kwargs1_path, kwargs1)
+    test_case_x(image_stack1, stack1_kwargs2_path, kwargs2)
     test_case_x(image_stack1, stack1_kwargs3_path, kwargs3)
+    test_case_x(image_stack1, stack1_kwargs4_path, kwargs4)
+    test_case_x(image_stack2, stack2_kwargs1_path, kwargs1)
+    test_case_x(image_stack2, stack2_kwargs2_path, kwargs2)
+    test_case_x(image_stack2, stack2_kwargs3_path, kwargs3)
     test_case_x(image_stack2, stack2_kwargs4_path, kwargs4)
-    test_case_x(image_stack2, stack2_kwargs5_path, kwargs5)
+    test_case_x(image_stack3, stack3_kwargs1_path, kwargs1)
+    test_case_x(image_stack3, stack3_kwargs2_path, kwargs2)
     test_case_x(image_stack3, stack3_kwargs3_path, kwargs3)
-    test_case_x(image_stack3, stack3_kwargs5_path, kwargs5)
-    test_case_x(image_stack4, stack4_kwargs2_path, kwargs2)
-    test_case_x(image_stack4, stack4_kwargs4_path, kwargs4)
-    test_case_x(image_stack5, stack5_kwargs1_path, kwargs1)
-    test_case_x(image_stack5, stack5_kwargs3_path, kwargs3)
-    test_case_x(image_stack6, stack6_kwargs2_path, kwargs2)
-    test_case_x(image_stack6, stack6_kwargs4_path, kwargs4)
+    test_case_x(image_stack3, stack3_kwargs4_path, kwargs4)
