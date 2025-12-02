@@ -12,7 +12,12 @@ from src.cell_tracking import raft
 from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = ["datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
+TIFF_PATHS = [
+    (
+        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+        (96, 3, 520, 2329),
+    )
+]
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -26,7 +31,8 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
     Returns:
         (tiff.Tiff): Tiff class instance of the path.
     """
-    return tiff.Tiff(request.param)
+    path, info = request.param
+    return (tiff.Tiff(path), info)
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -41,7 +47,8 @@ def init_torch_tensor(request: pytest.FixtureRequest) -> torch.Tensor:
     Returns:
         (torch.Tensor): tensor representation of the tiff file.
     """
-    tiff_file = tiff.Tiff(request.param)
+    path, info = request.param
+    tiff_file = tiff.Tiff(path)
     arr = tiff_file.arr[:, 0, ...]
     original_dtype = arr.dtype
     arr = arr.astype("float32") / np.iinfo(original_dtype).max
@@ -158,6 +165,8 @@ class TestPadToMultipleOf8(TensorHelpers):
         self._check_preserved_values(ten, pad_ten)
         self._check_idempotence(pad_ten)
 
+        assert pad_ten.shape == (ten.shape[2], ten.shape[3])
+
 
 class TestPreprocessTensor(TensorHelpers):
     def test_preprocess_tensor(
@@ -166,7 +175,9 @@ class TestPreprocessTensor(TensorHelpers):
         """
         Tests the preprocess_tensor function.
         """
-        tiff_file = init_tiff
+        tiff_file, info = init_tiff
+        f, c, h, w = info
+
         ten = init_torch_tensor
         pad_ten = raft.pad_to_multiple_of_8(ten)
         expected_shape = pad_ten.shape
@@ -461,11 +472,10 @@ class TestCalcOpticalFlowRAFT:
         """
         Tests the calcOpticalFlowRAFT function.
         """
-        with patch("src.cell_tracking.raft.raft_small") as mock_raft, \
-            patch("src.cell_tracking.raft.preprocess_tensor") as mock_preprocess_tensor, \
-            patch("src.cell_tracking.raft.batch_frames") as mock_batch_frames, \
-            patch("src.cell_tracking.raft.get_raft_optical_flow") as mock_get_raft_optical_flow, \
-            patch("src.cell_tracking.raft.make_raft_output_array") as mock_make_raft_output_array:
+        tiff_file, info = init_tiff
+        f, c, h, w = info
+
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
             mock_model = type(
                 "MockModel",
                 (),
@@ -480,9 +490,17 @@ class TestCalcOpticalFlowRAFT:
             )()
             mock_raft.return_value = mock_model
 
+            """
+            , \
+            patch("src.cell_tracking.raft.preprocess_tensor") as mock_preprocess_tensor, \
+            patch("src.cell_tracking.raft.batch_frames") as mock_batch_frames, \
+            patch("src.cell_tracking.raft.get_raft_optical_flow") as mock_get_raft_optical_flow, \
+            patch("src.cell_tracking.raft.make_raft_output_array") as mock_make_raft_output_array
+            """
+
             #make return values/side effects
 
-            result = raft.calcOpticalFlowRAFT(init_tiff)
+            result = raft.calcOpticalFlowRAFT(tiff_file)
 
             #assert args, kwargs for four mocked funcs
             #assert called for four mocked funcs
@@ -491,13 +509,18 @@ class TestCalcOpticalFlowRAFT:
             assert result.ndim == 4
             assert result.shape[3] == 2
 
-            expected_frames = init_tiff.arr.shape[0] - 1
+            expected_frames = tiff_file.arr.shape[0] - 1
             assert result.shape[0] == expected_frames
+
+            assert result.shape == (f, h, w, 2)
 
     def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
         """
         Tests calcOpticalFlowRAFT with custom parameters.
         """
+        tiff_file, info = init_tiff
+        f, c, h, w = info
+
         custom_weights = {"layer1.weight": torch.randn(10, 10)}
 
         with patch("src.cell_tracking.raft.raft_large") as mock_raft:
@@ -516,7 +539,7 @@ class TestCalcOpticalFlowRAFT:
             mock_raft.return_value = mock_model
 
             result = raft.calcOpticalFlowRAFT(
-                init_tiff,
+                tiff_file,
                 model_size=raft.ModelSize.LARGE,
                 model_weights=custom_weights,
                 gpu_flag=False,

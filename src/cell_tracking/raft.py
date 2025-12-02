@@ -20,7 +20,7 @@ def pad_to_multiple_of_8(ten: torch.Tensor) -> torch.Tensor:
         ten (torch.Tensor): A 4D PyTorch tensor.
 
     Returns:
-        torch.Tensor: ten, with a padded height and width.
+        torch.Tensor: ten, with a padded height and width. Shape is (H, W).
     """
     _, _, H, W = ten.shape
     pad_h = (8 - H % 8) % 8
