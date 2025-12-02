@@ -1,9 +1,11 @@
-import cv2
-from matplotlib import animation
-import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.colors as colors
+import matplotlib.pyplot as plt
 
+def convert_frame_to_polar(frame: np.ndarray) -> np.ndarray:
+    raise NotImplementedError
+
+def convert_stack_to_polar(frame_stack: np.ndarray) -> np.ndarray:
+    raise NotImplementedError
 
 def plot_heatmap(arr: np.ndarray, title: str, output_path: str, fps: int = 30) -> None:
     """
