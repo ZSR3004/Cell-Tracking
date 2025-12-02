@@ -461,7 +461,11 @@ class TestCalcOpticalFlowRAFT:
         """
         Tests the calcOpticalFlowRAFT function.
         """
-        with patch("src.cell_tracking.raft.raft_small") as mock_raft:
+        with patch("src.cell_tracking.raft.raft_small") as mock_raft, \
+            patch("src.cell_tracking.raft.preprocess_tensor") as mock_preprocess_tensor, \
+            patch("src.cell_tracking.raft.batch_frames") as mock_batch_frames, \
+            patch("src.cell_tracking.raft.get_raft_optical_flow") as mock_get_raft_optical_flow, \
+            patch("src.cell_tracking.raft.make_raft_output_array") as mock_make_raft_output_array:
             mock_model = type(
                 "MockModel",
                 (),
@@ -476,7 +480,12 @@ class TestCalcOpticalFlowRAFT:
             )()
             mock_raft.return_value = mock_model
 
+            #make return values/side effects
+
             result = raft.calcOpticalFlowRAFT(init_tiff)
+
+            #assert args, kwargs for four mocked funcs
+            #assert called for four mocked funcs
 
             assert isinstance(result, np.ndarray)
             assert result.ndim == 4

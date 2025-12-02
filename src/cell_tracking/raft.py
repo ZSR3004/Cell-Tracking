@@ -37,7 +37,7 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
 
     Args:
         tiff_file (tiff.Tiff): The tiff file representing the video to be processed.
-            It holds an array of shape [frames, channels, height, width].
+            It holds an array of shape (frames, channels, height, width).
         kwargs (dict): See preprocess_frame in tiffclass.py
 
     Returns:
@@ -68,7 +68,7 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple of torch.Tensors.
                 The first tensor is t[0:len(t) - 1]. The second is
-                t[1:len(t)].
+                t[1:len(t)]. Each is of shape (f, 3, h, w).
     """
     return ten[:-1], ten[1:]
 
@@ -79,6 +79,12 @@ def get_raft_optical_flow(
     model_weights: dict | None = None,
     gpu_flag: bool = False,
 ) -> torch.Tensor:
+    """
+
+    Args:
+
+    Returns:
+    """
     device = torch.device("cuda" if gpu_flag and torch.cuda.is_available() else "cpu")
 
     try:
@@ -119,11 +125,11 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
 
     Args:
         flow (torch.Tensor): The torch.Tensor representation of optical flow.
-            The shape is [f, 2, h, w]
+            The shape is (f, 2, h, w)
 
     Returns:
         np.ndarray: The same representation, but as an np.ndarray.
-            The shape is [f, h, w, 2] to match the outputs of the
+            The shape is (f, h, w, 2) to match the outputs of the
             other optical flow models.
     """
     ten = torch.permute(flow, (0, 2, 3, 1))
@@ -143,18 +149,16 @@ def calcOpticalFlowRAFT(
 
     Args:
         tiff_file (tiff.Tiff): The tiff file representing the video to be processed.
-            It holds an array of shape [frames, channels, height, width].
-        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2),
-                 each of shape [f, 3, h, w].
+            It holds an array of shape (frames, channels, height, width).
         model_size (ModelSize): Which RAFT variant to use (SMALL or LARGE).
         model_weights (dict | None): A loaded state_dict for the model, or None
                        to use default pretrained weights.
-        device_flag (bool): If True, use CUDA when available; else CPU.
+        gpu_flag (bool): If True, use CUDA when available; else CPU.
         kwargs (dict): See preprocess_frame in tiffclass.py
 
     Returns:
         np.ndarray: The same representation, but as an np.ndarray.
-            The shape is [f, h, w, 2] to match the outputs of the
+            The shape is (f, h, w, 2) to match the outputs of the
             other optical flow models.
     """
     ten = preprocess_tensor(tiff_file, **kwargs)
