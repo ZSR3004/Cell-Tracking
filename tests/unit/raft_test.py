@@ -258,6 +258,8 @@ class TestBatchFrames(TensorHelpers):
         ten = init_torch_tensor
         batch1, batch2 = raft.batch_frames(ten)
 
+        assert batch1.shape == (ten.shape[0]-1, ten.shape[1], ten.shape[2], ten.shape[3])
+        assert batch2.shape == (ten.shape[0]-1, ten.shape[1], ten.shape[2], ten.shape[3])
         assert batch1.shape == batch2.shape
         assert torch.equal(batch1[0], ten[0])
         assert torch.equal(batch1[-1], ten[-2])

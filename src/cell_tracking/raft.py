@@ -68,7 +68,7 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple of torch.Tensors.
                 The first tensor is t[0:len(t) - 1]. The second is
-                t[1:len(t)]. Each is of shape (f, 3, h, w).
+                t[1:len(t)]. Each is of shape (f-1, 3, h, w).
     """
     return ten[:-1], ten[1:]
 
