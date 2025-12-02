@@ -75,7 +75,7 @@ def optical_flow(arr: np.ndarray, channel: int, **kwargs) -> np.ndarray:
             - flags (int): Operation flags. Default 0
 
     Returns:
-        np.ndarray: Flow vectors of shape (N-1, H, W, 2) between frames.
+        np.ndarray: Flow vectors of shape (f-1, h, w, 2) between frames.
     """
     flow_args = {
         "pyr_scale": 0.5,
@@ -118,7 +118,7 @@ def calculate_optical_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
             - flags (int)
 
     Returns:
-        np.ndarray: Combined flow vectors of shape (N-1, 3, H, W, 2).
+        np.ndarray: Combined flow vectors of shape (f-1, 3, h, w, 2).
     """
     flow_channel1 = optical_flow(arr, 1, **kwargs)
     flow_channel2 = optical_flow(arr, 2, **kwargs)
