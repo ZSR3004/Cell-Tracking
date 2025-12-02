@@ -338,7 +338,7 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             mock_xlabel.assert_called_once_with('Position')
             mock_ylabel.assert_called_once_with('Time')
 
-            if save_path_x is not None:
+            if save_path_x:
                 args_savefig, kwargs_savefig = mock_savefig.call_args
                 assert args_savefig[0] == save_path_x
                 assert kwargs_savefig["bbox_inches"] == "tight"

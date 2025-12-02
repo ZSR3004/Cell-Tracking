@@ -78,7 +78,7 @@ def plot_basic_kymo(arr: np.ndarray, save_path: str, threshold: float=0.5):
     plt.xlabel('Position')
     plt.ylabel('Time')
 
-    if save_path is not None:
+    if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
         plt.close()
     else:
