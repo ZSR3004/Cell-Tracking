@@ -376,7 +376,3 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
     test_case_x(flow2, threshold3, None)                    #flow2, threshold3 show
     test_case_x(flow2, threshold4, flow2_threshold4_path)   #flow2, threshold4 save
     test_case_x(flow2, threshold4, None)                    #flow2, threshold4 show
-
-            #change the if not nones here and in kymograph?
-
-            #DON'T need to assert if it was saved
