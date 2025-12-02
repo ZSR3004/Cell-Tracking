@@ -307,7 +307,7 @@ class TestGetRAFTOpticalFlow:
         Args:
             ten (torch.Tensor): tensor to check.
         """
-        if torch.cuda.is_available():
+        if not torch.cuda.is_available():
             return None
 
         if ten.shape[0] >= 2:
