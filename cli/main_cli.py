@@ -80,7 +80,7 @@ def get_output_type() -> str:
     Returns: string of their answer
     """
 
-    my_video = click.prompt("Type in the type of optical flow you want to calculate (f for farneback, r for raft):", type=str)
+    my_video = click.prompt("Type in the type of optical flow you want to calculate (f for farneback, r for raft)", type=str)
 
     return my_video
 
