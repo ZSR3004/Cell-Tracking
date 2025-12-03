@@ -604,13 +604,12 @@ class TestCalcOpticalFlowRAFT:
 
             result = raft.calcOpticalFlowRAFT(tiff_file)
 
+            pad_h = (8 - h % 8) % 8
+            pad_w = (8 - w % 8) % 8
+
             assert isinstance(result, np.ndarray)
             assert result.ndim == 4
-            assert result.shape[3] == 2
-
-            expected_frames = tiff_file.arr.shape[0] - 1
-            assert result.shape[0] == expected_frames
-            assert result.shape == (f, h, w, 2)
+            assert result.shape == (f-1, h+pad_h, w+pad_w, 2)
 
     def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
         """
@@ -654,8 +653,10 @@ class TestCalcOpticalFlowRAFT:
                 gpu_flag=False,
             )
 
+            pad_h = (8 - h % 8) % 8
+            pad_w = (8 - w % 8) % 8
+
             assert isinstance(result, np.ndarray)
-            assert result.shape[3] == 2
-            assert result.shape == (f, h, w, 2)
+            assert result.shape == (f-1, h+pad_h, w+pad_w, 2)
 
             mock_raft.assert_called_once_with(progress=False)

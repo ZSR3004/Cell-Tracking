@@ -84,15 +84,16 @@ def get_raft_optical_flow(
     """
 
     Args:
-        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2),
-                 each of shape (f, 3, h, w).
+        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2), each of shape (f-1, 3, a, b) 
+                                                     (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
         model_size (ModelSize): Which RAFT variant to use (SMALL or LARGE).
         model_weights (dict | None): A loaded state_dict for the model, or None
                        to use default pretrained weights.
         gpu_flag (bool): If True, use CUDA when available; else CPU.
 
     Returns:
-        (torch.Tensor): The torch.Tensor representation of optical flow. The shape is (f, 2, h, w).
+        (torch.Tensor): The torch.Tensor representation of optical flow. The shape is (f-1, 2, a, b)
+                        (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
     """
     device = torch.device("cuda" if gpu_flag and torch.cuda.is_available() else "cpu")
 
@@ -134,12 +135,13 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
 
     Args:
         flow (torch.Tensor): The torch.Tensor representation of optical flow.
-            The shape is (f, 2, h, w).
+            The shape is (f, 2, a, b) (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
 
     Returns:
         np.ndarray: The same representation, but as an np.ndarray.
-            The shape is (f, h, w, 2) to match the outputs of the
-            other optical flow models.
+            The shape is (f, a, b, 2) to match the outputs of the
+            other optical flow models 
+            (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
     """
     ten = torch.permute(flow, (0, 2, 3, 1))
     arr = torch.Tensor.numpy(ten)
