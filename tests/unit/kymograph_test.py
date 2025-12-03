@@ -298,6 +298,9 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             masked_line_arr1 = mask_boundary(flowx[:, 1, ...], threshold=thresholdx)
             masked_line_arr2 = mask_boundary(flowx[:, 2, ...], threshold=thresholdx)
 
+            assert masked_line_arr1.shape == (f, h, w)
+            assert masked_line_arr2.shape == (f, h, w)
+
             combined_data = np.zeros_like(masked_line_arr1)
             combined_data[masked_line_arr1 != 0] += 1
             combined_data[masked_line_arr2 != 0] += 2
