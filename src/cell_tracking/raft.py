@@ -37,12 +37,13 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
 
     Args:
         tiff_file (tiff.Tiff): The tiff file representing the video to be processed.
-            It holds an array of shape (frames, channels, height, width).
+            It holds an array of shape (f, c, h, w).
         kwargs (dict): See preprocess_frame in tiffclass.py
 
     Returns:
         torch.Tensor: A preprocessed representation of the tiff_file; ready
-            to be used in the RAFT model.
+            to be used in the RAFT model. Shape is (f, 3, h+pad_h, w+pad_w) 
+            (see pad_to_multiple_of_8 to understand what pad_h and pad_w are).
     """
     arr = tiff_file.arr
     arr = arr[:, 0, ...]
@@ -63,12 +64,13 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     Batches frames together for use in RAFT model.
 
     Args:
-        ten (torch.Tensor): A torch.Tensor representation of a tiff video.
+        ten (torch.Tensor): A torch.Tensor representation of a tiff video. Shape is (f, 3, a, b) 
+                            (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple of torch.Tensors.
-                The first tensor is t[0:len(t) - 1]. The second is
-                t[1:len(t)]. Each is of shape (f-1, 3, h, w).
+                                           The first tensor is t[0:len(t) - 1]. The second is t[1:len(t)]. Each is of shape (f-1, 3, a, b) 
+                                           (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
     """
     return ten[:-1], ten[1:]
 
