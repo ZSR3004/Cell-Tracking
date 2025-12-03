@@ -597,20 +597,7 @@ class TestCalcOpticalFlowRAFT:
             )()
             mock_raft.return_value = mock_model
 
-            """
-            , \
-            patch("src.cell_tracking.raft.preprocess_tensor") as mock_preprocess_tensor, \
-            patch("src.cell_tracking.raft.batch_frames") as mock_batch_frames, \
-            patch("src.cell_tracking.raft.get_raft_optical_flow") as mock_get_raft_optical_flow, \
-            patch("src.cell_tracking.raft.make_raft_output_array") as mock_make_raft_output_array
-            """
-
-            #make return values/side effects
-
             result = raft.calcOpticalFlowRAFT(tiff_file)
-
-            #assert args, kwargs for four mocked funcs
-            #assert called for four mocked funcs
 
             assert isinstance(result, np.ndarray)
             assert result.ndim == 4
@@ -618,7 +605,6 @@ class TestCalcOpticalFlowRAFT:
 
             expected_frames = tiff_file.arr.shape[0] - 1
             assert result.shape[0] == expected_frames
-
             assert result.shape == (f, h, w, 2)
 
     def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
@@ -665,5 +651,6 @@ class TestCalcOpticalFlowRAFT:
 
             assert isinstance(result, np.ndarray)
             assert result.shape[3] == 2
+            assert result.shape == (f, h, w, 2)
 
             mock_raft.assert_called_once_with(progress=False)
