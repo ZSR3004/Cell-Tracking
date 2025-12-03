@@ -17,14 +17,14 @@ def pad_to_multiple_of_8(ten: torch.Tensor) -> torch.Tensor:
     This is required for the RAFT model to work.
 
     Args:
-        ten (torch.Tensor): A 4D PyTorch tensor.
+        ten (torch.Tensor): A 4D PyTorch tensor. Shape is (f, 3, h, w).
 
     Returns:
-        torch.Tensor: ten, with a padded height and width. Shape is (H, W).
+        torch.Tensor: ten, with a padded height and width. Shape is (f, 3, h+pad_h, w+pad_w).
     """
-    _, _, H, W = ten.shape
-    pad_h = (8 - H % 8) % 8
-    pad_w = (8 - W % 8) % 8
+    _, _, h, w = ten.shape
+    pad_h = (8 - h % 8) % 8
+    pad_w = (8 - w % 8) % 8
 
     return F.pad(ten, (0, pad_w, 0, pad_h), mode="replicate")
 
@@ -52,7 +52,7 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
 
     ten = (
         torch.from_numpy(arr).unsqueeze(1).repeat(1, 3, 1, 1)
-    )  # [frames, 3, height, width]
+    )  # (frames, 3, height, width)
     ten = pad_to_multiple_of_8(ten)
 
     return ten

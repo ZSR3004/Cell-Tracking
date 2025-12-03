@@ -50,7 +50,7 @@ def init_torch_tensor(request: pytest.FixtureRequest) -> torch.Tensor:
         request (pytest.FixtureRequest): The paths to generate Tiff instances from.
 
     Returns:
-        (torch.Tensor): Tensor representation of the tiff file.
+        (torch.Tensor): Tensor representation of the tiff file. Shape is (f, 3, h, w)
     """
     path, info = request.param
     tiff_file = tiff.Tiff(path)
@@ -192,7 +192,7 @@ class TestPadToMultipleOf8(TensorHelpers):
         Tests the pad_to_multiple_of_8 function.
 
         Args:
-            init_torch_tensor (torch.Tensor): Tensor representation of the tiff file.
+            init_torch_tensor (torch.Tensor): Tensor representation of the tiff file. Shape is (f, 3, h, w).
 
         Returns:
             None.
@@ -204,11 +204,12 @@ class TestPadToMultipleOf8(TensorHelpers):
         self._check_preserved_values(ten, pad_ten)
         self._check_idempotence(pad_ten)
 
-        B, C, H, W = ten.shape
-        pad_h = (8 - H % 8) % 8
-        pad_w = (8 - W % 8) % 8
+        (f, _, h, w) = ten.shape
+        assert ten.shape[1] == 3
+        pad_h = (8 - h % 8) % 8
+        pad_w = (8 - w % 8) % 8
 
-        assert pad_ten.shape == (B, C, H+pad_h, W+pad_w)
+        assert pad_ten.shape == (f, 3, h+pad_h, w+pad_w)
 
 
 class TestPreprocessTensor(TensorHelpers):
