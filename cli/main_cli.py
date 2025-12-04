@@ -181,9 +181,7 @@ def main():
         if "Kymograph" in outputs:
             #Change to kymograph directory, save combined kymograph
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            #v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "kymo_nuclei_dyed_flow.tif"))
-            print("Kymograph in progress")
-
+            v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "kymo_nuclei_dyed_flow.png"))
 
 
     elif output_type == 'r':
@@ -202,8 +200,7 @@ def main():
         
         if "Kymograph" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
-            #v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "kymo_phase_contrast.mp4"))
-            print("Kymograph in progress")
+            v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "kymo_phase_contrast.png"))
     
     os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
