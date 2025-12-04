@@ -171,7 +171,7 @@ def main():
         if "Optical Flow Data" in outputs:
             #Change to opt flow directory, save combined flow data
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
-            s.save_flow_cli("farneback_flow", combined_flow, os.getcwd())
+            s.save_flow_cli("farneback", combined_flow, os.getcwd())
 
         if "Heatmap" in outputs:
             #Change to heatmap directory, save combined heatmap video
