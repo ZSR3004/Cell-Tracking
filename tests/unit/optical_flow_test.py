@@ -368,8 +368,6 @@ def test_calculate_optical_flow(init_tiff):
             patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine:
             mock_optflow.return_value = np.zeros((f-1, h, w, 2))
             mock_combine.return_value = np.zeros((f-1, 3, h, w, 2))
-            print(tiff_arr.shape)
-            a
 
             result = flow.calculate_optical_flow(tiff_arr, **kwargsx)
 

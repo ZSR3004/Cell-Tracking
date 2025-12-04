@@ -3,8 +3,8 @@ import numpy as np
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
-from cell_tracking import tiffclass as tc
-from cell_tracking import saving as save
+from . import tiffclass as tiff
+from . import saving as save
 
 
 def combine_flows(flow_list: list) -> np.ndarray:
