@@ -1,4 +1,4 @@
-import os
+import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import hsv_to_rgb
 from matplotlib.animation import FuncAnimation, FFMpegWriter
