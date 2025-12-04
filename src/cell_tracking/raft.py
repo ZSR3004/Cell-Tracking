@@ -82,7 +82,9 @@ def get_raft_optical_flow(
     gpu_flag: bool = False,
 ) -> torch.Tensor:
     """
-
+    Takes the input batches and runs the Pytorch raft model on it to 
+    extract optical flow.
+    
     Args:
         batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2), each of shape (f-1, 3, a, b) 
                                                      (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
