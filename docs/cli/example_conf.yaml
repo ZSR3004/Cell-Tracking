@@ -1,0 +1,46 @@
+preprocess_args:
+
+  gauss: 
+    ksize: !!python/tuple
+      [5, 5]
+    sigmaX: !!float
+      1.5 
+
+  median:
+    ksize: !!int
+      5
+
+  normalize:
+    alpha: !!int
+    beta: !!int
+
+  contrast:
+    alpha: !!float
+      1.0
+    beta: !!float
+      0.0
+
+  skip: python/list
+    []
+
+farneback_args:
+  levels: !!float
+    0.5
+  winsize: !!int
+    3
+  iterations: !!int
+    3
+  poly_n: !!int
+    5
+  poly_sigma: !!float
+    1.2
+  flags: !!int
+    0
+
+raft_args:
+  model_size: !!int
+    1
+  model_weights_path: !!str
+    "" 
+  gpu_flag: !!bool
+    False 

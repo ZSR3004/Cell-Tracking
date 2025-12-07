@@ -25,7 +25,7 @@ def get_unique_path(name: str, pattern_fn, main_path: str) -> Path:
     Returns:
         Path: Unique file path that does not yet exist.
     """
-    save_dir = main_path / name
+    save_dir = main_path
     save_dir.mkdir(parents=True, exist_ok=True)
 
     i = 1
@@ -75,7 +75,7 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     labels_arr = ["I"] * len(dx_dy_arr)
 
     xyz_py.save_xyz(
-        f_name=str(save_path), labels=labels_arr, coords=xyz_arr, comment=None
+        f_name= f"{name}_flow.xyz", labels=labels_arr, coords=xyz_arr, comment=None
     )
 
 

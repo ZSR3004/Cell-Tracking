@@ -2,12 +2,11 @@ import os
 import yaml
 from .defaults import default_yaml_config
 
-
-class MemoryManager:
+class MemoryManagement:
     def __init__(self, path: str) -> None:
         """
-        Args:
-            path (str): The path where the directory will be created. In particular,
+        Args: 
+            path (str): The path where the directory will be created. In particular, 
                 "path/cell-tracking/"
 
         Attributes:
@@ -17,9 +16,7 @@ class MemoryManager:
         """
         self.path = path
         self.yaml_path = os.path.join(self.path, "config.yaml")
-        if not os.path.exists(self.yaml_path):
-            self.create_main_dir()
-        self.read_yaml()
+        self.config = None
 
     def _write_default_yaml(self) -> None:
         """
@@ -30,20 +27,22 @@ class MemoryManager:
 
     def create_main_dir(self) -> None:
         """
-        Creates the main cell tracking directory where all files are stored. Does NOT
+        Creates the main cell tracking directory where all files are stored. Does NOT 
         overwrite the directory if it exists already.
         """
         os.makedirs(self.path, exist_ok=True)
-        self._write_default_yaml()
-        self.config = default_yaml_config
-
+        try: 
+                self._write_default_yaml()
+        except FileExistsError:
+            pass
+        
     def read_yaml(self) -> None:
         """
         Reads the YAML file from the main path.
         """
         try:
             with open(self.yaml_path, "r") as y:
-                self.config = yaml.safe_load(y)
+                self.config = yaml.load(y, Loader=yaml.FullLoader)
         except:
             print("Failed to read configuration YAML file.")
 
@@ -52,9 +51,14 @@ class MemoryManager:
         Handles creations of subdirectories for each Tiff file.
         """
         tiff_dir_path = os.path.join(self.path, name)
-        os.makedirs(tiff_dir_path, exist_ok=True)
+        os.makedirs(tiff_dir_path)
 
-        sub_dirs = ["raw_data", "optical_flows", "heatmaps", "kymographs"]
+        sub_dirs = [
+                    "raw_data",
+                    "optical_flows",
+                    "heatmaps",
+                    "kymographs"
+                ]
 
         for path in sub_dirs:
             os.makedirs(os.path.join(tiff_dir_path, path))
