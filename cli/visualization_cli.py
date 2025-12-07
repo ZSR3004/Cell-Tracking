@@ -20,7 +20,7 @@ def plot_heatmap_cli(flow, title, output_path):
     hm.plot_heatmap(flow, title, output_path)
 
 
-def plot_basic_kymo_cli(arr:np.ndarray, threshold=0.5, save_path = os.getcwd()):
+def plot_basic_kymo_cli(arr:np.ndarray, save_path: str, threshold=0.5,):
     """
     Plots a kymograph from a 2D array.
 
