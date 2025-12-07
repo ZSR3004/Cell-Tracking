@@ -1,11 +1,13 @@
 # Core
 /.venv
-.gitignore
 .vscode/
 
+# Giant Dataset Files
+datasets/
+
 # Machine Code
-**/__pycache__
-**/.DS_Store
+*__pycache__**
+*.DS_Store
 dist/
 build/
 *.egg-info/

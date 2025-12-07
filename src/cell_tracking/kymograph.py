@@ -37,15 +37,15 @@ def mask_line_arr(line_arr: np.ndarray, threshold: int=0.5):
     masked_line_arr = np.where(line_arr > threshold, max_val, 0)
     return masked_line_arr
 
-def plot_basic_kymo(arr: np.ndarray, save_path: str, threshold: float=0.5):
+def plot_basic_kymo(arr: np.ndarray, save_path: str=None, threshold: float=0.5):
     """
     Plots a kymograph from the input array, which is expected to be a 4D array
-    with shape (frames-1, height, width, 2). The kymograph visualizes
+    with shape (frames-1, channel, height, width, 2). The kymograph visualizes
     flow vectors over time, with different colors representing different
     flow directions.
 
     Args:
-        arr (np.ndarray): Input array of shape (frames-1, height, width, 2), where the last dimension contains the flow vectors (dx, dy).
+        arr (np.ndarray): Input array of shape (frames-1, channel, height, width, 2), where the last dimension contains the flow vectors (dx, dy).
         save_path (str): Path to save the plot. If None, the plot will be displayed instead of saved.
         threshold (float, optional): Threshold value to mask the array. Defaults to 0.5.
     
