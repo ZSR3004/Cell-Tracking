@@ -2,11 +2,12 @@
 Optical-flow analysis for cell-imagining.
 
 ## Table of Contents
-1. [What is Cell-Tracking?](#what-is-cell-tracking)
-2. [Versions & Status](#versions--status)
-3. [Contributing](#contributing-or-running-our-tests)
-4. [Style Guide](#style-guide)
-5. [Additional Resources & Creators](#additional-resources-and-creators)
+- [Cell-Tracking](#cell-tracking)
+  - [Table of Contents](#table-of-contents)
+  - [What is Cell-Tracking?](#what-is-cell-tracking)
+    - [Contributing or Running our Tests](#contributing-or-running-our-tests)
+  - [Style Guide](#style-guide)
+  - [Additional Resources and Creators:](#additional-resources-and-creators)
 
 
 ## What is Cell-Tracking?
@@ -21,6 +22,8 @@ But all of these do the exact same thing (just in different ways)!
 
 `Cell-Tracking` is a platform designed to enable optical-flow analysis of moving cells. In other words, it takes your TIFF files
 and turns them into analyzable data using optical-flow algorithms.
+
+(Note: A TIFF file, which stands for Tagged Image File Format, is a computer file used to store raster graphics and image information. TIFF files typically use the extensions .tiff or .tif.) Our program requires the input file to be a tiff file, so when you input a file, it should end with .tiff or .tif.
 
 We haven't yet implemented all three of these version. Below, is the status of each, including where you can find the 
 documentation which has the installation and usage instructions (if they exist).
