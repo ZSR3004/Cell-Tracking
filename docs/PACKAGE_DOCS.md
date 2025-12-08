@@ -31,11 +31,22 @@ the basic kymograph and heatmaps that we offer. This file serves as a general gu
 
 You should have the following installed on your laptop already.
 
-1. Python
+1. Python 
 2. A text editor
 3. Pip
 
 ### Main Installation Steps
+Before you begin, you need to check your python version.
+
+Our Cell-Tracking package requires Python 3.13.x.
+If you are not on Python version 3.13, you will need to upgrade before continuing. 
+
+To check your python version you can check your current version with: 
+```bash
+python3 --version
+```
+If it is not Python 3.13.x, install python 3.13 first (from python.org or pyenv/homebrew).
+
 
 We highly recommend using a virtual environment. As a quick reminder, you can create and activate one by going to your terminal and typing the following.
 
@@ -43,6 +54,12 @@ We highly recommend using a virtual environment. As a quick reminder, you can cr
 python3 -m venv .venv
 source .venv/bin/activate
 ```
+
+Note: If you find yourself in a virtual environment with an older version of Python then you can type:
+```bash
+deactivate
+```
+in the Terminal. After that, you can repeat the steps above to enter the correct virtual environment.
 
 After that, you can install our Cell-Tracking package by using the following command.
 
