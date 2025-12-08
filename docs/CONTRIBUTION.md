@@ -12,17 +12,18 @@ changes to repository.
 
 ## Table of Contents
 
-1. [Introduction](#contribution-guide)
-2. [Downloading the Source Code and Making Changes](#downloading-the-source-code-and-making-changes)
-   - [Prerequisite](#prerequisite)
-   - [Dependencies](#dependencies)
-   - [Cloning](#cloning)
-3. [Github Issues](#github-issues)
-   - [Writing Good Issues](#writing-good-issues)
-   - [Closing Issues](#closing-issues)
-4. [Pull Requests](#pull-requests)
-5. [Testing the Software](#testing-the-software)
-   - [How To Get Cell-Tracking's Path](#how-to-get-cell-trackings-path)
+- [Contribution Guide](#contribution-guide)
+  - [Table of Contents](#table-of-contents)
+  - [Downloading the Source Code and Making Changes](#downloading-the-source-code-and-making-changes)
+    - [Prerequisite](#prerequisite)
+    - [Dependencies](#dependencies)
+      - [Cloning](#cloning)
+  - [Github Issues](#github-issues)
+    - [Writing Good Issues](#writing-good-issues)
+    - [Closing Issues](#closing-issues)
+  - [Pull Requests](#pull-requests)
+  - [Testing the Software](#testing-the-software)
+    - [How To Get Cell-Tracking's Path](#how-to-get-cell-trackings-path)
 
 
 ## Downloading the Source Code and Making Changes
@@ -36,7 +37,7 @@ package manager rather than off the internet. It just makes it easier to maintai
 ### Dependencies
 
 - A text editor like VSode (you should Google how to configure this for Python)
-- Python 3
+- Python 3.13 (If not yet installed, you can install it from the official Python website: python.org)
 - Pip
 - Git
 - A Github account.
