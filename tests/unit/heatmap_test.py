@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, pytest
+import cv2, pytest, tifffile
 from src.cell_tracking import heatmap
 from src.cell_tracking import tiffclass as tiff
 from matplotlib import animation
@@ -21,7 +21,7 @@ TIFF_PATHS = [
 
 
 @pytest.fixture(params=TIFF_PATHS)
-def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+def init_tiff(request: pytest.FixtureRequest):
     """
     Creates a Tiff class instance.
 
@@ -37,7 +37,7 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - w (int): Width.
     """
     path = request.param
-    img = tiff.imread(path)
+    img = tifffile.imread(path)
     info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 

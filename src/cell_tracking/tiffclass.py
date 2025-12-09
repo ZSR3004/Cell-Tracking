@@ -1,5 +1,5 @@
 import numpy as np
-import tifffile as tiff
+import tifffile
 import datetime
 import cv2
 from scipy.ndimage import gaussian_laplace
@@ -32,7 +32,7 @@ class Tiff:
         """
         self.path = path
         self.timestamp = datetime.datetime.now()
-        self.arr = tiff.imread(path)
+        self.arr = tifffile.imread(path)
 
     def isolate_channel(self, channel_idx: int) -> np.ndarray:
         """
