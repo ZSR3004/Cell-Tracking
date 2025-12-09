@@ -56,7 +56,7 @@ def get_last_saved_pattern_fn_path(name: str, pattern_fn, main_path: str) -> Pat
     Returns:
         Path: Unique file path that does not yet exist.
     """
-    save_dir = main_path / name
+    save_dir = main_path
     save_dir.mkdir(parents=True, exist_ok=True)
 
     i = 1
@@ -111,18 +111,18 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     assert not save_dir2.exists()
     assert not save_dir3.exists()
 
-    unique_path_npy_fn_1 = save.get_unique_path(name1, npy_fn_1, tmp_path)
+    unique_path_npy_fn_1 = save.get_unique_path(name1, npy_fn_1, save_dir1)
     assert save_dir1.exists()
     assert unique_path_npy_fn_1.name == "flow_flow1.npy"
     assert unique_path_npy_fn_1.parent == save_dir1
 
-    unique_path_xyz_fn_2 = save.get_unique_path(name2, xyz_fn_2, tmp_path)
+    unique_path_xyz_fn_2 = save.get_unique_path(name2, xyz_fn_2, save_dir2)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert unique_path_xyz_fn_2.name == "Test_Name_flow1.xyz"
     assert unique_path_xyz_fn_2.parent == save_dir2
 
-    unique_path_mat_fn_3 = save.get_unique_path(name3, mat_fn_3, tmp_path)
+    unique_path_mat_fn_3 = save.get_unique_path(name3, mat_fn_3, save_dir3)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -136,21 +136,21 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     (save_dir3 / "randomfile1.mat").touch()
     (save_dir3 / "Test_Name_flow1.npy").touch()
 
-    unique_path_npy_fn_2 = save.get_unique_path(name2, npy_fn_2, tmp_path)
+    unique_path_npy_fn_2 = save.get_unique_path(name2, npy_fn_2, save_dir2)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_npy_fn_2.name == "Test_Name_flow1.npy"
     assert unique_path_npy_fn_2.parent == save_dir2
 
-    unique_path_xyz_fn_3 = save.get_unique_path(name3, xyz_fn_3, tmp_path)
+    unique_path_xyz_fn_3 = save.get_unique_path(name3, xyz_fn_3, save_dir3)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_xyz_fn_3.name == "1Name_flow1.xyz"
     assert unique_path_xyz_fn_3.parent == save_dir3
 
-    unique_path_mat_fn_1 = save.get_unique_path(name1, mat_fn_1, tmp_path)
+    unique_path_mat_fn_1 = save.get_unique_path(name1, mat_fn_1, save_dir1)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -171,21 +171,21 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     (save_dir2 / "Test_Name_flow8.mat").touch()
     (save_dir3 / "1Name_flow1.npy").touch()
 
-    unique_path_npy_fn_3 = save.get_unique_path(name3, npy_fn_3, tmp_path)
+    unique_path_npy_fn_3 = save.get_unique_path(name3, npy_fn_3, save_dir3)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_npy_fn_3.name == "1Name_flow2.npy"
     assert unique_path_npy_fn_3.parent == save_dir3
 
-    unique_path_xyz_fn_1 = save.get_unique_path(name1, xyz_fn_1, tmp_path)
+    unique_path_xyz_fn_1 = save.get_unique_path(name1, xyz_fn_1, save_dir1)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_xyz_fn_1.name == "flow_flow5.xyz"
     assert unique_path_xyz_fn_1.parent == save_dir1
 
-    unique_path_mat_fn_2 = save.get_unique_path(name2, mat_fn_2, tmp_path)
+    unique_path_mat_fn_2 = save.get_unique_path(name2, mat_fn_2, save_dir2)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -217,11 +217,12 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     save_dir = tmp_path / name1
     assert not save_dir.exists()
 
-    save_arr1 = save.save_arr(name1, img, tmp_path)
+    save_arr1 = save.save_arr(name1, img, save_dir)
     save_arr1_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", tmp_path
+        name1, lambda i: f"{name1}_flow{i}.npy", save_dir
     )
 
+    print(save_arr1_path)
     assert save_dir.exists()
     assert save_arr1_path.exists()
 
