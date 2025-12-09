@@ -57,4 +57,4 @@ class MemoryManager:
         sub_dirs = ["raw_data", "optical_flows", "heatmaps", "kymographs"]
 
         for path in sub_dirs:
-            os.makedirs(os.path.join(tiff_dir_path, path))
+            os.makedirs(os.path.join(tiff_dir_path, path), exist_ok=True)
