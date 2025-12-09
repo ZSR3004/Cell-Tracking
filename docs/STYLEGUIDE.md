@@ -134,15 +134,6 @@ Comments should be used sparingly. We'll adhere to the "why, not what" conventio
 you are doing something, don't use it to describe what is happening. If you find yourself needing to do the latter,
 we might need to refactor the code to make it easier to read.
 
-We should also be including comments at the top of every Python file to describe what the file does. For example,
-
-```python
-"""
-File: file_name.py
-Description: This file handles things that this file was made for.
-"""
-```
-
 ## 5. Importing and Dependency Management
 
 ### 5.1 Importing Packages or Modules
@@ -184,7 +175,7 @@ We will use Pytest to provide a framework for our unit tests.
 
 ## 7. Error Handling
 
-We will use try: except for error handling within our code. When moving into the except branch, we will make sure to log what's happening.
+We will use try: except for error handling within our code. When moving into the except branch, we will make sure to log what's happening.poetry install specific 
 
 ## 8. Logging
 
