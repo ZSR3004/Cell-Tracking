@@ -17,7 +17,7 @@ from unittest.mock import patch, Mock, MagicMock
 
 TIFF_PATHS = [
     (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+        "datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
         (96, 3, 520, 2329),
     )
 ]

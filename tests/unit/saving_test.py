@@ -20,7 +20,7 @@ from src.cell_tracking.defaults import default_process, default_flow
 
 TIFF_PATHS = [
     (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
+        "datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
         (96, 3, 520, 2329),
     )
 ]
