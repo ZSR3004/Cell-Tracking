@@ -15,10 +15,7 @@ from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import kymograph as kymo
 
 TIFF_PATHS = [
-    (
-        "datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
-        (96, 3, 520, 2329),
-    )
+        "datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
 ]
 
 
@@ -38,7 +35,9 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - h (int): Height.
             - w (int): Width.
     """
-    path, info = request.param
+    path = request.param
+    img = tiff.read(path)
+    info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 
 
