@@ -1,9 +1,6 @@
-import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 from src.memory import save_vector_video
-
-import matplotlib.animation as animation
 
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
