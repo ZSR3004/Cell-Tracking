@@ -121,12 +121,18 @@ that every new function has tests and that it works cohesively with what already
    
    - Note that this will take a second to install.
      
-5. Find the file whose tests you want to run. This file will be referred to as TEST_FILE. (Make sure TEST_FILE includes ".py" at the end. For example, TEST_FILE could be tiffclass_test.py).
+5. You must download the TIFF files we use in our testing. Please email Professor Mitchel to obtain these test files.
+
+   - Make sure that once the TIFF files are downloaded, their names match the names in our test files (these names are located in 'TIFF_PATHS').
+
+6. Go into your Cell-Tracking folder on your desktop and create a new folder named 'datasets'. Then, put all these TIFF files you just downloaded into the 'datasets' folder.
+
+7. Find the file whose tests you want to run. This file will be referred to as TEST_FILE. (Make sure TEST_FILE includes ".py" at the end. For example, TEST_FILE could be tiffclass_test.py).
    
-6. Figure out which folder TEST_FILE lies in. Note that this folder is a folder within the "tests" folder. This folder will be referred to as TEST_FOLDER. Make sure you are
+8. Figure out which folder TEST_FILE lies in. Note that this folder is a folder within the "tests" folder. This folder will be referred to as TEST_FOLDER. Make sure you are
    running the test from the main directory.
      
-8. Run ```pytest TEST_FILE```
+9. Run ```pytest TEST_FILE```
 <br><br>
 
 Here's an example work flow. We'll assume you're starting from scratch because you just want to check the tests.
