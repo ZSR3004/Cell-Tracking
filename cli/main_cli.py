@@ -143,7 +143,8 @@ def main():
     output_type = get_output_type()
         
     if output_type == 'f':
-        combined_flow = opt.calculate_combined_flow(my_video.arr)
+        farneback_args = my_folders.config["farneback_args"]
+        combined_flow = opt.calculate_combined_flow(my_video.arr, **farneback_args)
 
         #Change to Tiff specific directory
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
@@ -152,10 +153,13 @@ def main():
 
         answer = click.prompt("Do you want to calculate the isolated flows of channels 1 and 2? [y/n]", 
                          type=click.Choice(['y', 'n'], case_sensitive=False))
-            
+        
+        farneback_args = my_folders.config["farneback_args"]
+        raft_args = my_folders.config["raft_args"]
+
         if answer.lower() == 'y':
-            flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 1)
-            flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 2)
+            flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 1, **farneback_args)
+            flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 2, **farneback_args)
 
             s.save_original_video_cli("Original_Video_Left", full_path, 1)
             s.save_original_video_cli("Original_Video_Right", full_path, 2)
@@ -185,7 +189,8 @@ def main():
 
 
     elif output_type == 'r':
-        raft_flow = opt.calculate_raft_optical_flow(my_video)
+        raft_args = my_folders.config["raft_args"]
+        raft_flow = opt.calculate_raft_optical_flow(my_video, **raft_args)
 
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
         s.save_original_video_cli("Original_Video_Combined", full_path, 0)

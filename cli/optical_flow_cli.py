@@ -10,9 +10,9 @@ from src.cell_tracking import raft
 from src.cell_tracking import tiffclass
 import numpy as np
 
-def calculate_nuclei_optical_flow(arr: np.ndarray, channel: int) -> np.ndarray:
+def calculate_nuclei_optical_flow(arr: np.ndarray, channel: int, **kwargs) -> np.ndarray:
     """
-    This function preprocess the tiff stack with the parameters.
+    This function calculates the optical flow for an isolated channel.
 
     Args:
       arr: The stack from the initialized tiff class
@@ -20,11 +20,11 @@ def calculate_nuclei_optical_flow(arr: np.ndarray, channel: int) -> np.ndarray:
     Returns:
       The optical flow array. 
       """
-    return of.optical_flow(arr, channel)
+    return of.optical_flow(arr, channel, **kwargs)
 
-def calculate_combined_flow(arr: np.ndarray) -> np.ndarray:
+def calculate_combined_flow(arr: np.ndarray, **kwargs) -> np.ndarray:
     """
-    This function preprocess the tiff stack with the parameters.
+    This function calculates the combined flow of channels 1 and 2.
 
     Args:
       arr: The stack from the initialized tiff class
@@ -32,16 +32,16 @@ def calculate_combined_flow(arr: np.ndarray) -> np.ndarray:
     Returns:
       The optical flow array from combining the channels. 
       """
-    return of.calculate_optical_flow(arr)
+    return of.calculate_optical_flow(arr, **kwargs)
 
-def calculate_raft_optical_flow(Tiff: tiffclass.Tiff) -> np.ndarray:
+def calculate_raft_optical_flow(Tiff: tiffclass.Tiff, **kwargs) -> np.ndarray:
     """
-    This function preprocess the tiff stack with the parameters.
+    This function calculates optical flow using the raft method.
 
     Args:
       arr: The stack from the initialized tiff class.
     
     Returns:
-      The raft flow for the third channel
+      The raft flow for the zeroth channel
       """
-    return raft.calcOpticalFlowRAFT(Tiff)
+    return raft.calcOpticalFlowRAFT(Tiff, **kwargs)
