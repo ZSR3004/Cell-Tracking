@@ -67,7 +67,7 @@ Now, you can setup your development environment. We've used the library Poetry t
 environment. 
 
 ```bash
-python3 -m venv .venv       # create a virtual environment
+python3.13 -m venv .venv       # create a virtual environment with Python version 3.13
 source .venv/bin/activate   # use the virtual environment
 pip install poetry
 poetry install
