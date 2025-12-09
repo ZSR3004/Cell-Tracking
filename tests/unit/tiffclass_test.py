@@ -36,7 +36,7 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - w (int): Width.
     """
     path = request.param
-    img = tiff.read(path)
+    img = tiff.imread(path)
     info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 
