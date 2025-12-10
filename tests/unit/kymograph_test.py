@@ -171,7 +171,7 @@ def test_mask_line_arr(init_tiff: tuple):
         """
         with patch("numpy.max") as mock_max, \
             patch("numpy.where") as mock_where:
-            mock_max.side_effect = lambda x: x[0, 0, 0]
+            mock_max.side_effect = lambda x: x[0, 0]
             mock_where.return_value = flowx
 
             result = kymo.mask_line_arr(flowx, thresholdx)
@@ -181,7 +181,7 @@ def test_mask_line_arr(init_tiff: tuple):
 
             args_where, _ = mock_where.call_args
             assert np.array_equal(args_where[0], (flowx > thresholdx))
-            assert np.array_equal(args_where[1], flowx[0, 0, 0])
+            assert np.array_equal(args_where[1], flowx[0, 0])
             assert args_where[2] == 0
 
             mock_max.assert_called_once()
