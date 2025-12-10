@@ -26,12 +26,12 @@ def mask_line_arr(line_arr: np.ndarray, threshold: int=0.5):
     flow vectors in a kymograph.
 
     Args:
-        line_arr (np.ndarray): Input array.
+        line_arr (np.ndarray): Input array (usually of shape (f-1, w)).
         threshold (int, optional): Threshold value to mask the array. Defaults to 0.5.
 
     Returns:
         np.ndarray: Masked array where values below the threshold are set to zero, and the 
-                    maximum value in the array is retained. Shape is the same as the input array's shape.
+                    maximum value in the array is retained. Shape is the same as the input array's shape (which is usually (f-1, w)).
     """
     max_val = np.max(line_arr)
     masked_line_arr = np.where(line_arr > threshold, max_val, 0)
