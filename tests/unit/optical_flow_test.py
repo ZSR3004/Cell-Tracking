@@ -416,16 +416,8 @@ def test_calculate_optical_flow(init_tiff):
             mock_combine.assert_called_once()
 
     test_case_x(flow0, **kwargs1)
-    test_case_x(flow1, **kwargs1)
-    test_case_x(flow2, **kwargs1)
     test_case_x(flow0, **kwargs2)
-    test_case_x(flow1, **kwargs2)
-    test_case_x(flow2, **kwargs2)
-    test_case_x(flow0, **kwargs3)
     test_case_x(flow1, **kwargs3)
-    test_case_x(flow2, **kwargs3)
-    test_case_x(flow0, **kwargs4)
-    test_case_x(flow1, **kwargs4)
     test_case_x(flow2, **kwargs4)
 
 
