@@ -142,10 +142,16 @@ def test_mask_line_arr(init_tiff: tuple):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    #flow0, flow1, and flow2 have shape (f, h, w)
-    flow0 = tiff_arr[:, 0, :, :]
-    flow1 = tiff_arr[:, 1, :, :]
-    flow2 = tiff_arr[:, 2, :, :]
+    #all the flows below have shape (f-1, w) (which is the same shape as flatten_arr's output)
+    flow0_first = tiff_arr[1:, 0, 0, :]
+    flow0_middle = tiff_arr[1:, 0, h//2, :]
+    flow0_last = tiff_arr[1:, 0, -1, :]
+    flow1_first = tiff_arr[1:, 1, 0, :]
+    flow1_middle = tiff_arr[1:, 1, h//2, :]
+    flow1_last = tiff_arr[1:, 1, -1, :]
+    flow2_first = tiff_arr[1:, 2, 0, :]
+    flow2_middle = tiff_arr[1:, 2, h//2, :]
+    flow2_last = tiff_arr[1:, 2, -1, :]
 
     threshold1 = 0.5
     threshold2 = 0.0
@@ -157,7 +163,7 @@ def test_mask_line_arr(init_tiff: tuple):
         Tests whether the mask_line_arr function works correctly on a specific test case.
 
         Args:
-            flowx (np.ndarray): Flow array of shape (frames, height, width).
+            flowx (np.ndarray): Flow array of shape (frames-1, width).
             thresholdx (float): Threshold value to mask the array.
 
         Returns:
@@ -181,22 +187,46 @@ def test_mask_line_arr(init_tiff: tuple):
             mock_max.assert_called_once()
             mock_where.assert_called_once()
 
-            assert result.shape == (f, h, w)
+            assert result.shape == (f-1, w)
             assert result.shape == flowx.shape
             assert isinstance(result, np.ndarray)
 
-    test_case_x(flow0, threshold1)
-    test_case_x(flow0, threshold2)
-    test_case_x(flow0, threshold3)
-    test_case_x(flow0, threshold4)
-    test_case_x(flow1, threshold1)
-    test_case_x(flow1, threshold2)
-    test_case_x(flow1, threshold3)
-    test_case_x(flow1, threshold4)
-    test_case_x(flow2, threshold1)
-    test_case_x(flow2, threshold2)
-    test_case_x(flow2, threshold3)
-    test_case_x(flow2, threshold4)
+    test_case_x(flow0_first, threshold1)
+    test_case_x(flow0_first, threshold2)
+    test_case_x(flow0_first, threshold3)
+    test_case_x(flow0_first, threshold4)
+    test_case_x(flow0_middle, threshold1)
+    test_case_x(flow0_middle, threshold2)
+    test_case_x(flow0_middle, threshold3)
+    test_case_x(flow0_middle, threshold4)
+    test_case_x(flow0_last, threshold1)
+    test_case_x(flow0_last, threshold2)
+    test_case_x(flow0_last, threshold3)
+    test_case_x(flow0_last, threshold4)
+    test_case_x(flow1_first, threshold1)
+    test_case_x(flow1_first, threshold2)
+    test_case_x(flow1_first, threshold3)
+    test_case_x(flow1_first, threshold4)
+    test_case_x(flow1_middle, threshold1)
+    test_case_x(flow1_middle, threshold2)
+    test_case_x(flow1_middle, threshold3)
+    test_case_x(flow1_middle, threshold4)
+    test_case_x(flow1_last, threshold1)
+    test_case_x(flow1_last, threshold2)
+    test_case_x(flow1_last, threshold3)
+    test_case_x(flow1_last, threshold4)
+    test_case_x(flow2_first, threshold1)
+    test_case_x(flow2_first, threshold2)
+    test_case_x(flow2_first, threshold3)
+    test_case_x(flow2_first, threshold4)
+    test_case_x(flow2_middle, threshold1)
+    test_case_x(flow2_middle, threshold2)
+    test_case_x(flow2_middle, threshold3)
+    test_case_x(flow2_middle, threshold4)
+    test_case_x(flow2_last, threshold1)
+    test_case_x(flow2_last, threshold2)
+    test_case_x(flow2_last, threshold3)
+    test_case_x(flow2_last, threshold4)
 
 
 def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
@@ -219,53 +249,29 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    def dummy_optical_flow(channel: int):
-        """
-        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
-        faster than calling flow.optical_flow (which is why it's perfect for testing).
+    #Making flowx
+    dummy_dx = tiff_arr[1:] - tiff_arr[:-1]
+    dummy_dy = tiff_arr[1:] - tiff_arr[:-1]
 
-        Args:
-            channel (int): The channel to process.
-
-        Returns:
-            A np.ndarray of shape (f-1, h, w, 2).
-        """
-        arr_channel = tiff_arr[:, channel, :, :]
-
-        dummy_dx = arr_channel[1:] - arr_channel[:-1]
-        dummy_dy = arr_channel[1:] - arr_channel[:-1]
-
-        return np.stack([dummy_dx, dummy_dy], axis=-1)
-
-    #flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
-    flow0 = dummy_optical_flow(0)
-    flow1 = dummy_optical_flow(1)
-    flow2 = dummy_optical_flow(2)
+    #flowx has shape (f-1, c, h, w, 2), which is the shape of plot_basic_kymo's input array
+    flowx = np.stack([dummy_dx, dummy_dy], axis=-1)
 
     threshold1 = 0.5
     threshold2 = 0.0
     threshold3 = 1.5
     threshold4 = 0.25
 
-    flow0_threshold1_path = tmp_path / "flow0_threshold1_path.png"
-    flow0_threshold2_path = tmp_path / "flow0_threshold2_path.png"
-    flow0_threshold3_path = tmp_path / "flow0_threshold3_path.png"
-    flow0_threshold4_path = tmp_path / "flow0_threshold4_path.png"
-    flow1_threshold1_path = tmp_path / "flow1_threshold1_path.png"
-    flow1_threshold2_path = tmp_path / "flow1_threshold2_path.png"
-    flow1_threshold3_path = tmp_path / "flow1_threshold3_path.png"
-    flow1_threshold4_path = tmp_path / "flow1_threshold4_path.png"
-    flow2_threshold1_path = tmp_path / "flow2_threshold1_path.png"
-    flow2_threshold2_path = tmp_path / "flow2_threshold2_path.png"
-    flow2_threshold3_path = tmp_path / "flow2_threshold3_path.png"
-    flow2_threshold4_path = tmp_path / "flow2_threshold4_path.png"
+    flowx_threshold1_path = tmp_path / "flowx_threshold1_path.png"
+    flowx_threshold2_path = tmp_path / "flowx_threshold2_path.png"
+    flowx_threshold3_path = tmp_path / "flowx_threshold3_path.png"
+    flowx_threshold4_path = tmp_path / "flowx_threshold4_path.png"
 
     def test_case_x(flowx: np.ndarray, thresholdx: float, save_path_x: str=None):
         """
         Tests whether the plot_basic_kymo function works correctly on a specific test case.
 
         Args:
-            flowx (np.ndarray): Flow array of shape (frames-1, height, width, 2).
+            flowx (np.ndarray): Flow array of shape (frames-1, channel, height, width, 2).
             thresholdx (float): Threshold value to mask the array.
             save_path_x (str): Path to save the plot. If None, the plot will be displayed instead of saved.
 
@@ -297,8 +303,8 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             masked_line_arr1 = mask_boundary(flowx[:, 1, ...], threshold=thresholdx)
             masked_line_arr2 = mask_boundary(flowx[:, 2, ...], threshold=thresholdx)
 
-            assert masked_line_arr1.shape == (f, h, w)
-            assert masked_line_arr2.shape == (f, h, w)
+            assert masked_line_arr1.shape == (f, h, w, 2)
+            assert masked_line_arr2.shape == (f, h, w, 2)
 
             combined_data = np.zeros_like(masked_line_arr1)
             combined_data[masked_line_arr1 != 0] += 1
@@ -359,27 +365,11 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
                 mock_savefig.assert_not_called()
                 mock_close.assert_not_called()
 
-    test_case_x(flow0, threshold1, flow0_threshold1_path)   #flow0, threshold1 save
-    test_case_x(flow0, threshold1, None)                    #flow0, threshold1 show
-    test_case_x(flow0, threshold2, flow0_threshold2_path)   #flow0, threshold2 save
-    test_case_x(flow0, threshold2, None)                    #flow0, threshold2 show
-    test_case_x(flow0, threshold3, flow0_threshold3_path)   #flow0, threshold3 save
-    test_case_x(flow0, threshold3, None)                    #flow0, threshold3 show
-    test_case_x(flow0, threshold4, flow0_threshold4_path)   #flow0, threshold4 save
-    test_case_x(flow0, threshold4, None)                    #flow0, threshold4 show
-    test_case_x(flow1, threshold1, flow1_threshold1_path)   #flow1, threshold1 save
-    test_case_x(flow1, threshold1, None)                    #flow0, threshold1 show
-    test_case_x(flow1, threshold2, flow1_threshold2_path)   #flow1, threshold2 save
-    test_case_x(flow1, threshold2, None)                    #flow1, threshold2 show
-    test_case_x(flow1, threshold3, flow1_threshold3_path)   #flow1, threshold3 save
-    test_case_x(flow1, threshold3, None)                    #flow1, threshold3 show
-    test_case_x(flow1, threshold4, flow1_threshold4_path)   #flow1, threshold4 save
-    test_case_x(flow1, threshold4, None)                    #flow1, threshold4 show
-    test_case_x(flow2, threshold1, flow2_threshold1_path)   #flow2, threshold1 save
-    test_case_x(flow2, threshold1, None)                    #flow2, threshold1 show
-    test_case_x(flow2, threshold2, flow2_threshold2_path)   #flow2, threshold2 save
-    test_case_x(flow2, threshold2, None)                    #flow2, threshold2 show
-    test_case_x(flow2, threshold3, flow2_threshold3_path)   #flow2, threshold3 save
-    test_case_x(flow2, threshold3, None)                    #flow2, threshold3 show
-    test_case_x(flow2, threshold4, flow2_threshold4_path)   #flow2, threshold4 save
-    test_case_x(flow2, threshold4, None)                    #flow2, threshold4 show
+    test_case_x(flowx, threshold1, flowx_threshold1_path)   #flowx, threshold1 save
+    test_case_x(flowx, threshold1, None)                    #flowx, threshold1 show
+    test_case_x(flowx, threshold2, flowx_threshold2_path)   #flowx, threshold2 save
+    test_case_x(flowx, threshold2, None)                    #flowx, threshold2 show
+    test_case_x(flowx, threshold3, flowx_threshold3_path)   #flowx, threshold3 save
+    test_case_x(flowx, threshold3, None)                    #flowx, threshold3 show
+    test_case_x(flowx, threshold4, flowx_threshold4_path)   #flowx, threshold4 save
+    test_case_x(flowx, threshold4, None)                    #flowx, threshold4 show
