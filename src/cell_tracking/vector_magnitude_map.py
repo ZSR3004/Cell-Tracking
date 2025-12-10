@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from src.memory import save_vector_video
+from .saving import save_vector_video
 
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
