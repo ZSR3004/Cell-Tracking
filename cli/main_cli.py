@@ -93,6 +93,12 @@ def get_output_type() -> str:
 
     my_video = click.prompt("Type in the type of optical flow you want to calculate (f for farneback, r for raft)", type=str)
 
+    if my_video == 'r':
+        answer = click.prompt("We are no longer updating raft optical flow training, and the output might not be accurate. Do you wish to calculate using the farneback method instead?", 
+                         type=click.Choice(['y', 'n'], case_sensitive=False))  
+        if answer == 'y':
+            return 'f'
+
     return my_video
 
 def wants_isolated() -> bool:
@@ -126,11 +132,14 @@ def process_single_tiff(full_path, parent_dir, my_folders, outputs, output_type,
 
     Returns: None, just calculates everything the user wanted for a single tiff file
     """
+
     tiff_base_path = os.path.join(parent_dir, "Cell-Tracking")
 
     tiff_name = os.path.basename(full_path)
- 
+    
     my_video = fic.init_tiff_class(full_path)
+
+    print("Creating folder for " + tiff_name + "...")
 
     if not os.path.exists(tiff_base_path + "/" + tiff_name):
         my_folders.create_tiff_dir(tiff_name)
@@ -138,31 +147,36 @@ def process_single_tiff(full_path, parent_dir, my_folders, outputs, output_type,
         i=1
         while os.path.exists(os.path.join(tiff_base_path, f"{tiff_name} ({i})")):
             i += 1
-        new_name = f"{tiff_name} ({i})"
-        my_folders.create_tiff_dir(new_name)
-        tiff_name = new_name
+            new_name = f"{tiff_name} ({i})"
+            my_folders.create_tiff_dir(new_name)
+            tiff_name = new_name
 
     #Creates a Tiff class instance and preprocesses based on the yaml config file.
     my_folders.read_yaml()
     preprocess_args = my_folders.config["preprocess_args"]
     fic.preprocess_tiff(my_video, **preprocess_args)
-        
+    print("Processing " + tiff_name + "...")
+            
     if output_type == 'f':
         farneback_args = my_folders.config["farneback_args"]
+        print("Calculating farneback optical flow...")
         combined_flow = opt.calculate_combined_flow(my_video.arr, **farneback_args)
 
         #Change to Tiff specific directory
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
+        print("Saving original video...")
         s.save_original_video_cli("Original_Video_Combined", full_path, 0)
         
         farneback_args = my_folders.config["farneback_args"]
         raft_args = my_folders.config["raft_args"]
 
         if isolated_answer == True:
+            print("Calculating isolated flow...")
             flow_channel_1 = opt.calculate_nuclei_optical_flow(my_video.arr, 1, **farneback_args)
             flow_channel_2 = opt.calculate_nuclei_optical_flow(my_video.arr, 2, **farneback_args)
 
+            print("Saving videos of isolated flow...")
             s.save_original_video_cli("Original_Video_Left", full_path, 1)
             s.save_original_video_cli("Original_Video_Right", full_path, 2)
 
@@ -170,6 +184,7 @@ def process_single_tiff(full_path, parent_dir, my_folders, outputs, output_type,
             if "Optical Flow Data" in outputs:
                 #Change to opt flow directory, save isolated flow data
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+                print("Saving isolated optical flow data...")
                 s.save_flow_cli("Channel_1", flow_channel_1, os.getcwd())
                 s.save_flow_cli("Channel_2", flow_channel_2, os.getcwd())
 
@@ -177,42 +192,51 @@ def process_single_tiff(full_path, parent_dir, my_folders, outputs, output_type,
         if "Optical Flow Data" in outputs:
             #Change to opt flow directory, save combined flow data
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+            print("Saving combined flow data...")
             s.save_flow_cli("farneback", combined_flow, os.getcwd())
 
         if "Heatmap" in outputs:
             #Change to heatmap directory, save combined heatmap video
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
+            print("Creating heatmap...")
             v.plot_heatmap_cli(combined_flow, "Nuclei Dyed Heatmap", os.path.join(os.getcwd(), "heatmap_nuclei_dyed_flow.mp4"))
                 
         if "Kymograph" in outputs:
             #Change to kymograph directory, save combined kymograph
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
+            print("Creating kymograph...")
             v.plot_basic_kymo_cli(combined_flow, os.path.join(os.getcwd(), "kymo_nuclei_dyed_flow.png"))
 
-
     elif output_type == 'r':
+        
         raft_args = my_folders.config["raft_args"]
+        print("Calculating raft optical flow...")
         raft_flow = opt.calculate_raft_optical_flow(my_video, **raft_args)
 
         os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
+        print("Saving original video...")
         s.save_original_video_cli("Original_Video_Combined", full_path, 0)
 
         if "Optical Flow Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
+            print("Saving optical flow...")
             s.save_flow_cli("raft_flow", raft_flow, os.getcwd())
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
+            print("Creating heatmap...")
             v.plot_heatmap_cli(raft_flow, "Phase Contrast Heatmap", os.path.join(os.getcwd(), "heatmap_phase_contrast.mp4"))
         
         if "Kymograph" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/kymographs")
+            print("Creating kymograph...")
             v.plot_basic_kymo_cli(raft_flow, os.path.join(os.getcwd(), "kymo_phase_contrast.png"))
     
     os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name)
 
     if "Raw Data" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/raw_data")
+            print("Saving raw tiff array...")
             s.save_arr_cli("tiff_array", my_video, Path(os.getcwd()))
 
 def main():
