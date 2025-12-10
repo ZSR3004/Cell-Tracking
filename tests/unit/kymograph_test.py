@@ -289,9 +289,9 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             patch("matplotlib.pyplot.close") as mock_close, \
             patch("matplotlib.pyplot.show") as mock_show:
             #mock_flatten_arr_flow has shape (f-1, w), which is the same shape as kymograph.flatten_arr(flowx)
-            mock_flatten_arr_flow = flowx[:, 0, :, 0]
+            mock_flatten_arr_flow = flowx[:, 0, 0, :, 0]
             mock_flatten_arr.return_value = mock_flatten_arr_flow
-            #mock_mask_line_arr_flow returns an array of shape (f, h, w), which is the same shape as kymograph.flatten_arr(arr1) (where arr1 is an array of shape (f, h, w))
+            #mock_mask_line_arr_flow returns an array of shape (f-1, w), which is the same shape as kymograph.flatten_arr(arr1) (where arr1 is an array of shape (f-1, w))
             mock_mask_line_arr.side_effect = lambda x: x
 
             def mask_boundary(channel_arr: np.ndarray, threshold: float=0.5):
@@ -303,8 +303,8 @@ def test_plot_basic_kymo(init_tiff: tuple, tmp_path):
             masked_line_arr1 = mask_boundary(flowx[:, 1, ...], threshold=thresholdx)
             masked_line_arr2 = mask_boundary(flowx[:, 2, ...], threshold=thresholdx)
 
-            assert masked_line_arr1.shape == (f, h, w, 2)
-            assert masked_line_arr2.shape == (f, h, w, 2)
+            assert masked_line_arr1.shape == (f-1, w)
+            assert masked_line_arr2.shape == (f-1, w)
 
             combined_data = np.zeros_like(masked_line_arr1)
             combined_data[masked_line_arr1 != 0] += 1
