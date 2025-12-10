@@ -346,11 +346,35 @@ def test_calculate_optical_flow(init_tiff):
     kwargs3 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
     kwargs4 = {}
 
-    def test_case_x(**kwargsx):
+    def dummy_optical_flow(channel: int):
+        """
+        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
+        faster than calling flow.optical_flow (which is why it's perfect for testing).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    #flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    flow0 = dummy_optical_flow(0)
+    flow1 = dummy_optical_flow(1)
+    flow2 = dummy_optical_flow(2)
+
+    def test_case_x(flowx: np.ndarray, **kwargsx):
         """
         Tests whether the calculate_optical_flow function works correctly.
 
         Args:
+            flowx (np.ndarray): The return value for optflow. This is a parameter because I want to test all channels. Shape is (f-1, h, w, 2).
             **kwargsx: Additional keyword arguments passed to `optical_flow` for Farneback parameters:
                 - pyr_scale (float)
                 - levels (int)
@@ -365,8 +389,9 @@ def test_calculate_optical_flow(init_tiff):
         """
         with patch("src.cell_tracking.optical_flow.optical_flow") as mock_optflow, \
             patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine:
-            mock_optflow.return_value = np.zeros((f-1, h, w, 2))
-            mock_combine.return_value = np.zeros((f-1, 3, h, w, 2))
+            mock_optflow.return_value = flowx
+            combine_return_value = np.stack([flowx, flowx, flowx], axis=1)
+            mock_combine.return_value = combine_return_value
 
             result = flow.calculate_optical_flow(tiff_arr, **kwargsx)
 
@@ -381,19 +406,27 @@ def test_calculate_optical_flow(init_tiff):
             assert second_optflow_kwargs == kwargsx
 
             combine_args, _ = mock_combine.call_args
-            assert np.array_equal(combine_args[0], [np.zeros((f-1, h, w, 2)), np.zeros((f-1, h, w, 2))])
+            assert np.array_equal(combine_args[0], [flowx, flowx])
 
-            assert np.array_equal(result, np.zeros((f-1, 3, h, w, 2)))
+            assert np.array_equal(result, combine_return_value)
             assert result.shape == (f-1, 3, h, w, 2)
             assert isinstance(result, np.ndarray)
 
             assert mock_optflow.call_count == 2
             mock_combine.assert_called_once()
 
-    test_case_x(**kwargs1)
-    test_case_x(**kwargs2)
-    test_case_x(**kwargs3)
-    test_case_x(**kwargs4)
+    test_case_x(flow0, **kwargs1)
+    test_case_x(flow1, **kwargs1)
+    test_case_x(flow2, **kwargs1)
+    test_case_x(flow0, **kwargs2)
+    test_case_x(flow1, **kwargs2)
+    test_case_x(flow2, **kwargs2)
+    test_case_x(flow0, **kwargs3)
+    test_case_x(flow1, **kwargs3)
+    test_case_x(flow2, **kwargs3)
+    test_case_x(flow0, **kwargs4)
+    test_case_x(flow1, **kwargs4)
+    test_case_x(flow2, **kwargs4)
 
 
 def test_show_flow(init_tiff, tmp_path):
