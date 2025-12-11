@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
 

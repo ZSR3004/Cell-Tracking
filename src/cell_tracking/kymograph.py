@@ -4,7 +4,7 @@ import matplotlib.colors as mcolors
 import os
 
 
-def flatten_arr(arr: np.ndarray):
+def flatten_arr(arr: np.ndarray) -> np.ndarray:
     """
     Flattens the input array along the last axis and returns a 2D array.
     The input array is expected to have a shape of (frames-1, height, width, 2),
@@ -23,7 +23,7 @@ def flatten_arr(arr: np.ndarray):
     return mag_arr
 
 
-def mask_line_arr(line_arr: np.ndarray, threshold: int = 0.5):
+def mask_line_arr(line_arr: np.ndarray, threshold: float = 0.5) -> np.ndarray:
     """
     Masks the input array by setting values below a threshold to zero and
     keeping the maximum value in the array. This is useful for visualizing
@@ -42,7 +42,7 @@ def mask_line_arr(line_arr: np.ndarray, threshold: int = 0.5):
     return masked_line_arr
 
 
-def plot_basic_kymo(arr: np.ndarray, save_path: str = None, threshold: float = 0.5):
+def plot_basic_kymo(arr: np.ndarray, save_path: str | None = None, threshold: float = 0.5) -> None:
     """
     Plots a kymograph from the input array, which is expected to be a 4D array
     with shape (frames-1, channel, height, width, 2). The kymograph visualizes
