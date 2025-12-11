@@ -17,9 +17,7 @@ from scipy.io import savemat
 import matplotlib.animation as animation
 from src.cell_tracking.defaults import default_process, default_flow
 
-TIFF_PATHS = [
-        "datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-]
+TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -257,11 +255,24 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
         shaped_arr1, np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]])
     )
     unshaped_arr2 = np.array(
-        [[[[[4.2, 3.8]], [[9.5, 11.9]], [[0.1, 1.9]]]], [[[[7.0, 18.3829]], [[9.0, 1029.8]], [[4.3, 5.53]]]]]
+        [
+            [[[[4.2, 3.8]], [[9.5, 11.9]], [[0.1, 1.9]]]],
+            [[[[7.0, 18.3829]], [[9.0, 1029.8]], [[4.3, 5.53]]]],
+        ]
     )
     shaped_arr2 = unshaped_arr2.reshape(-1, 2)
     assert np.allclose(
-        shaped_arr2, np.array([[4.2, 3.8], [9.5, 11.9], [0.1, 1.9], [7.0, 18.3829], [9.0, 1029.8], [4.3, 5.53]])
+        shaped_arr2,
+        np.array(
+            [
+                [4.2, 3.8],
+                [9.5, 11.9],
+                [0.1, 1.9],
+                [7.0, 18.3829],
+                [9.0, 1029.8],
+                [4.3, 5.53],
+            ]
+        ),
     )
 
     name = "Test_Name"
@@ -357,7 +368,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
 
     with patch("numpy.save") as mock_save:
         save.save_optical_flow_as_numpy(name, tiff_arr, save_dir)
-        
+
         args, _ = mock_save.call_args
         save_path = args[0]
         opt_flow = args[1]
@@ -434,14 +445,28 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
-        with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter, \
-            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation:
+        with (
+            patch(
+                "src.cell_tracking.saving.animation.FFMpegWriter"
+            ) as mock_ffmpegwriter,
+            patch(
+                "src.cell_tracking.saving.animation.FuncAnimation"
+            ) as mock_funcanimation,
+        ):
             mock_ani = MagicMock()
             mock_funcanimation.return_value = mock_ani
             mock_writer_instance = MagicMock()
             mock_ffmpegwriter.return_value = mock_writer_instance
 
-            save.save_original_video("Video_Name", stackx_kwargsx_path, mock_im, image_stackx, mock_fig, mock_ax, **kwargsx)
+            save.save_original_video(
+                "Video_Name",
+                stackx_kwargsx_path,
+                mock_im,
+                image_stackx,
+                mock_fig,
+                mock_ax,
+                **kwargsx,
+            )
 
             T = kwargsx.get("T", image_stackx.shape[0])
             fps = kwargsx.get("fps", 10)
@@ -456,7 +481,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             _, kwargs_FFMpegWriter = mock_ffmpegwriter.call_args
             assert kwargs_FFMpegWriter["fps"] == fps
 
-            mock_ani.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
+            mock_ani.save.assert_called_once_with(
+                stackx_kwargsx_path, writer=mock_writer_instance
+            )
             mock_funcanimation.assert_called_once()
             mock_ffmpegwriter.assert_called_once()
 

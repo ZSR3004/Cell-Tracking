@@ -132,8 +132,8 @@ def show_flow(
     scale: int = 200,
     pivot: str = "tail",
     color: str = "blue",
-    save_path: str = None
-    ) -> None:
+    save_path: str = None,
+) -> None:
     """
     Displays optical flow as a quiver plot using matplotlib.
 

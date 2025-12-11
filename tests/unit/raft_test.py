@@ -11,9 +11,7 @@ from src.cell_tracking import raft
 from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = [
-        "datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"
-]
+TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -207,7 +205,7 @@ class TestPadToMultipleOf8(TensorHelpers):
         pad_h = (8 - h % 8) % 8
         pad_w = (8 - w % 8) % 8
 
-        assert pad_ten.shape == (f, 3, h+pad_h, w+pad_w)
+        assert pad_ten.shape == (f, 3, h + pad_h, w + pad_w)
 
 
 class TestPreprocessTensor(TensorHelpers):
@@ -260,8 +258,8 @@ class TestBatchFrames(TensorHelpers):
         (f, _, a, b) = ten.shape
         assert ten.shape[1] == 3
 
-        assert batch1.shape == (f-1, 3, a, b)
-        assert batch2.shape == (f-1, 3, a, b)
+        assert batch1.shape == (f - 1, 3, a, b)
+        assert batch2.shape == (f - 1, 3, a, b)
         assert batch1.shape == batch2.shape
 
         assert torch.equal(batch1[0], ten[0])
@@ -579,7 +577,7 @@ class TestCalcOpticalFlowRAFT:
                 - h (int): Height.
                 - w (int): Width.
 
-        Returns: 
+        Returns:
             None.
         """
         tiff_file, info = init_tiff
@@ -607,7 +605,7 @@ class TestCalcOpticalFlowRAFT:
 
             assert isinstance(result, np.ndarray)
             assert result.ndim == 4
-            assert result.shape == (f-1, h+pad_h, w+pad_w, 2)
+            assert result.shape == (f - 1, h + pad_h, w + pad_w, 2)
 
     def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
         """
@@ -655,6 +653,6 @@ class TestCalcOpticalFlowRAFT:
             pad_w = (8 - w % 8) % 8
 
             assert isinstance(result, np.ndarray)
-            assert result.shape == (f-1, h+pad_h, w+pad_w, 2)
+            assert result.shape == (f - 1, h + pad_h, w + pad_w, 2)
 
             mock_raft.assert_called_once_with(progress=False)
