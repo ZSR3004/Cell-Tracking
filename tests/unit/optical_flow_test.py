@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, gc, pytest
+import cv2, gc, pytest, tifffile
 from sympy import Idx
 from src.cell_tracking import optical_flow as flow
 import numpy as np
@@ -17,16 +17,11 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
 
-TIFF_PATHS = [
-    (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
-        (96, 3, 520, 2329),
-    )
-]
+TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
-def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+def init_tiff(request: pytest.FixtureRequest):
     """
     Creates a Tiff class instance.
 
@@ -41,7 +36,9 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - h (int): Height.
             - w (int): Width.
     """
-    path, info = request.param
+    path = request.param
+    img = tifffile.imread(path)
+    info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 
 
@@ -82,7 +79,7 @@ def test_combine_flows(init_tiff):
 
         return np.stack([dummy_dx, dummy_dy], axis=-1)
 
-    #flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    # flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
     flow0 = dummy_optical_flow(0)
     flow1 = dummy_optical_flow(1)
     flow2 = dummy_optical_flow(2)
@@ -120,10 +117,10 @@ def test_compute_flow_pair(init_tiff):
     tiff_arr = img.arr
 
     # shapes of these: (height, width)
-    frame0_channel0 = tiff_arr[0, 0]  
+    frame0_channel0 = tiff_arr[0, 0]
     frame1_channel0 = tiff_arr[1, 0]
-    middleframe0_channel1 = tiff_arr[f//2, 1]
-    middleframe1_channel1 = tiff_arr[(f//2)-1, 1]
+    middleframe0_channel1 = tiff_arr[f // 2, 1]
+    middleframe1_channel1 = tiff_arr[(f // 2) - 1, 1]
     lastframe0_channel2 = tiff_arr[-1, 2]
     lastframe1_channel2 = tiff_arr[-2, 2]
 
@@ -273,7 +270,9 @@ def test_optical_flow(init_tiff):
             ]
 
             mock_pool_instance = mock_pool.return_value.__enter__.return_value
-            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros((x[0].shape[0], x[0].shape[1], 2)) for x in arr1]
+            mock_pool_instance.map.side_effect = lambda func, arr1: [
+                np.zeros((x[0].shape[0], x[0].shape[1], 2)) for x in arr1
+            ]
 
             result = flow.optical_flow(tiff_arr, channelx, **kwargsx)
 
@@ -291,7 +290,7 @@ def test_optical_flow(init_tiff):
             mock_pool.assert_called_once()
             mock_pool_instance.map.assert_called_once()
 
-            assert result.shape == (f-1, h, w, 2)
+            assert result.shape == (f - 1, h, w, 2)
 
     test_case_x(0, **kwargs1)
     test_case_x(1, **kwargs1)
@@ -347,11 +346,35 @@ def test_calculate_optical_flow(init_tiff):
     kwargs3 = {"levels": 5, "winsize": 17, "poly_n": 10, "flags": 1}
     kwargs4 = {}
 
-    def test_case_x(**kwargsx):
+    def dummy_optical_flow(channel: int):
+        """
+        A function that creates an array similar to (and with the same shape as) flow.optical_flow(tiff_arr, channel). This function is much
+        faster than calling flow.optical_flow (which is why it's perfect for testing).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    # flow0, flow1, and flow2 have shape (f-1, h, w, 2), which is the same shape as flow.optical_flow(tiff_arr, n) (where n is 0, 1, or 2)
+    flow0 = dummy_optical_flow(0)
+    flow1 = dummy_optical_flow(1)
+    flow2 = dummy_optical_flow(2)
+
+    def test_case_x(flowx: np.ndarray, **kwargsx):
         """
         Tests whether the calculate_optical_flow function works correctly.
 
         Args:
+            flowx (np.ndarray): The return value for optflow. This is a parameter because I want to test all channels. Shape is (f-1, h, w, 2).
             **kwargsx: Additional keyword arguments passed to `optical_flow` for Farneback parameters:
                 - pyr_scale (float)
                 - levels (int)
@@ -364,10 +387,13 @@ def test_calculate_optical_flow(init_tiff):
         Returns:
             None.
         """
-        with patch("src.cell_tracking.optical_flow.optical_flow") as mock_optflow, \
-            patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine:
-            mock_optflow.return_value = np.zeros((f-1, h, w, 2))
-            mock_combine.return_value = np.zeros((f-1, 3, h, w, 2))
+        with (
+            patch("src.cell_tracking.optical_flow.optical_flow") as mock_optflow,
+            patch("src.cell_tracking.optical_flow.combine_flows") as mock_combine,
+        ):
+            mock_optflow.return_value = flowx
+            combine_return_value = np.stack([flowx, flowx, flowx], axis=1)
+            mock_combine.return_value = combine_return_value
 
             result = flow.calculate_optical_flow(tiff_arr, **kwargsx)
 
@@ -382,19 +408,19 @@ def test_calculate_optical_flow(init_tiff):
             assert second_optflow_kwargs == kwargsx
 
             combine_args, _ = mock_combine.call_args
-            assert np.array_equal(combine_args[0], [np.zeros((f-1, h, w, 2)), np.zeros((f-1, h, w, 2))])
+            assert np.array_equal(combine_args[0], [flowx, flowx])
 
-            assert np.array_equal(result, np.zeros((f-1, 3, h, w, 2)))
-            assert result.shape == (f-1, 3, h, w, 2)
+            assert np.array_equal(result, combine_return_value)
+            assert result.shape == (f - 1, 3, h, w, 2)
             assert isinstance(result, np.ndarray)
 
             assert mock_optflow.call_count == 2
             mock_combine.assert_called_once()
 
-    test_case_x(**kwargs1)
-    test_case_x(**kwargs2)
-    test_case_x(**kwargs3)
-    test_case_x(**kwargs4)
+    test_case_x(flow0, **kwargs1)
+    test_case_x(flow0, **kwargs2)
+    test_case_x(flow1, **kwargs3)
+    test_case_x(flow2, **kwargs4)
 
 
 def test_show_flow(init_tiff, tmp_path):
@@ -440,13 +466,13 @@ def test_show_flow(init_tiff, tmp_path):
     dummy_optical_flow_channel2 = dummy_optical_flow(2)
 
     first_frame_channel0 = dummy_optical_flow_channel0[0]
-    middle_frame_channel0 = dummy_optical_flow_channel0[f//2]
+    middle_frame_channel0 = dummy_optical_flow_channel0[f // 2]
     last_frame_channel0 = dummy_optical_flow_channel0[-1]
     first_frame_channel1 = dummy_optical_flow_channel1[0]
-    middle_frame_channel1 = dummy_optical_flow_channel1[f//2]
+    middle_frame_channel1 = dummy_optical_flow_channel1[f // 2]
     last_frame_channel1 = dummy_optical_flow_channel1[-1]
     first_frame_channel2 = dummy_optical_flow_channel2[0]
-    middle_frame_channel2 = dummy_optical_flow_channel2[f//2]
+    middle_frame_channel2 = dummy_optical_flow_channel2[f // 2]
     last_frame_channel2 = dummy_optical_flow_channel2[-1]
 
     first_frame_channel0_save_path = tmp_path / "first_frame_channel0.png"
@@ -459,14 +485,16 @@ def test_show_flow(init_tiff, tmp_path):
     middle_frame_channel2_save_path = tmp_path / "middle_frame_channel2.png"
     last_frame_channel2_save_path = tmp_path / "last_frame_channel2.png"
 
-    def test_case_x(flowx: np.ndarray,
-                    titlex: str = "Optical Flow",
-                    stepx: int = 25,
-                    figsizex: int | int = (12, 6),
-                    scalex: int = 200,
-                    pivotx: str = "tail",
-                    colorx: str = "blue",
-                    x_save_path: str = None):
+    def test_case_x(
+        flowx: np.ndarray,
+        titlex: str = "Optical Flow",
+        stepx: int = 25,
+        figsizex: int | int = (12, 6),
+        scalex: int = 200,
+        pivotx: str = "tail",
+        colorx: str = "blue",
+        x_save_path: str = None,
+    ):
         """
         Tests the show_flow function on a specific test case.
 
@@ -488,18 +516,22 @@ def test_show_flow(init_tiff, tmp_path):
         U = flowx[::stepx, ::stepx, 0]  # dx
         V = flowx[::stepx, ::stepx, 1]  # dy
 
-        with patch("matplotlib.pyplot.figure") as mock_figure, \
-            patch("matplotlib.pyplot.quiver") as mock_quiver, \
-            patch("matplotlib.pyplot.title") as mock_title, \
-            patch("matplotlib.pyplot.xlim") as mock_xlim, \
-            patch("matplotlib.pyplot.ylim") as mock_ylim, \
-            patch("matplotlib.pyplot.xlabel") as mock_xlabel, \
-            patch("matplotlib.pyplot.ylabel") as mock_ylabel, \
-            patch("matplotlib.pyplot.tight_layout") as mock_tight_layout, \
-            patch("matplotlib.pyplot.savefig") as mock_savefig, \
-            patch("matplotlib.pyplot.show") as mock_show:
-            flow.show_flow(flowx, titlex, stepx, figsizex, scalex, pivotx, colorx, x_save_path)
-            
+        with (
+            patch("matplotlib.pyplot.figure") as mock_figure,
+            patch("matplotlib.pyplot.quiver") as mock_quiver,
+            patch("matplotlib.pyplot.title") as mock_title,
+            patch("matplotlib.pyplot.xlim") as mock_xlim,
+            patch("matplotlib.pyplot.ylim") as mock_ylim,
+            patch("matplotlib.pyplot.xlabel") as mock_xlabel,
+            patch("matplotlib.pyplot.ylabel") as mock_ylabel,
+            patch("matplotlib.pyplot.tight_layout") as mock_tight_layout,
+            patch("matplotlib.pyplot.savefig") as mock_savefig,
+            patch("matplotlib.pyplot.show") as mock_show,
+        ):
+            flow.show_flow(
+                flowx, titlex, stepx, figsizex, scalex, pivotx, colorx, x_save_path
+            )
+
             _, figure_kwargs = mock_figure.call_args
             assert figure_kwargs["figsize"] == figsizex
 
@@ -551,21 +583,116 @@ def test_show_flow(init_tiff, tmp_path):
 
             gc.collect()
 
-    test_case_x(first_frame_channel0, "first_frame_channel0", 30, (14, 8), 300, "middle", "red", first_frame_channel0_save_path) #first_frame_channel0 save
-    test_case_x(first_frame_channel0, stepx=15, figsizex=(10,10), scalex=150, pivotx="tail", colorx="blue", x_save_path=None) #first_frame_channel0 show
-    test_case_x(middle_frame_channel0, titlex="Sample_Title", x_save_path=middle_frame_channel0_save_path) #middle_frame_channel0 save
-    test_case_x(flowx=middle_frame_channel0, titlex="middle_frame_channel0", stepx=18, figsizex=(12,10), scalex=225, pivotx="tip", colorx="green", x_save_path=None) #middle_frame_channel0 show
-    test_case_x(last_frame_channel0, titlex="last_frame_channel0", stepx=15, scalex=100, colorx="red", x_save_path=last_frame_channel0_save_path) #last_frame_channel0 save
-    test_case_x(last_frame_channel0) #last_frame_channel0 show
-    test_case_x(first_frame_channel1, x_save_path=first_frame_channel1_save_path) #first_frame_channel1 save
-    test_case_x(first_frame_channel1, titlex="Optical Flow", stepx=25, figsizex=(12, 6), scalex=200, pivotx="tail", colorx="blue", x_save_path=None) #first_frame_channel1 show
-    test_case_x(middle_frame_channel1, x_save_path=middle_frame_channel1_save_path) #middle_frame_channel1 save
-    test_case_x(middle_frame_channel1, titlex="middle_frame_channel1") #middle_frame_channel1 show
-    test_case_x(flowx=last_frame_channel1, titlex="last_frame_channel1", stepx=20, figsizex=(8,8), scalex=350, pivotx="middle", colorx="yellow", x_save_path=last_frame_channel1_save_path) #last_frame_channel1 save
-    test_case_x(last_frame_channel1, scalex=240) #last_frame_channel1 show
-    test_case_x(first_frame_channel2, x_save_path=first_frame_channel2_save_path) #first_frame_channel2 save
-    test_case_x(first_frame_channel2, stepx=180, scalex=400, pivotx="middle", colorx="black") #first_frame_channel2 show
-    test_case_x(middle_frame_channel2, titlex="middle_frame_channel2", figsizex=(6,8), scalex=200, pivotx="tip", colorx="orange", x_save_path=middle_frame_channel2_save_path) #middle_frame_channel2 save
-    test_case_x(middle_frame_channel2, "middle_frame_channel2", 27, (10, 6), 250, "tip", "purple", None) #middle_frame_channel2 show
-    test_case_x(last_frame_channel2, titlex="last_frame_channel2", figsizex=(12,6), x_save_path=last_frame_channel2_save_path) #last_frame_channel2 save
-    test_case_x(last_frame_channel2, titlex="last_frame_channel2", stepx=30, figsizex=(10,14), scalex=180, pivotx="middle", colorx="black") #last_frame_channel2 show
+    test_case_x(
+        first_frame_channel0,
+        "first_frame_channel0",
+        30,
+        (14, 8),
+        300,
+        "middle",
+        "red",
+        first_frame_channel0_save_path,
+    )  # first_frame_channel0 save
+    test_case_x(
+        first_frame_channel0,
+        stepx=15,
+        figsizex=(10, 10),
+        scalex=150,
+        pivotx="tail",
+        colorx="blue",
+        x_save_path=None,
+    )  # first_frame_channel0 show
+    test_case_x(
+        middle_frame_channel0,
+        titlex="Sample_Title",
+        x_save_path=middle_frame_channel0_save_path,
+    )  # middle_frame_channel0 save
+    test_case_x(
+        flowx=middle_frame_channel0,
+        titlex="middle_frame_channel0",
+        stepx=18,
+        figsizex=(12, 10),
+        scalex=225,
+        pivotx="tip",
+        colorx="green",
+        x_save_path=None,
+    )  # middle_frame_channel0 show
+    test_case_x(
+        last_frame_channel0,
+        titlex="last_frame_channel0",
+        stepx=15,
+        scalex=100,
+        colorx="red",
+        x_save_path=last_frame_channel0_save_path,
+    )  # last_frame_channel0 save
+    test_case_x(last_frame_channel0)  # last_frame_channel0 show
+    test_case_x(
+        first_frame_channel1, x_save_path=first_frame_channel1_save_path
+    )  # first_frame_channel1 save
+    test_case_x(
+        first_frame_channel1,
+        titlex="Optical Flow",
+        stepx=25,
+        figsizex=(12, 6),
+        scalex=200,
+        pivotx="tail",
+        colorx="blue",
+        x_save_path=None,
+    )  # first_frame_channel1 show
+    test_case_x(
+        middle_frame_channel1, x_save_path=middle_frame_channel1_save_path
+    )  # middle_frame_channel1 save
+    test_case_x(
+        middle_frame_channel1, titlex="middle_frame_channel1"
+    )  # middle_frame_channel1 show
+    test_case_x(
+        flowx=last_frame_channel1,
+        titlex="last_frame_channel1",
+        stepx=20,
+        figsizex=(8, 8),
+        scalex=350,
+        pivotx="middle",
+        colorx="yellow",
+        x_save_path=last_frame_channel1_save_path,
+    )  # last_frame_channel1 save
+    test_case_x(last_frame_channel1, scalex=240)  # last_frame_channel1 show
+    test_case_x(
+        first_frame_channel2, x_save_path=first_frame_channel2_save_path
+    )  # first_frame_channel2 save
+    test_case_x(
+        first_frame_channel2, stepx=180, scalex=400, pivotx="middle", colorx="black"
+    )  # first_frame_channel2 show
+    test_case_x(
+        middle_frame_channel2,
+        titlex="middle_frame_channel2",
+        figsizex=(6, 8),
+        scalex=200,
+        pivotx="tip",
+        colorx="orange",
+        x_save_path=middle_frame_channel2_save_path,
+    )  # middle_frame_channel2 save
+    test_case_x(
+        middle_frame_channel2,
+        "middle_frame_channel2",
+        27,
+        (10, 6),
+        250,
+        "tip",
+        "purple",
+        None,
+    )  # middle_frame_channel2 show
+    test_case_x(
+        last_frame_channel2,
+        titlex="last_frame_channel2",
+        figsizex=(12, 6),
+        x_save_path=last_frame_channel2_save_path,
+    )  # last_frame_channel2 save
+    test_case_x(
+        last_frame_channel2,
+        titlex="last_frame_channel2",
+        stepx=30,
+        figsizex=(10, 14),
+        scalex=180,
+        pivotx="middle",
+        colorx="black",
+    )  # last_frame_channel2 show

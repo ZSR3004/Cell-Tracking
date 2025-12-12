@@ -1,15 +1,9 @@
-import os
-import json
 import numpy as np
-import pathlib
 from pathlib import Path
 import matplotlib.animation as animation
-import scipy.io
 import xyz_py
-import gc
 from scipy.io import savemat
 from . import tiffclass as tiff
-from .defaults import default_process, default_flow
 import matplotlib.image, matplotlib.figure, matplotlib.axes
 
 
@@ -75,7 +69,7 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     labels_arr = ["I"] * len(dx_dy_arr)
 
     xyz_py.save_xyz(
-        f_name= f"{name}_flow.xyz", labels=labels_arr, coords=xyz_arr, comment=None
+        f_name=f"{name}_flow.xyz", labels=labels_arr, coords=xyz_arr, comment=None
     )
 
 

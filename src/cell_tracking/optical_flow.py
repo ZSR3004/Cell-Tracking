@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
 
@@ -132,8 +131,8 @@ def show_flow(
     scale: int = 200,
     pivot: str = "tail",
     color: str = "blue",
-    save_path: str = None
-    ) -> None:
+    save_path: str = None,
+) -> None:
     """
     Displays optical flow as a quiver plot using matplotlib.
 

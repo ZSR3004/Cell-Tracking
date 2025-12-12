@@ -5,6 +5,7 @@ from src.cell_tracking import kymograph as kg
 from src.cell_tracking import vector_magnitude_map as vm
 import optical_flow_cli as ofc
 
+
 def plot_heatmap_cli(flow, title, output_path):
     """
     Computes magnitude heatmaps from a flow array of shape (frames, height, width, 2).
@@ -20,7 +21,11 @@ def plot_heatmap_cli(flow, title, output_path):
     hm.plot_heatmap(flow, title, output_path)
 
 
-def plot_basic_kymo_cli(arr:np.ndarray, save_path: str, threshold=0.5,):
+def plot_basic_kymo_cli(
+    arr: np.ndarray,
+    save_path: str,
+    threshold=0.5,
+):
     """
     Plots a kymograph from a 2D array.
 
@@ -36,7 +41,7 @@ def plot_basic_kymo_cli(arr:np.ndarray, save_path: str, threshold=0.5,):
         ylabel (str): Label for the y-axis.
         title (str): Title of the plot.
         show (bool): Whether to display the plot immediately.
-    
+
     Returns:
         None: Just displays the kymograph.
     """

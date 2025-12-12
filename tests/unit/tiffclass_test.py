@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, pytest, gc
+import cv2, pytest, gc, tifffile
 from unittest.mock import patch, Mock, MagicMock, ANY
 from multiprocessing import Pool, cpu_count
 from src.cell_tracking import tiffclass as tiff
@@ -14,16 +14,11 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import numpy as np
 
-TIFF_PATHS = [
-    (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
-        (96, 3, 520, 2329),
-    )
-]
+TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
-def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+def init_tiff(request: pytest.FixtureRequest):
     """
     Creates a Tiff class instance.
 
@@ -38,7 +33,9 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - h (int): Height.
             - w (int): Width.
     """
-    path, info = request.param
+    path = request.param
+    img = tifffile.imread(path)
+    info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 
 
@@ -144,7 +141,9 @@ def test_show_image(init_tiff: tuple, tmp_path):
     image5_save_path = tmp_path / "image5_save.png"
     image6_save_path = tmp_path / "image6_save.png"
 
-    def test_case_x(imagex: np.ndarray, titlex="Image", figsizex=(12, 8), imagex_save_path=None):
+    def test_case_x(
+        imagex: np.ndarray, titlex="Image", figsizex=(12, 8), imagex_save_path=None
+    ):
         """
         Tests whether the show_image method works correctly on a specific test case.
 
@@ -157,12 +156,14 @@ def test_show_image(init_tiff: tuple, tmp_path):
         Return:
             None
         """
-        with patch("matplotlib.pyplot.figure") as mock_figure, \
-            patch("matplotlib.pyplot.imshow") as mock_imshow, \
-            patch("matplotlib.pyplot.title") as mock_title, \
-            patch("matplotlib.pyplot.axis") as mock_axis, \
-            patch("matplotlib.pyplot.savefig") as mock_savefig, \
-            patch("matplotlib.pyplot.show") as mock_show:
+        with (
+            patch("matplotlib.pyplot.figure") as mock_figure,
+            patch("matplotlib.pyplot.imshow") as mock_imshow,
+            patch("matplotlib.pyplot.title") as mock_title,
+            patch("matplotlib.pyplot.axis") as mock_axis,
+            patch("matplotlib.pyplot.savefig") as mock_savefig,
+            patch("matplotlib.pyplot.show") as mock_show,
+        ):
             img.show_image(imagex, titlex, figsizex, imagex_save_path)
 
             _, kwargs_figure = mock_figure.call_args
@@ -174,7 +175,7 @@ def test_show_image(init_tiff: tuple, tmp_path):
 
             args_title, _ = mock_title.call_args
             assert args_title[0] == titlex
-            
+
             args_axis, _ = mock_axis.call_args
             assert args_axis[0] == "off"
 
@@ -196,18 +197,26 @@ def test_show_image(init_tiff: tuple, tmp_path):
 
             gc.collect()
 
-    test_case_x(image1, "image1_save", (14, 10), image1_save_path)                                  #image1 save
-    test_case_x(image1, "image1_show", (10, 6), None)                                               #image1 show
-    test_case_x(image2, imagex_save_path=image2_save_path)                                          #image2 save
-    test_case_x(image2)                                                                             #image2 show
-    test_case_x(image3, figsizex=(18, 16), imagex_save_path=image3_save_path)                       #image3 save
-    test_case_x(image3, figsizex=(7, 9), imagex_save_path=None)                                     #image3 show
-    test_case_x(image4, titlex="image4_save", figsizex=(5, 7), imagex_save_path=image4_save_path)   #image4 save
-    test_case_x(image4, titlex="image4_show")                                                       #image4 show
-    test_case_x(image5, titlex="image5_save", imagex_save_path=image5_save_path)                    #image5 save
-    test_case_x(image5, figsizex=(3, 3))                                                            #image5 show
-    test_case_x(image6, "image6_save", figsizex=(2, 10), imagex_save_path=image6_save_path)         #image6 save
-    test_case_x(image6, imagex_save_path=None)                                                      #image6 show
+    test_case_x(image1, "image1_save", (14, 10), image1_save_path)  # image1 save
+    test_case_x(image1, "image1_show", (10, 6), None)  # image1 show
+    test_case_x(image2, imagex_save_path=image2_save_path)  # image2 save
+    test_case_x(image2)  # image2 show
+    test_case_x(
+        image3, figsizex=(18, 16), imagex_save_path=image3_save_path
+    )  # image3 save
+    test_case_x(image3, figsizex=(7, 9), imagex_save_path=None)  # image3 show
+    test_case_x(
+        image4, titlex="image4_save", figsizex=(5, 7), imagex_save_path=image4_save_path
+    )  # image4 save
+    test_case_x(image4, titlex="image4_show")  # image4 show
+    test_case_x(
+        image5, titlex="image5_save", imagex_save_path=image5_save_path
+    )  # image5 save
+    test_case_x(image5, figsizex=(3, 3))  # image5 show
+    test_case_x(
+        image6, "image6_save", figsizex=(2, 10), imagex_save_path=image6_save_path
+    )  # image6 save
+    test_case_x(image6, imagex_save_path=None)  # image6 show
 
 
 def test_preprocess_frame(init_tiff: tuple):
@@ -398,7 +407,11 @@ def test_preprocess_stack(init_tiff: tuple):
     stack1 = np.asarray(tiff_arr[:, 0, :, :])
     stack2 = np.asarray([tiff_arr[0, 1, :, :]])
     stack3 = np.asarray(
-        [tiff_arr[0, 2, :, :], tiff_arr[(f - 1) // 2, 1, :, :], tiff_arr[f - 1, 0, :, :]]
+        [
+            tiff_arr[0, 2, :, :],
+            tiff_arr[(f - 1) // 2, 1, :, :],
+            tiff_arr[f - 1, 0, :, :],
+        ]
     )
     stack4 = np.asarray(tiff_arr[: (f - 1) // 2, 2, :, :])
     stack5 = np.asarray(tiff_arr[:, 1, :, :])
@@ -444,7 +457,9 @@ def test_preprocess_stack(init_tiff: tuple):
         """
         with patch("src.cell_tracking.tiffclass.Pool") as mock_pool:
             mock_pool_instance = mock_pool.return_value.__enter__.return_value
-            mock_pool_instance.map.side_effect = lambda func, arr1: [np.zeros_like(x[0]) for x in arr1]
+            mock_pool_instance.map.side_effect = lambda func, arr1: [
+                np.zeros_like(x[0]) for x in arr1
+            ]
 
             frames = [(stackx[i], kwargsx) for i in range(stackx.shape[0])]
 

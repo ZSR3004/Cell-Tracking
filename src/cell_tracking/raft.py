@@ -42,7 +42,7 @@ def preprocess_tensor(tiff_file: tiff.Tiff, **kwargs) -> torch.Tensor:
 
     Returns:
         torch.Tensor: A preprocessed representation of the tiff_file; ready
-            to be used in the RAFT model. Shape is (f, 3, h+pad_h, w+pad_w) 
+            to be used in the RAFT model. Shape is (f, 3, h+pad_h, w+pad_w)
             (see pad_to_multiple_of_8 to understand what pad_h and pad_w are).
     """
     arr = tiff_file.arr
@@ -64,12 +64,12 @@ def batch_frames(ten: torch.Tensor) -> tuple[torch.Tensor, torch.Tensor]:
     Batches frames together for use in RAFT model.
 
     Args:
-        ten (torch.Tensor): A torch.Tensor representation of a tiff video. Shape is (f, 3, a, b) 
+        ten (torch.Tensor): A torch.Tensor representation of a tiff video. Shape is (f, 3, a, b)
                             (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
 
     Returns:
         tuple[torch.Tensor, torch.Tensor]: A tuple of torch.Tensors.
-                                           The first tensor is t[0:len(t) - 1]. The second is t[1:len(t)]. Each is of shape (f-1, 3, a, b) 
+                                           The first tensor is t[0:len(t) - 1]. The second is t[1:len(t)]. Each is of shape (f-1, 3, a, b)
                                            (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
     """
     return ten[:-1], ten[1:]
@@ -82,11 +82,11 @@ def get_raft_optical_flow(
     gpu_flag: bool = False,
 ) -> torch.Tensor:
     """
-    Takes the input batches and runs the Pytorch raft model on it to 
+    Takes the input batches and runs the Pytorch raft model on it to
     extract optical flow.
-    
+
     Args:
-        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2), each of shape (f-1, 3, a, b) 
+        batches (tuple[torch.Tensor, torch.Tensor]): Tuple of two tensors (batch_1, batch_2), each of shape (f-1, 3, a, b)
                                                      (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
         model_size (ModelSize): Which RAFT variant to use (SMALL or LARGE).
         model_weights (dict | None): A loaded state_dict for the model, or None
@@ -142,7 +142,7 @@ def make_raft_output_array(flow: torch.Tensor) -> np.ndarray:
     Returns:
         np.ndarray: The same representation, but as an np.ndarray.
             The shape is (f, a, b, 2) to match the outputs of the
-            other optical flow models 
+            other optical flow models
             (where a = h or h+pad_h, and b = w or w+pad_w, depending on if pad_to_multiple_of_8 was run on it).
     """
     ten = torch.permute(flow, (0, 2, 3, 1))

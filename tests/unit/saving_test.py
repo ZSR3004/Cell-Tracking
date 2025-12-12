@@ -6,28 +6,22 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, json, pytest, gc, xyz_py
+import cv2, json, pytest, gc, xyz_py, tifffile, matplotlib
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
 from unittest.mock import patch, Mock, MagicMock, call
-import matplotlib
 import numpy as np
 from pathlib import Path
 from scipy.io import savemat
 import matplotlib.animation as animation
 from src.cell_tracking.defaults import default_process, default_flow
 
-TIFF_PATHS = [
-    (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
-        (96, 3, 520, 2329),
-    )
-]
+TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
-def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+def init_tiff(request: pytest.FixtureRequest):
     """
     Creates a Tiff class instance.
 
@@ -42,7 +36,9 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - h (int): Height.
             - w (int): Width.
     """
-    path, info = request.param
+    path = request.param
+    img = tifffile.imread(path)
+    info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 
 
@@ -58,7 +54,7 @@ def get_last_saved_pattern_fn_path(name: str, pattern_fn, main_path: str) -> Pat
     Returns:
         Path: Unique file path that does not yet exist.
     """
-    save_dir = main_path / name
+    save_dir = main_path
     save_dir.mkdir(parents=True, exist_ok=True)
 
     i = 1
@@ -113,18 +109,18 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     assert not save_dir2.exists()
     assert not save_dir3.exists()
 
-    unique_path_npy_fn_1 = save.get_unique_path(name1, npy_fn_1, tmp_path)
+    unique_path_npy_fn_1 = save.get_unique_path(name1, npy_fn_1, save_dir1)
     assert save_dir1.exists()
     assert unique_path_npy_fn_1.name == "flow_flow1.npy"
     assert unique_path_npy_fn_1.parent == save_dir1
 
-    unique_path_xyz_fn_2 = save.get_unique_path(name2, xyz_fn_2, tmp_path)
+    unique_path_xyz_fn_2 = save.get_unique_path(name2, xyz_fn_2, save_dir2)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert unique_path_xyz_fn_2.name == "Test_Name_flow1.xyz"
     assert unique_path_xyz_fn_2.parent == save_dir2
 
-    unique_path_mat_fn_3 = save.get_unique_path(name3, mat_fn_3, tmp_path)
+    unique_path_mat_fn_3 = save.get_unique_path(name3, mat_fn_3, save_dir3)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -138,21 +134,21 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     (save_dir3 / "randomfile1.mat").touch()
     (save_dir3 / "Test_Name_flow1.npy").touch()
 
-    unique_path_npy_fn_2 = save.get_unique_path(name2, npy_fn_2, tmp_path)
+    unique_path_npy_fn_2 = save.get_unique_path(name2, npy_fn_2, save_dir2)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_npy_fn_2.name == "Test_Name_flow1.npy"
     assert unique_path_npy_fn_2.parent == save_dir2
 
-    unique_path_xyz_fn_3 = save.get_unique_path(name3, xyz_fn_3, tmp_path)
+    unique_path_xyz_fn_3 = save.get_unique_path(name3, xyz_fn_3, save_dir3)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_xyz_fn_3.name == "1Name_flow1.xyz"
     assert unique_path_xyz_fn_3.parent == save_dir3
 
-    unique_path_mat_fn_1 = save.get_unique_path(name1, mat_fn_1, tmp_path)
+    unique_path_mat_fn_1 = save.get_unique_path(name1, mat_fn_1, save_dir1)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -173,21 +169,21 @@ def test_get_unique_path(init_tiff: tuple, tmp_path):
     (save_dir2 / "Test_Name_flow8.mat").touch()
     (save_dir3 / "1Name_flow1.npy").touch()
 
-    unique_path_npy_fn_3 = save.get_unique_path(name3, npy_fn_3, tmp_path)
+    unique_path_npy_fn_3 = save.get_unique_path(name3, npy_fn_3, save_dir3)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_npy_fn_3.name == "1Name_flow2.npy"
     assert unique_path_npy_fn_3.parent == save_dir3
 
-    unique_path_xyz_fn_1 = save.get_unique_path(name1, xyz_fn_1, tmp_path)
+    unique_path_xyz_fn_1 = save.get_unique_path(name1, xyz_fn_1, save_dir1)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
     assert unique_path_xyz_fn_1.name == "flow_flow5.xyz"
     assert unique_path_xyz_fn_1.parent == save_dir1
 
-    unique_path_mat_fn_2 = save.get_unique_path(name2, mat_fn_2, tmp_path)
+    unique_path_mat_fn_2 = save.get_unique_path(name2, mat_fn_2, save_dir2)
     assert save_dir1.exists()
     assert save_dir2.exists()
     assert save_dir3.exists()
@@ -219,11 +215,12 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     save_dir = tmp_path / name1
     assert not save_dir.exists()
 
-    save_arr1 = save.save_arr(name1, img, tmp_path)
+    save_arr1 = save.save_arr(name1, img, save_dir)
     save_arr1_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", tmp_path
+        name1, lambda i: f"{name1}_flow{i}.npy", save_dir
     )
 
+    print(save_arr1_path)
     assert save_dir.exists()
     assert save_arr1_path.exists()
 
@@ -258,11 +255,24 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
         shaped_arr1, np.array([[1, 2], [3, 4], [5, 6], [7, 8], [9, 10], [11, 12]])
     )
     unshaped_arr2 = np.array(
-        [[[[[4.2, 3.8]], [[9.5, 11.9]], [[0.1, 1.9]]]], [[[[7.0, 18.3829]], [[9.0, 1029.8]], [[4.3, 5.53]]]]]
+        [
+            [[[[4.2, 3.8]], [[9.5, 11.9]], [[0.1, 1.9]]]],
+            [[[[7.0, 18.3829]], [[9.0, 1029.8]], [[4.3, 5.53]]]],
+        ]
     )
     shaped_arr2 = unshaped_arr2.reshape(-1, 2)
     assert np.allclose(
-        shaped_arr2, np.array([[4.2, 3.8], [9.5, 11.9], [0.1, 1.9], [7.0, 18.3829], [9.0, 1029.8], [4.3, 5.53]])
+        shaped_arr2,
+        np.array(
+            [
+                [4.2, 3.8],
+                [9.5, 11.9],
+                [0.1, 1.9],
+                [7.0, 18.3829],
+                [9.0, 1029.8],
+                [4.3, 5.53],
+            ]
+        ),
     )
 
     name = "Test_Name"
@@ -358,7 +368,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
 
     with patch("numpy.save") as mock_save:
         save.save_optical_flow_as_numpy(name, tiff_arr, save_dir)
-        
+
         args, _ = mock_save.call_args
         save_path = args[0]
         opt_flow = args[1]
@@ -435,14 +445,28 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
-        with patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter, \
-            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation:
+        with (
+            patch(
+                "src.cell_tracking.saving.animation.FFMpegWriter"
+            ) as mock_ffmpegwriter,
+            patch(
+                "src.cell_tracking.saving.animation.FuncAnimation"
+            ) as mock_funcanimation,
+        ):
             mock_ani = MagicMock()
             mock_funcanimation.return_value = mock_ani
             mock_writer_instance = MagicMock()
             mock_ffmpegwriter.return_value = mock_writer_instance
 
-            save.save_original_video("Video_Name", stackx_kwargsx_path, mock_im, image_stackx, mock_fig, mock_ax, **kwargsx)
+            save.save_original_video(
+                "Video_Name",
+                stackx_kwargsx_path,
+                mock_im,
+                image_stackx,
+                mock_fig,
+                mock_ax,
+                **kwargsx,
+            )
 
             T = kwargsx.get("T", image_stackx.shape[0])
             fps = kwargsx.get("fps", 10)
@@ -457,7 +481,9 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             _, kwargs_FFMpegWriter = mock_ffmpegwriter.call_args
             assert kwargs_FFMpegWriter["fps"] == fps
 
-            mock_ani.save.assert_called_once_with(stackx_kwargsx_path, writer=mock_writer_instance)
+            mock_ani.save.assert_called_once_with(
+                stackx_kwargsx_path, writer=mock_writer_instance
+            )
             mock_funcanimation.assert_called_once()
             mock_ffmpegwriter.assert_called_once()
 

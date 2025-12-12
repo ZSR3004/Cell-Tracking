@@ -13,8 +13,8 @@ if ROOT_DIR not in sys.path:
 from src.cell_tracking import saving
 import numpy as np
 
-def save_flow_cli(name: str,
-                  opt_flow: np.ndarray, main_path: str):
+
+def save_flow_cli(name: str, opt_flow: np.ndarray, main_path: str):
     """
     Saves the raw data to the specified foler (raw data folder)
 
@@ -30,18 +30,19 @@ def save_flow_cli(name: str,
     """
 
     main_path = Path(main_path)
-    
+
     saving.save_optical_flow_as_xyz(name, opt_flow, main_path)
     saving.save_optical_flow_as_matlab(name, opt_flow, main_path)
     saving.save_optical_flow_as_numpy(name, opt_flow, main_path)
 
+
 def save_arr_cli(name: str, tiff_instance: tiffclass.Tiff, main_path: str) -> None:
     """
     Saves a numpy array to a file.
-    
+
     Args:
         arr (np.array): The numpy array to save.
-    
+
     Returns:
         None: Just saves the array to a file.
     """
@@ -73,7 +74,7 @@ def save_original_video_cli(name: str, file_path: str, channel_idx: int) -> None
     while output_path.exists():
         output_path = output_dir / f"{name}_{i}.mp4"
         i += 1
-    
+
     fig, ax = plt.subplots()
     im = ax.imshow(image_stack[0], cmap="gray")
     ax.set_title("Frame" + str(channel_idx))

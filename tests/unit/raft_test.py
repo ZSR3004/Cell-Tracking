@@ -5,23 +5,17 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import torch
-import pytest
+import pytest, torch, tifffile
 import numpy as np
 from src.cell_tracking import raft
 from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
 
-TIFF_PATHS = [
-    (
-        "datasets/nuclei_labeled/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif",
-        (96, 3, 520, 2329),
-    )
-]
+TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
-def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
+def init_tiff(request: pytest.FixtureRequest):
     """
     Creates a Tiff class instance.
 
@@ -36,7 +30,9 @@ def init_tiff(request: pytest.FixtureRequest) -> tiff.Tiff:
             - h (int): Height.
             - w (int): Width.
     """
-    path, info = request.param
+    path = request.param
+    img = tifffile.imread(path)
+    info = (img.shape[0], img.shape[1], img.shape[2], img.shape[3])
     return (tiff.Tiff(path), info)
 
 
@@ -209,7 +205,7 @@ class TestPadToMultipleOf8(TensorHelpers):
         pad_h = (8 - h % 8) % 8
         pad_w = (8 - w % 8) % 8
 
-        assert pad_ten.shape == (f, 3, h+pad_h, w+pad_w)
+        assert pad_ten.shape == (f, 3, h + pad_h, w + pad_w)
 
 
 class TestPreprocessTensor(TensorHelpers):
@@ -262,8 +258,8 @@ class TestBatchFrames(TensorHelpers):
         (f, _, a, b) = ten.shape
         assert ten.shape[1] == 3
 
-        assert batch1.shape == (f-1, 3, a, b)
-        assert batch2.shape == (f-1, 3, a, b)
+        assert batch1.shape == (f - 1, 3, a, b)
+        assert batch2.shape == (f - 1, 3, a, b)
         assert batch1.shape == batch2.shape
 
         assert torch.equal(batch1[0], ten[0])
@@ -581,7 +577,7 @@ class TestCalcOpticalFlowRAFT:
                 - h (int): Height.
                 - w (int): Width.
 
-        Returns: 
+        Returns:
             None.
         """
         tiff_file, info = init_tiff
@@ -609,7 +605,7 @@ class TestCalcOpticalFlowRAFT:
 
             assert isinstance(result, np.ndarray)
             assert result.ndim == 4
-            assert result.shape == (f-1, h+pad_h, w+pad_w, 2)
+            assert result.shape == (f - 1, h + pad_h, w + pad_w, 2)
 
     def test_calcOpticalFlowRAFT_with_custom_params(self, init_tiff: tiff.Tiff) -> None:
         """
@@ -657,6 +653,6 @@ class TestCalcOpticalFlowRAFT:
             pad_w = (8 - w % 8) % 8
 
             assert isinstance(result, np.ndarray)
-            assert result.shape == (f-1, h+pad_h, w+pad_w, 2)
+            assert result.shape == (f - 1, h + pad_h, w + pad_w, 2)
 
             mock_raft.assert_called_once_with(progress=False)

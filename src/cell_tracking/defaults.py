@@ -13,7 +13,7 @@ default_flow = {
     "iterations": 3,
     "poly_n": 5,
     "poly_sigma": 1.2,
-    "flag": 0,
+    "flags": 0,
 }
 
 default_yaml_config = {
@@ -25,8 +25,9 @@ default_yaml_config = {
         "skip": [],
     },
     "farneback_args": {
-        "levels": 0.5,
-        "winsize": 3,
+        "pyr_scale": 0.5,
+        "levels": 3,
+        "winsize": 15,
         "iterations": 3,
         "poly_n": 5,
         "poly_sigma": 1.2,

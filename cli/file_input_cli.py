@@ -19,12 +19,13 @@ def init_tiff_class(path: str) -> tiff.Tiff:
 
     Assumptions:
       Assumes input leads to a valid tiff file.
-    
+
     Returns:
       A tiff class.
     """
     my_class = tiff.Tiff(path)
     return my_class
+
 
 def preprocess_tiff(tiff_obj: tiff.Tiff, **kwargs) -> np.ndarray:
     """
@@ -38,7 +39,7 @@ def preprocess_tiff(tiff_obj: tiff.Tiff, **kwargs) -> np.ndarray:
             - normalize (dict): {'alpha': int, 'beta': int, 'norm_type': int}
             - contrast (dict): {'alpha': float, 'beta': int}
             - skip (list[str]): steps to skip (e.g., ['gauss', 'median'])
-    
+
     Returns:
       The preprocessed stack (as a numpy array.)
     """
