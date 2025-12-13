@@ -13,9 +13,7 @@ from src.cell_tracking import tiffclass as tiff
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import numpy as np
-
-TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
-
+from tests.unit.sample_tiffs import TIFF_PATHS
 
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):

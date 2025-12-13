@@ -14,9 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import matplotlib.colors as colors
 from unittest.mock import patch, Mock, MagicMock
-
-TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
-
+from tests.unit.sample_tiffs import TIFF_PATHS
 
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
