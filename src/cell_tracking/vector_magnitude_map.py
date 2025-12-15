@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from .saving import save_vector_video
+from . import saving
 
 
 def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None, 
@@ -49,7 +49,7 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
     quiver = ax.quiver(X, Y, U, V, scale=scale, pivot='tail', color=color)
 
     if flag != "":
-        save_vector_video(name, flag, 
+        saving.save_vector_video(name, flag, 
                    **{
                           'img_disp': img_disp,
                           'arr': arr,
