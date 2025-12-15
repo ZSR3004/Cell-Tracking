@@ -1,0 +1,26 @@
+body {
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .container {
+    display: flex;
+    height: 100vh;
+  }
+  
+  .controls {
+    width: 300px;
+    padding: 20px;
+    border-right: 1px solid #ccc;
+  }
+  
+  .output {
+    flex: 1;
+    padding: 20px;
+  }
+  
+  #resultImage {
+    max-width: 100%;
+    max-height: 100%;
+  }
