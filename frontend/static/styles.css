@@ -5,13 +5,14 @@ body {
   
   .container {
     display: flex;
-    height: 100vh;
+    min-height: 100vh;
   }
   
   .controls {
     width: 300px;
     padding: 20px;
     border-right: 1px solid #ccc;
+    align-self: stretch;
   }
   
   .output {
@@ -24,7 +25,18 @@ body {
     max-height: 100%;
   }
   .control-box {
-    margin-bottom: 20px;
+    background: #fafafa;
+    border: 1px solid #e3e3e3;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
   }
   
   .param-group {
@@ -48,4 +60,54 @@ body {
     padding: 6px;
     font-size: 0.9rem;
     box-sizing: border-box;
+  }
+
+  #runBtn {
+    width: 100%;
+    padding: 10px;
+    margin-top: 12px;
+    font-size: 1rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  #runBtn:hover {
+    background-color: #3a7fcf;
+  }
+
+  .collapsible-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+  }
+  
+  .collapsible-header h3 {
+    margin: 0;
+  }
+  
+  .chevron {
+    transition: transform 0.2s ease;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .collapsible-content {
+    margin-top: 10px;
+  }
+  
+  .collapsible:not(.open) .collapsible-content {
+    display: none;
+  }
+  
+  .collapsible:not(.open) .chevron {
+    transform: rotate(-90deg);
+  }
+
+  #fileInput {
+    margin-bottom: 20px;
   }
