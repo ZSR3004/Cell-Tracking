@@ -85,6 +85,28 @@
           </div>
         </div>
       </div>
+      <!-- setup for RAFT -->
+      <div class="control-box collapsible">
+        <div class="collapsible-header">
+          <h3>RAFT Flow Arguments</h3>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="param">
+            <label>Model Size</label>
+            <input type="number" id="rfModSize" value="1" step="1" min="1" />
+          </div>
+          <div class="param">
+            <label>Model Weight</label>
+            <input type="text" id="rfModWeight" placeholder="Leave empty for default" />
+          </div>
+          <label class="checkbox">
+            <input type="checkbox" id="rfGPU" />
+            Use GPU
+          </label>
+          </div>
+        </div>
+      
 
       <!-- Output options for the user-->
       <div class="control-box">
@@ -127,6 +149,6 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
