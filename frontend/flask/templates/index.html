@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Cell Tracking Software</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
 </head>
 <body>
 
@@ -128,8 +129,13 @@
         </label>
       
         <label class="checkbox">
+          <input type="checkbox" id="outFarnebackIsolated" />
+          Optical Flow (Farneback) with isolated flows
+        </label>
+
+        <label class="checkbox">
           <input type="checkbox" id="outFarneback" />
-          Optical Flow (Farneback)
+          Optical Flow (Farneback) without isolated flows
         </label>
       
         <label class="checkbox">
@@ -148,7 +154,5 @@
       <img id="resultImage" />
     </div>
   </div>
-
-  <script src="script.js" defer></script>
 </body>
 </html>

@@ -47,6 +47,7 @@ function collectInputs() {
     kymograph: document.getElementById("outKymograph").checked,
     heatmap: document.getElementById("outHeatmap").checked,
     vector_magnitude: document.getElementById("outVectorMag").checked,
+    farneback_isolated: document.getElementById("outFarnebackIsolated").checked,
     farneback: document.getElementById("outFarneback").checked,
     raft: document.getElementById("outRAFT").checked
   };
@@ -62,10 +63,28 @@ function collectInputs() {
   return config;
 }
 
-
-runBtn.addEventListener("click", () => {
+runBtn.addEventListener("click", async () => {
   const config = collectInputs();
   statusText.textContent = "Running analysis with config: " + JSON.stringify(config, null, 2);
+
+  const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    formData.append("config", JSON.stringify(config));
+
+  const response = await fetch("/run", {
+      method: "POST",
+      body: formData
+  });
+  if (response.ok) {
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "results.zip";
+    a.click();
+} else {
+    alert("Error running analysis");
+}
 
 });
 
