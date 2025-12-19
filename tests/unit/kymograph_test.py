@@ -13,9 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import kymograph as kymo
-
-TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
-
+from tests.unit.sample_tiffs import TIFF_PATHS
 
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
