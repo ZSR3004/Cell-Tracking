@@ -31,8 +31,8 @@ documentation which has the installation and usage instructions (if they exist).
 | Version   |   Status      | Documentation | 
 | --------  | ------------  | ------------  | 
 | Package       | Up!               | [Package Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/PACKAGE_DOCS.md) |
-| Command Line | In Development!    | [Command Line Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/CLI_DOCS.md) |
-| Graphical |   Development hasn't started just quite yet! | [GUI Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/GUI_DOCS.md) | 
+| Command Line | Up!    | [Command Line Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/CLI_DOCS.md) |
+| Graphical |   Up! | [GUI Docs](https://github.com/ZSR3004/Cell-Tracking/blob/main/docs/GUI_DOCS.md) | 
 
 ### Contributing or Running our Tests
 If you're interested in running our tests or contributing, refer to the 
