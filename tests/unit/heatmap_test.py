@@ -205,8 +205,56 @@ def test_polar_to_heatmap(init_tiff: tuple):
     test_case_x(polar_frame_channel2_lastframe)
 
 
-def test_plot_heatmap():
-    pass
+def test_plot_heatmap(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the plot_heatmap function works correctly.
 
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
 
-# note: when working with stuff of shape like (f, c, h, w, 2), use stuff i wrote for test_plot_basic_kymo
+    Returns:
+        None.
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    # Making flowx
+    dummy_dx = tiff_arr[1:] - tiff_arr[:-1]
+    dummy_dy = tiff_arr[1:] - tiff_arr[:-1]
+
+    # arrx has shape (f-1, c, h, w, 2), which is the shape of plot_heatmap's input array arr
+    arrx = np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    title1 = "plot_heatmap0"
+    title2 = "Test Title"
+
+    output_pathx = tmp_path / "arrx"
+
+    fps1 = 5
+    fps2 = 50
+    fps3 = 20
+
+    def test_case_x(titlex: str, fpsx: int = 20):
+        """
+        Tests whether the plot_heatmap function works correctly on a specific test case.
+
+        Args:
+            titlex (str): Title for the heatmap.
+            fpsx (int): Fps of the output heatmap video.
+
+        Returns:
+            None.
+        """
+        with patch("src.cell_tracking.heatmap.convert_stack_to_polar") as mock_convert_stack_to_polar, \
+            patch()
+
+#have some not have fpsx!
+
+# note: when working with stuff of shape like (f-1, c, h, w, 2), use stuff i wrote for test_plot_basic_kymo
