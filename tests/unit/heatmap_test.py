@@ -255,11 +255,20 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
         with (patch("src.cell_tracking.heatmap.convert_stack_to_polar") as mock_convert_stack_to_polar,
             patch("matplotlib.pyplot.figure") as mock_figure,
             patch("src.cell_tracking.heatmap.polar_to_heatmap") as mock_polar_to_heatmap,
-
+            patch("src.cell_tracking.heatmap.create_color_wheel") as mock_create_color_wheel,
+            patch("builtins.print") as mock_print,
+            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation,
+            patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter,
+            patch("matplotlib.pyplot.tight_layout") as mock_tight_layout
         ):
             mock_fig = MagicMock()
             mock_gs = MagicMock()
             mock_ax_main = MagicMock()
+            mock_im = MagicMock()
+            mock_title_text = MagicMock()
+            mock_ax_wheel = MagicMock()
+            mock_anim = MagicMock()
+            mock_writer = MagicMock()
 
             # arrx_0 has shape (f-1, h, w, 2)
             arrx_0 = arrx[:, 0]
@@ -267,14 +276,119 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             mock_convert_stack_to_polar.return_value = arrx_0
             mock_figure.return_value = mock_fig
             mock_fig.add_gridspec.return_value = mock_gs
-            mock_fig.add_subplot.return_value = mock_ax_main
-            mock_polar_to_heatmap.return_value = turn h, w, 2 into h, w, 3 np.repeat(arr_2[:, :, :1], 3, axis=-1)
+            mock_fig.add_subplot.side_effect = [mock_ax_main, mock_ax_wheel]
+            # mock_polar_to_heatmap.return_value has shape (f-1, h, w, 3), which is the same shape as polar_to_heatmap(polar_arr[0]), where polar_arr = arrx_0
+            mock_polar_to_heatmap.return_value = np.repeat(arrx_0[:, :, :1], 3, axis=-1)
+            mock_ax_main.imshow.return_value = mock_im
+            mock_ax_main.set_title.return_value = mock_title_text
+            ADD WHEN I KNOW THE OUTPUTS OF CREATE COLOR WHEEL
+            mock_funcanimation.return_value = mock_anim
+            mock_ffmpegwriter.return_value = mock_writer
+
+            num_frames = arrx_0.shape[0]
+
+            args_fig_add_gridspec, kwargs_fig_add_gridspec = mock_fig.add_gridspec.call_args
+            assert args_fig_add_gridspec[0] == 1
+            assert args_fig_add_gridspec[1] == 2
+            assert kwargs_fig_add_gridspec["width_ratios"] == [3, 1]
+            assert kwargs_fig_add_gridspec["wspace"] == 0.3
+
+            for i, call_argsx in enumerate(mock_fig.add_subplot.call_args_list):
+                assert np.array_equal(call_argsx[0][0], mock_gs[i])
+
+            mock_convert_stack_to_polar.assert_called_once_with(arrx_0)
+            mock_figure.assert_called_once_with(figsize=(14, 8))
+
+            """
+            Assert args of:
+            ax_main.set_xlabel
+            ax_main.set_ylabel
+            polar_to_heatmap (called multiple times)
+            ax_main.imshow
+            ax_main.set_title
+            create_color_wheel
+            ax_wheel.imshow
+            ax_wheel.set_aspect
+            np.radians (called multiple times)
+            np.cos (called multiple times)
+            np.sin (called multiple times)
+            ax_wheel.text (called multiple times)
+            ax_wheel.set_xlim
+            ax_wheel.set_ylim
+            ax_wheel.axis
+            plt.tight_layout
+            polar_to_heatmap (in update) (called multiple times)
+            im.set_array (in update) (called multiple times)
+            title_text.set_text (in update) (called multiple times)
+            mock_print (printing)
+            FuncAnimation
+            FFMpegWriter
+            anim.save
+            """
+
+            """
+            Assert called:
+            fig.add_gridspec
+            fig.add_subplot (called multiple times)
+            ax_main.set_xlabel
+            ax_main.set_ylabel
+            polar_to_heatmap (called multiple times)
+            ax_main.imshow
+            ax_main.set_title
+            fig.add_subplot (called multiple times)
+            create_color_wheel
+            ax_wheel.imshow
+            ax_wheel.set_aspect
+            np.radians (called multiple times)
+            np.cos (called multiple times)
+            np.sin (called multiple times)
+            ax_wheel.text (called multiple times)
+            ax_wheel.set_xlim
+            ax_wheel.set_ylim
+            ax_wheel.axis
+            plt.tight_layout
+            polar_to_heatmap (in update) (called multiple times)
+            im.set_array (in update) (called multiple times)
+            title_text.set_text (in update) (called multiple times)
+            mock_print (printing)
+            FuncAnimation
+            FFMpegWriter
+            anim.save
+            """
 
 
 
-
-            #assert called
-
+            """
+            This is just a template. delete after.
+            convert_stack_to_polar
+            plt.figure
+            fig.add_gridspec
+            fig.add_subplot (called multiple times)
+            ax_main.set_xlabel
+            ax_main.set_ylabel
+            polar_to_heatmap (called multiple times)
+            ax_main.imshow
+            ax_main.set_title
+            fig.add_subplot (called multiple times)
+            create_color_wheel
+            ax_wheel.imshow
+            ax_wheel.set_aspect
+            np.radians (called multiple times)
+            np.cos (called multiple times)
+            np.sin (called multiple times)
+            ax_wheel.text (called multiple times)
+            ax_wheel.set_xlim
+            ax_wheel.set_ylim
+            ax_wheel.axis
+            plt.tight_layout
+            polar_to_heatmap (in update) (called multiple times)
+            im.set_array (in update) (called multiple times)
+            title_text.set_text (in update) (called multiple times)
+            mock_print (printing)
+            FuncAnimation
+            FFMpegWriter
+            anim.save
+            """
 
 #have some not have fpsx!
 
