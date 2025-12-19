@@ -1,13 +1,44 @@
 document.addEventListener("DOMContentLoaded", () => {
   const fileInput = document.getElementById("fileInput");
-  const runBtn = document.getElementById("runBtn"); 
+  const goBtn = document.getElementById("goBtn");
   const statusText = document.getElementById("status");
+  const videoContainer = document.getElementById("UploadedVideoContainer");
+  const uploadedVideo = document.getElementById("uploadedVideo");
 
-  runBtn.disabled = true;
+  // Initially hide video and go button
+  videoContainer.style.display = "none";
+  goBtn.style.display = "none";
 
-  fileInput.addEventListener("change", () => {
-    runBtn.disabled = !fileInput.files.length;
+  fileInput.addEventListener("change", async () => {
+    statusText.textContent = "Uploading video...";
+    
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+
+    const response = await fetch("/upload", {
+      method: "POST",
+      body: formData
+    });
+
+    if (!response.ok) throw new Error("Upload failed");
+
+    const data = await response.json();
+
+    // Show uploaded video
+    uploadedVideo.src = data.video_url;
+    uploadedVideo.load();
+    videoContainer.style.display = "block";
+    statusText.textContent = "Upload complete! Video ready.";
+
+      // Show Go button
+    goBtn.style.display = "inline-block";
   });
+
+  goBtn.addEventListener("click", () => {
+    // Show the rest of the controls, or navigate to another page
+    window.location.href = "/process";
+  });
+});
 
 function collectInputs() {
   //--- Preprocessing ---
@@ -63,35 +94,14 @@ function collectInputs() {
   return config;
 }
 
-runBtn.addEventListener("click", async () => {
-  const config = collectInputs();
-  statusText.textContent = "Running analysis with config: " + JSON.stringify(config, null, 2);
-
-  const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-    formData.append("config", JSON.stringify(config));
-
-  const response = await fetch("/run", {
-      method: "POST",
-      body: formData
-  });
-  if (response.ok) {
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "results.zip";
-    a.click();
-} else {
-    alert("Error running analysis");
-}
-
-});
-
-
 document.querySelectorAll(".collapsible-header").forEach(header => {
   header.addEventListener("click", () => {
-    header.parentElement.classList.toggle("open");
+    header.closest(".collapsible").classList.toggle("open");
   });
 });
+
+runBtn.addEventListener("Processing Parameters", async () => {
+  const statusTextTwo = document.getElementById("status_two");
+
+
 });

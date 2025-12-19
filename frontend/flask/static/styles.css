@@ -1,29 +1,40 @@
-body {
-    font-family: sans-serif;
-    margin: 0;
-  }
+body.upload-page {
+  font-family: sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start; /* start from top */
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+}
+
+body.control-page {
+  font-family: sans-serif;
+  margin: 0;
+}
   
-  .container {
+  /* MAIN TWO-COLUMN LAYOUT */
+  .ControlsContainer {
     display: flex;
+    gap: 24px;
+    align-items: flex-start;
     min-height: 100vh;
   }
   
+  /* LEFT PANEL */
   .controls {
-    width: 300px;
+    width: 340px;
     padding: 20px;
     border-right: 1px solid #ccc;
     align-self: stretch;
   }
   
+  /* RIGHT PANEL */
   .output {
     flex: 1;
     padding: 20px;
   }
   
-  #resultImage {
-    max-width: 100%;
-    max-height: 100%;
-  }
   .control-box {
     background: #fafafa;
     border: 1px solid #e3e3e3;
@@ -110,4 +121,59 @@ body {
 
   #fileInput {
     margin-bottom: 20px;
+  }
+  
+  #uploadedImage {
+    max-width: 80%;           
+    height: auto;            
+    margin-top: 10px;        
+    border: 1px solid #ccc;   
+    border-radius: 5px;       
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .upload-container {
+    flex-direction: column; /* stack children vertically */
+    align-items: center; 
+    text-align: center;
+    margin: 10px auto;
+    width: 600px; /* or whatever fits your layout */
+  }
+  
+  #UploadedVideoContainer {
+    margin-top: 15px;
+  }
+  
+  #goBtn {
+    width: 50%;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  
+  #goBtn:hover {
+    background-color: #3a7fcf;
+  }
+
+  #UploadedVideoContainer {
+    margin-top: 15px;
+  }
+  
+  #goBtn {
+    margin-top: 10px;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  #status {
+    margin-top: 10px;
+    font-weight: bold;
   }
