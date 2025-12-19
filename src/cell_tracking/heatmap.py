@@ -60,7 +60,7 @@ def polar_to_heatmap(polar_frame: np.ndarray) -> np.ndarray:
     Converts polar coordinates to RGB heatmap.
 
     Args:
-        polar_frame: Array of shape (height, width, 2), where last dim is (r, theta)
+        polar_frame: Array of shape (height, width, 2), where last dim is (r, theta).
 
     Returns:
         RGB image array of shape (height, width, 3) with values in [0, 1]

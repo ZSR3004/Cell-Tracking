@@ -11,6 +11,7 @@ from src.cell_tracking import heatmap
 from src.cell_tracking import tiffclass as tiff
 from matplotlib import animation
 import matplotlib.pyplot as plt
+from matplotlib.colors import hsv_to_rgb
 import numpy as np
 import matplotlib.colors as colors
 from unittest.mock import patch, Mock, MagicMock
@@ -75,40 +76,40 @@ def test_convert_stack_to_polar(init_tiff: tuple):
 
         return np.stack([dummy_dx, dummy_dy], axis=-1)
 
-    # flow0, flow1, and flow2 have shape (f-1, h, w, 2)
-    flow0 = dummy_optical_flow(0)
-    flow1 = dummy_optical_flow(1)
-    flow2 = dummy_optical_flow(2)
+    # frame_stack0, frame_stack1, and frame_stack2 have shape (f-1, h, w, 2)
+    frame_stack0 = dummy_optical_flow(0)
+    frame_stack1 = dummy_optical_flow(1)
+    frame_stack2 = dummy_optical_flow(2)
 
-    def test_case_x(flowx: np.ndarray):
+    def test_case_x(frame_stackx: np.ndarray):
         """
         Tests whether the convert_stack_to_polar function works correctly on a specific test case.
 
         Args:
-            flowx (np.ndarray): The numpy array representation
+            frame_stackx (np.ndarray): The numpy array representation
             of the TIFF file. Shape is (f-1, h, w, 2), where 2 is (dx, dy).
 
         Returns:
             None.
         """
-        x = flowx[..., 0]
-        y = flowx[..., 1]
+        x = frame_stackx[..., 0]
+        y = frame_stackx[..., 1]
         r = np.sqrt(x**2 + y**2)
-        max_f = np.max(np.abs(flowx))
+        max_f = np.max(np.abs(frame_stackx))
         r_norm = r / (np.sqrt(2) * max_f)
         theta = np.arctan2(y, x)
         expected_result = np.stack([r_norm, theta], axis=-1)
 
-        result = heatmap.convert_stack_to_polar(flowx)
+        result = heatmap.convert_stack_to_polar(frame_stackx)
 
         assert result.shape == (f-1, h, w, 2)
-        assert result.shape == flowx.shape
+        assert result.shape == frame_stackx.shape
         assert result.shape == expected_result.shape
         assert np.array_equal(result, expected_result)
 
-    test_case_x(flow0)
-    test_case_x(flow1)
-    test_case_x(flow2)
+    test_case_x(frame_stack0)
+    test_case_x(frame_stack1)
+    test_case_x(frame_stack2)
 
 
 def test_create_color_wheel():
@@ -118,13 +119,90 @@ def test_create_color_wheel():
     """
 
 
-def test_polar_to_heatmap():
+def test_polar_to_heatmap(init_tiff: tuple):
     """
-    Cont when I get the answers to these questions:
-    When it says "last dim is (r, theta)", r and theta are just numbers, right? (If so, when I'm creating the dummy array for testing it doesnt matter what
-    the numbers r and theta are) YES
+    Tests whether the polar_to_heatmap function works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+
+    Returns:
+        None.
     """
-    pass
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    def dummy_polar_frame(frame: int, channel: int):
+        """
+        A function that creates an array of shape (h, w, 2).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        all_frames = np.stack([dummy_dx, dummy_dy], axis=-1)
+
+        return all_frames[frame, ...]
+
+    #these all have shape (h, w, 2)
+    polar_frame_channel0_firstframe = dummy_polar_frame(0, 0)
+    polar_frame_channel0_middleframe = dummy_polar_frame(0, f//2)
+    polar_frame_channel0_lastframe = dummy_polar_frame(0, -1)
+    polar_frame_channel1_firstframe = dummy_polar_frame(1, 0)
+    polar_frame_channel1_middleframe = dummy_polar_frame(1, f//2)
+    polar_frame_channel1_lastframe = dummy_polar_frame(1, -1)
+    polar_frame_channel2_firstframe = dummy_polar_frame(2, 0)
+    polar_frame_channel2_middleframe = dummy_polar_frame(2, f//2)
+    polar_frame_channel2_lastframe = dummy_polar_frame(2, -1)
+
+    def test_case_x(polar_frame_channelx_xframe: np.ndarray):
+        """
+        Tests whether the polar_to_heatmap function works correctly on a specific test case.
+
+        Args:
+            polar_frame_channelx_xframe (np.ndarray): Array of shape (height, width, 2), where last dim is (r, theta).
+
+        Returns:
+            None.
+        """
+        r = polar_frame_channelx_xframe[:, :, 0]
+        theta = polar_frame_channelx_xframe[:, :, 1]
+        hue = (theta + np.pi) / (2 * np.pi)
+        saturation = r
+        value = np.ones_like(r)
+        hsv = np.stack([hue, saturation, value], axis=-1)
+        rgb = hsv_to_rgb(hsv)
+
+        expected_result = rgb
+
+        result = heatmap.polar_to_heatmap(polar_frame_channelx_xframe)
+
+        assert result.shape == (h, w, 3)
+        assert result.shape == expected_result.shape
+        assert np.array_equal(result, expected_result)
+
+    test_case_x(polar_frame_channel0_firstframe)
+    test_case_x(polar_frame_channel0_middleframe)
+    test_case_x(polar_frame_channel0_lastframe)
+    test_case_x(polar_frame_channel1_firstframe)
+    test_case_x(polar_frame_channel1_middleframe)
+    test_case_x(polar_frame_channel1_lastframe)
+    test_case_x(polar_frame_channel2_firstframe)
+    test_case_x(polar_frame_channel2_middleframe)
+    test_case_x(polar_frame_channel2_lastframe)
 
 
 def test_plot_heatmap():
