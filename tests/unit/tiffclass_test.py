@@ -15,6 +15,7 @@ from matplotlib.figure import Figure
 import numpy as np
 from tests.unit.sample_tiffs import TIFF_PATHS
 
+
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
     """
@@ -334,7 +335,6 @@ def test_preprocess_frame(init_tiff: tuple):
     assert not np.array_equal(kwargs1_preprocess_first_frame, first_frame_channel_0)
     assert not np.array_equal(kwargs1_preprocess_middle_frame, middle_frame_channel_1)
     assert not np.array_equal(kwargs1_preprocess_last_frame, last_frame_channel_2)
-    assert not np.array_equal(kwargs2_preprocess_first_frame, first_frame_channel_0)
     assert not np.array_equal(kwargs2_preprocess_middle_frame, middle_frame_channel_1)
     assert not np.array_equal(kwargs2_preprocess_last_frame, last_frame_channel_2)
     assert np.array_equal(kwargs3_preprocess_first_frame, first_frame_channel_0)

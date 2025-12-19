@@ -15,6 +15,7 @@ from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import kymograph as kymo
 from tests.unit.sample_tiffs import TIFF_PATHS
 
+
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
     """

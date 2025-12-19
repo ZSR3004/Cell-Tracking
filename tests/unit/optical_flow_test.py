@@ -18,6 +18,7 @@ from matplotlib.figure import Figure
 from matplotlib.quiver import Quiver
 from tests.unit.sample_tiffs import TIFF_PATHS
 
+
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
     """

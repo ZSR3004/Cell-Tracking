@@ -18,6 +18,7 @@ import matplotlib.animation as animation
 from src.cell_tracking.defaults import default_process, default_flow
 from tests.unit.sample_tiffs import TIFF_PATHS
 
+
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
     """
@@ -282,7 +283,9 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
         number_labels_arr = list(range(len(dx_dy_arr)))
 
         save.save_optical_flow_as_xyz(name1, tiff_arr, save_dir)
-        save_path = save.get_unique_path(name1, lambda i: f"{name1}_flow{i}.xyz", save_dir)
+        save_path = save.get_unique_path(
+            name1, lambda i: f"{name1}_flow{i}.xyz", save_dir
+        )
 
         _, save_xyz_kwargs = mock_save_xyz.call_args
         assert save_xyz_kwargs["f_name"] == save_path

@@ -42,7 +42,9 @@ def mask_line_arr(line_arr: np.ndarray, threshold: float = 0.5) -> np.ndarray:
     return masked_line_arr
 
 
-def plot_basic_kymo(arr: np.ndarray, save_path: str | None = None, threshold: float = 0.5) -> None:
+def plot_basic_kymo(
+    arr: np.ndarray, save_path: str | None = None, threshold: float = 0.5
+) -> None:
     """
     Plots a kymograph from the input array, which is expected to be a 4D array
     with shape (frames-1, channel, height, width, 2). The kymograph visualizes

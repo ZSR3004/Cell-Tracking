@@ -16,6 +16,7 @@ import matplotlib.colors as colors
 from unittest.mock import patch, Mock, MagicMock
 from tests.unit.sample_tiffs import TIFF_PATHS
 
+
 @pytest.fixture(params=TIFF_PATHS)
 def init_tiff(request: pytest.FixtureRequest):
     """
