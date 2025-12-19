@@ -14,8 +14,7 @@ def convert_stack_to_polar(frame_stack: np.ndarray) -> np.ndarray:
             of the TIFF file.
 
     Returns:
-        (np.ndarray): The same representation but in polar
-            coordianates.
+        (np.ndarray): The same representation but in polar coordinates.
     """
     x = frame_stack[..., 0]
     y = frame_stack[..., 1]
@@ -35,7 +34,7 @@ def create_color_wheel(size: int = 200):
     saturated colors.
 
     Args:
-        size (int): Radius of the color wheel in pixes.
+        size (int): Radius of the color wheel in pixels.
 
     Returns:
         (): RGB image array of the color wheel
@@ -58,13 +57,13 @@ def create_color_wheel(size: int = 200):
 
 def polar_to_heatmap(polar_frame: np.ndarray) -> np.ndarray:
     """
-    Convert polar coordinates to RGB heatmap.
+    Converts polar coordinates to RGB heatmap.
 
     Args:
-        polar_frame: Array of shape [height, width, 2] where last dim is [r, theta]
+        polar_frame: Array of shape (height, width, 2), where last dim is (r, theta)
 
     Returns:
-        RGB image array of shape [height, width, 3] with values in [0, 1]
+        RGB image array of shape (height, width, 3) with values in [0, 1]
         - r=0 appears white (no saturation)
         - r=1 appears as bright saturated color based on theta
     """
@@ -86,11 +85,14 @@ def plot_heatmap(arr: np.ndarray, title: str, output_path: str, fps: int = 20) -
 
     Args:
         arr (np.ndarray): The array to create a heatmap out of. This
-            should be shape (f, c, h, w, 2) where 2 is (dx, dy)
+            should be shape (f, c, h, w, 2), where 2 is (dx, dy)
             which is in cartesian coordinates.
         title (str): Title for the heatmap.
         output_path (str): The path for the file to be saved to.
         fps (int): Fps of the output heatmap video.
+
+    Returns:
+        None.
     """
     polar_arr = convert_stack_to_polar(arr[:, 0])
     num_frames = polar_arr.shape[0]
