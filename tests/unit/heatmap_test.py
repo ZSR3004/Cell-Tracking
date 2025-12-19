@@ -227,7 +227,7 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
 
     # Making flowx
     dummy_dx = tiff_arr[1:] - tiff_arr[:-1]
-    dummy_dy = tiff_arr[1:] - tiff_arr[:-1]
+    dummy_dy = tiff_arr[1:] - tiff_arr[:-1] 
 
     # arrx has shape (f-1, c, h, w, 2), which is the shape of plot_heatmap's input array arr
     arrx = np.stack([dummy_dx, dummy_dy], axis=-1)
@@ -252,8 +252,29 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
-        with patch("src.cell_tracking.heatmap.convert_stack_to_polar") as mock_convert_stack_to_polar, \
-            patch()
+        with (patch("src.cell_tracking.heatmap.convert_stack_to_polar") as mock_convert_stack_to_polar,
+            patch("matplotlib.pyplot.figure") as mock_figure,
+            patch("src.cell_tracking.heatmap.polar_to_heatmap") as mock_polar_to_heatmap,
+
+        ):
+            mock_fig = MagicMock()
+            mock_gs = MagicMock()
+            mock_ax_main = MagicMock()
+
+            # arrx_0 has shape (f-1, h, w, 2)
+            arrx_0 = arrx[:, 0]
+
+            mock_convert_stack_to_polar.return_value = arrx_0
+            mock_figure.return_value = mock_fig
+            mock_fig.add_gridspec.return_value = mock_gs
+            mock_fig.add_subplot.return_value = mock_ax_main
+            mock_polar_to_heatmap.return_value = turn h, w, 2 into h, w, 3 np.repeat(arr_2[:, :, :1], 3, axis=-1)
+
+
+
+
+            #assert called
+
 
 #have some not have fpsx!
 
