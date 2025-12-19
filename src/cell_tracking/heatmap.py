@@ -37,7 +37,9 @@ def create_color_wheel(size: int = 200):
         size (int): Radius of the color wheel in pixels.
 
     Returns:
-        (): RGB image array of the color wheel
+        (tuple): RGB image array of the color wheel. 
+                 rgb has type np.ndarray and shape (size, size, 3). 
+                 mask has type np.ndarray and shape (size, size).
     """
     y, x = np.ogrid[-1 : 1 : size * 1j, -1 : 1 : size * 1j]
     r = np.sqrt(x**2 + y**2)

@@ -272,13 +272,14 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
 
             # arrx_0 has shape (f-1, h, w, 2)
             arrx_0 = arrx[:, 0]
+            # polar_to_heatmap_return has shape (f-1, h, w, 3), which is the same shape as polar_to_heatmap(polar_arr[0]), where polar_arr = arrx_0
+            polar_to_heatmap_return = np.repeat(arrx_0[:, :, :1], 3, axis=-1)
 
             mock_convert_stack_to_polar.return_value = arrx_0
             mock_figure.return_value = mock_fig
             mock_fig.add_gridspec.return_value = mock_gs
             mock_fig.add_subplot.side_effect = [mock_ax_main, mock_ax_wheel]
-            # mock_polar_to_heatmap.return_value has shape (f-1, h, w, 3), which is the same shape as polar_to_heatmap(polar_arr[0]), where polar_arr = arrx_0
-            mock_polar_to_heatmap.return_value = np.repeat(arrx_0[:, :, :1], 3, axis=-1)
+            mock_polar_to_heatmap.return_value = polar_to_heatmap_return
             mock_ax_main.imshow.return_value = mock_im
             mock_ax_main.set_title.return_value = mock_title_text
             ADD WHEN I KNOW THE OUTPUTS OF CREATE COLOR WHEEL
@@ -296,16 +297,23 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             for i, call_argsx in enumerate(mock_fig.add_subplot.call_args_list):
                 assert np.array_equal(call_argsx[0][0], mock_gs[i])
 
+            # first polar_to_heatmap call
+            first_args_polar_to_heatmap, _ = mock_polar_to_heatmap.call_args_list[0]
+            assert first_args_polar_to_heatmap[0] == arrx_0[0]
+
+            args_ax_main_imshow, kwargs_ax_main_imshow = mock_ax_main.imshow.call_args
+            assert args_ax_main_imshow[0] == polar_to_heatmap_return
+            assert kwargs_ax_main_imshow["origin"] == "lower"
+
+
             mock_convert_stack_to_polar.assert_called_once_with(arrx_0)
             mock_figure.assert_called_once_with(figsize=(14, 8))
+            mock_ax_main.set_xlabel.assert_called_once_with("Width")
+            mock_ax_main.set_ylabel.assert_called_once_with("Height")
+            mock_ax_main.set_title.assert_called_once_with(f"{titlex} - Frame 0/{num_frames-1}")
 
             """
             Assert args of:
-            ax_main.set_xlabel
-            ax_main.set_ylabel
-            polar_to_heatmap (called multiple times)
-            ax_main.imshow
-            ax_main.set_title
             create_color_wheel
             ax_wheel.imshow
             ax_wheel.set_aspect
@@ -330,11 +338,8 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             Assert called:
             fig.add_gridspec
             fig.add_subplot (called multiple times)
-            ax_main.set_xlabel
-            ax_main.set_ylabel
             polar_to_heatmap (called multiple times)
             ax_main.imshow
-            ax_main.set_title
             fig.add_subplot (called multiple times)
             create_color_wheel
             ax_wheel.imshow
