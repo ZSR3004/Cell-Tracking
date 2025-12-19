@@ -508,5 +508,4 @@ def test_save_vector_video()
 """
 Cont once I get the answers to these questions:
 For the save_vector_video function, since we’re assuming that all values are present in kwargs and are of the correct type, then why can’t we just have them as regular parameters in save_vector_video? Or why can’t we replace things like arr = kwargs.get('arr', None) with arr = kwargs[‘arr’]?
-Also what is TiffVisualize.py?
 """

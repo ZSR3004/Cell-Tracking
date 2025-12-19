@@ -170,10 +170,6 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
             - T_minus_1: Total number of frames minus one (T-1).
     Returns:
         None: Just saves the video to the specified path.
-
-    Invariant
-        Assumes, that all values are present in kwargs and are of the correct type. The check occurs in the
-        `create_optical_flow_video` function (in TiffVisualize.py) before this function is called.
     """
     img_disp = kwargs.get('img_disp', None)
     arr = kwargs.get('arr', None)

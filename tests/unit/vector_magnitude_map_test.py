@@ -38,8 +38,3 @@ def init_tiff(request: pytest.FixtureRequest):
 
 
 def test_create_vector_field_video()
-"""
-Cont once I get the answers to these questions:
-Where do you get arr and og_arr from? In other words, what function do you pass the original array through to get arr and og_arr? 
-Also shouldn't arr's shape be (T-1, H, W, 2)?
-"""

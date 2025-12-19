@@ -12,9 +12,9 @@ def create_vector_field_video(name, arr : np.ndarray, og_arr : np.ndarray=None,
 
     Args:
         name (str): Name of the video file to save.
-        arr (np.ndarray): Optical flow array of shape (T, H, W, 2) where T is the number of frames,
+        arr (np.ndarray): Optical flow array of shape (f-1, h, w, 2) where T is the number of frames,
                           H is height, W is width, and the last dimension contains the flow vectors (dx, dy).
-        og_arr (np.ndarray): Original image frames array of shape (T, H, W, C). Default is None.
+        og_arr (np.ndarray): Original image frames array of shape (f, h, w, c). Default is None.
         step (int): Step size for downsampling the flow vectors for visualization. Default is 20.
         scale (int): Scale factor for the quiver arrows. Default is 500.
         color (str): Color of the arrows. Default is 'blue'.
