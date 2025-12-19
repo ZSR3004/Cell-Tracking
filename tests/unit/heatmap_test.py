@@ -40,32 +40,40 @@ def init_tiff(request: pytest.FixtureRequest):
     return (tiff.Tiff(path), info)
 
 
-def test_convert_stack_to_polar()
-"""
-Cont when I figure out the shape of frame_stack. I believe it's (f, h, w, 2), where 2 is (dx, dy). However, if the shape of arr in plot_heatmap
-changes to (f-1, c, h, w, 2), where 2 is (dx, dy), then the shape of frame_stack should change to (f-1, h, w, 2), where 2 is (dx, dy).
-Cont when I get this question answered:
-What are the input and output shapes of this function?
-And if the input/output shapes have (2) in them, does this 2 represent (dx, dy) or (r, theta)?
-"""
+def test_convert_stack_to_polar():
+    """
+    Cont when I figure out the shape of frame_stack. I believe it's (f, h, w, 2), where 2 is (dx, dy). However, if the shape of arr in plot_heatmap
+    changes to (f-1, c, h, w, 2), where 2 is (dx, dy), then the shape of frame_stack should change to (f-1, h, w, 2), where 2 is (dx, dy).
+    Cont when I get this question answered:
+    What are the input and output shapes of this function?
+    And if the input/output shapes have (2) in them, does this 2 represent (dx, dy) or (r, theta)?
+    """
+    pass
 
-def test_create_color_wheel()
-"""
-Cont when I get the answers to these questions:
-What is supposed to be in the returns part of the docstring?
-"""
 
-def test_polar_to_heatmap()
-"""
-Cont when I get the answers to these questions:
-When it says "last dim is (r, theta)", r and theta are just numbers, right? (If so, when I'm creating the dummy array for testing it doesnt matter what
-the numbers r and theta are)
-"""
+def test_create_color_wheel():
+    """
+    Cont when I get the answers to these questions:
+    What is supposed to be in the returns part of the docstring?
+    """
+    pass
 
-def test_plot_heatmap()
-"""
-Cont when I get the answers to these questions:
-Shouldn't the shape of arr be (f-1, c, h, w, 2)?
-"""
 
-#note: when working with stuff of shape like (f, c, h, w, 2), use stuff i wrote for test_plot_basic_kymo
+def test_polar_to_heatmap():
+    """
+    Cont when I get the answers to these questions:
+    When it says "last dim is (r, theta)", r and theta are just numbers, right? (If so, when I'm creating the dummy array for testing it doesnt matter what
+    the numbers r and theta are)
+    """
+    pass
+
+
+def test_plot_heatmap():
+    """
+    Cont when I get the answers to these questions:
+    Shouldn't the shape of arr be (f-1, c, h, w, 2)?
+    """
+    pass
+
+
+# note: when working with stuff of shape like (f, c, h, w, 2), use stuff i wrote for test_plot_basic_kymo
