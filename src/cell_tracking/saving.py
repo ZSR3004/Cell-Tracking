@@ -63,13 +63,13 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     save_path = get_unique_path(name, lambda i: f"{name}_flow{i}.xyz", main_path)
 
     dx_dy_arr = opt_flow.reshape(-1, 2)
-    zeros = np.zeros((len(dx_dy_arr), 1), dtype=dx_dy_arr[0][0].dtype)
+    zeros = np.zeros((len(dx_dy_arr), 1), dtype=int)
 
     xyz_arr = np.hstack((dx_dy_arr, zeros))
-    labels_arr = ["I"] * len(dx_dy_arr)
+    number_labels_arr = list(range(len(dx_dy_arr)))
 
     xyz_py.save_xyz(
-        f_name=f"{name}_flow.xyz", labels=labels_arr, coords=xyz_arr, comment=None
+        f_name=save_path, labels=number_labels_arr, coords=xyz_arr, comment="Atoms"
     )
 
 
