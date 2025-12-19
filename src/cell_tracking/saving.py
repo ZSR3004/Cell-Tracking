@@ -171,7 +171,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
     Returns:
         None: Just saves the video to the specified path.
 
-    Invariant:
+    Invariant
         Assumes, that all values are present in kwargs and are of the correct type. The check occurs in the
         `create_optical_flow_video` function (in TiffVisualize.py) before this function is called.
     """
