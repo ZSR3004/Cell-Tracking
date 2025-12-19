@@ -4,22 +4,24 @@ One of the ways you can run our Cell_Tracking software is through the Command Li
 
 ## Table of Contents
   1. Prerequisites
+
+  2. Downloading and Setting Up the CLI
   
-  2. Locating the Cell-Tracking Folder
+  3. Locating the Cell-Tracking Folder
   
-  3. Launching the CLI
+  4. Launching the CLI
   
-  4. Initializing the Cell-Tracking Folder
+  5. Initializing the Cell-Tracking Folder
   
-  5. Entering Folder and File Paths 
+  6. Entering Folder and File Paths 
   
-  6. Selecting Output items
+  7. Selecting Output items
   
-  7. Specifying Video Type
+  8. Specifying Video Type
   
-  8. Combined Flow Option 
+  9. Combined Flow Option 
   
-  9. Processing and Output 
+  10. Processing and Output 
 
 ### Prerequisites
 
@@ -39,6 +41,31 @@ python3 --version
 ```
 If it installed, proceed to the next step, if it is not installed we recommend opening an internet browser and downloading the latest python version, 3.14.0 into your computer.
 
+### Downloading and Setting Up the CLI
+NOTE: These are the same instructions as the GUI. 
+
+1. Open Google Chrome or a supporting internet browser.
+
+2. Follow this [link](https://github.com/ZSR3004/Cell-Tracking/tree/main)
+    - Note: After step 2, you should have arrived at the GitHub homepage, titled "Cell Tracking." (this page will contain all of the files you need to download.) You will see a screen like the image below, ![FIGURE 1](../images/Homepage.png) which displays the GitHub homepage.
+
+3. Clone the Github repository using your terminal. Just open up the terminal and type
+```bash
+git clone https://github.com/ZSR3004/Cell-Tracking
+```
+
+4. `cd` into the repository.
+```bash
+cd Cell-Tracking
+```
+
+5. Once inside the directory, you need to setup the dependencies. Just type the following into the command line.
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate # or the equivalent for your device
+pip install poetry
+poetry install
+```
 
 ### Locating the Cell-Tracking Folder 
 
@@ -74,10 +101,28 @@ Example:
 cd Users/shitaloli/Documents/Cell-Tracking
 ```
 
-3. Once inside the directory, run the CLI tool: 
+3. Once inside the directory, you need to setup the dependencies. Just type the following into the command line.
 ```bash
-python3 cli/main_cli.py
+python3 -m venv .venv
+source .venv/bin/activate # or the equivalent for your device
+pip install poetry
+poetry add
 ```
+
+4. Now, you can run the tool in two ways. You can use Python directly: 
+```bash
+.venv/bin/python3 cli/main_cli.py
+```
+
+Or you can use the provided script to launch the CLI. 
+```bash
+chmod +x ctcl // Tell your computer this is safe to execute.
+./ctcl
+```
+If you 
+plan to use the CLI frequently, you may wish to use the bash
+script and add it to you PATH.
+
 When you run this command inside the Cell-Tracking repository, it launches the main CLI scrip tthat controls the dull user-interactive workflow. 
 
 ### Initializing the Cell-Tracking Folder
