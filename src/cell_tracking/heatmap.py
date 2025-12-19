@@ -11,10 +11,10 @@ def convert_stack_to_polar(frame_stack: np.ndarray) -> np.ndarray:
 
     Args:
         frame_stack (np.ndarray): The numpy array representation
-            of the TIFF file.
+            of the TIFF file. Shape is (f-1, h, w, 2), where 2 is (dx, dy).
 
     Returns:
-        (np.ndarray): The same representation but in polar coordinates.
+        (np.ndarray): The same representation but in polar coordinates. Shape is (f-1, h, w, 2), where 2 is (r, theta).
     """
     x = frame_stack[..., 0]
     y = frame_stack[..., 1]
@@ -85,7 +85,7 @@ def plot_heatmap(arr: np.ndarray, title: str, output_path: str, fps: int = 20) -
 
     Args:
         arr (np.ndarray): The array to create a heatmap out of. This
-            should be shape (f, c, h, w, 2), where 2 is (dx, dy)
+            should be shape (f-1, c, h, w, 2), where 2 is (dx, dy)
             which is in cartesian coordinates.
         title (str): Title for the heatmap.
         output_path (str): The path for the file to be saved to.
