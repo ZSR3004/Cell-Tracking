@@ -15,9 +15,8 @@ import numpy as np
 from pathlib import Path
 from scipy.io import savemat
 import matplotlib.animation as animation
+from tests.unit.sample_tiffs import TIFF_PATHS
 from src.cell_tracking.defaults import default_process, default_flow
-
-TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
