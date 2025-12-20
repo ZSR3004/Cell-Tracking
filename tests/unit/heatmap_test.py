@@ -147,7 +147,10 @@ def test_create_color_wheel(init_tiff: tuple):
         Returns:
             None.
         """
-        y, x = np.ogrid[-1 : 1 : sizex * 1j, -1 : 1 : sizex * 1j]
+        if sizex == 0:
+            y, x = np.ogrid[-1 : 1 : 200 * 1j, -1 : 1 : 200 * 1j]
+        else:
+            y, x = np.ogrid[-1 : 1 : sizex * 1j, -1 : 1 : sizex * 1j]
         r = np.sqrt(x**2 + y**2)
         theta = np.arctan2(y, x)
         hue = (theta + np.pi) / (2 * np.pi)
@@ -356,7 +359,7 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             mock_polar_to_heatmap.return_value = polar_to_heatmap_return
             mock_ax_main.imshow.return_value = mock_im
             mock_ax_main.set_title.return_value = mock_title_text
-            ADD WHEN I KNOW THE OUTPUTS OF CREATE COLOR WHEEL
+            #ADD WHEN I KNOW THE OUTPUTS OF CREATE COLOR WHEEL
             mock_funcanimation.return_value = mock_anim
             mock_ffmpegwriter.return_value = mock_writer
 
