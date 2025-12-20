@@ -553,7 +553,12 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
     name1 = "save_vector_video0"
     name2 = "Test Save"
 
-    ADD FLAGS IN WHEN I KNOW WHAT THEY ARE! GET TEXT BACK
+    flag0 = ''
+    flag00 = ' '
+    flag000 = 'ft'
+    flag0000 = 'f '
+    flag1 = 'f'
+    flag2 = 't'
 
     step1 = 10
     step2 = 35
@@ -594,22 +599,26 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
         Returns:
             None.
         """
-        img_disp = kwargsx.get('img_disp', None)
-        arr = kwargsx['arr']
-        og_arr = kwargsx.get('og_arr', None)
-        step = kwargsx.get('step', 20)
-        fps = kwargsx.get('fps', 10)
-        quiver = kwargsx['quiver']
-        ax = kwargsx['ax']
-        fig = kwargsx['fig']
-        T = kwargsx['T']
+        with (
 
+        ):
+            img_disp = kwargsx.get('img_disp', None)
+            arr = kwargsx['arr']
+            og_arr = kwargsx.get('og_arr', None)
+            step = kwargsx.get('step', 20)
+            fps = kwargsx.get('fps', 10)
+            quiver = kwargsx['quiver']
+            ax = kwargsx['ax']
+            fig = kwargsx['fig']
+            T = kwargsx['T']
 
-        DO FLAG STUFF HERE ONCE I GET RESPONSE
+            if flag not in ['f', 't']:
+                raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
+
+            file_path = get_last_saved_pattern_fn_path(namex, 'video', lambda i: f"{namex}_v{flagx}_{i}.mp4")
+
         """
-        stuff is related to this:
-        if flag[0] not in ['f', 't']:
-            raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
+        Args to check:
+        ValueError
+        get_unique_path
         """
-
-        file_path = get_last_saved_pattern_fn_path(namex, 'video', lambda i: f"{namex}_v{flagx}_{i}.mp4")
