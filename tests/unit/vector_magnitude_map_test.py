@@ -139,18 +139,55 @@ def test_create_vector_field_video(init_tiff: tuple):
         ):
             mock_fig = MagicMock()
             mock_ax = MagicMock()
+            mock_quiver = MagicMock()
 
             mock_subplots.return_value = (mock_fig, mock_ax)
+            mock_ax.quiver.return_value = mock_quiver
             
             T, H, W, _ = arrx.shape
             Y, X = np.mgrid[0:H:stepx, 0:W:stepx]
+            U = arrx[0, ::stepx, ::stepx, 0]
+            V = arrx[0, ::stepx, ::stepx, 1]
 
             _ , kwargs_subplots = mock_subplots.call_args
             assert kwargs_subplots["figsize"] == (12, 6)
 
+            if og_arrx is not None:
+                is_gray = og_arrx.ndim == 3
+                mock_ax.imshow.assert_called_once_with(og_arrx[0], cmap='gray' if is_gray else None)
+            else:
+                img_disp = None
+                mock_ax.imshow.assert_not_called()
 
+            args_ax_quiver, kwargs_ax_quiver = mock_ax.quiver.call_args
+            assert args_ax_quiver[0] == X
+            assert args_ax_quiver[1] == Y
+            assert args_ax_quiver[2] == U
+            assert args_ax_quiver[3] == V
+            assert kwargs_ax_quiver['scale'] == scalex
+            assert kwargs_ax_quiver['pivot'] == 'tail'
+            assert kwargs_ax_quiver['color'] == colorx
 
+            if flagx != "":
+                args_save_vector_video, kwargs_save_vector_video = mock_save_vector_video.call_args
+                assert args_save_vector_video[0] == namex
+                assert args_save_vector_video[1] == flagx
+                assert kwargs_save_vector_video['img_disp'] == img_disp
+                assert kwargs_save_vector_video['arr'] == arrx
+                assert kwargs_save_vector_video['og_arr'] == og_arrx
+                assert kwargs_save_vector_video['step'] == stepx
+                assert kwargs_save_vector_video['fps'] == fpsx
+                assert kwargs_save_vector_video['figsize'] == figsizex
+                assert kwargs_save_vector_video['title'] == titlex
+                assert kwargs_save_vector_video['quiver'] == mock_quiver
+                assert kwargs_save_vector_video['ax'] == mock_ax
+                assert kwargs_save_vector_video['fig'] == mock_fig
+                assert kwargs_save_vector_video['T'] == T
+                mock_save_vector_video.assert_called_once()
+            else:
+                mock_save_vector_video.assert_not_called()
 
+            mock_subplots.assert_called_once()
             mock_ax.set_xlim.assert_called_once_with(0, W)
             mock_ax.set_ylim.assert_called_once_with(H, 0)
             mock_ax.set_xlabel.assert_called_once_with("X")
@@ -158,20 +195,8 @@ def test_create_vector_field_video(init_tiff: tuple):
             mock_ax.set_title.assert_called_once_with("Optical Flow")
             mock_ax.set_aspect.assert_called_once_with('equal')
             mock_ax.axis.assert_called_once_with('off')
+            mock_ax.quiver.assert_called_once()
+            mock_save_vector_video.assert_called_once()
+            mock_close.assert_called_once_with(mock_fig)
 
-            """
-            Args:
-            ax.imshow
-            ax.quiver
-            saving.save_vector_video
-            plt.close
-            """
-
-            """
-            Assert called:
-            plt.subplots
-            ax.imshow
-            ax.quiver
-            saving.save_vector_video
-            plt.close
-            """
+    test_case_x()
