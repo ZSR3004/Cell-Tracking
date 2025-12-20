@@ -310,12 +310,12 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
 
     output_pathx = tmp_path / "arrx"
 
-    fps0 = 0
     fps1 = 5
     fps2 = 50
-    fps3 = 20
+    fps3 = 18
+    fps4 = 20
 
-    def test_case_x(titlex: str, fpsx: int = 20):
+    def test_case_x(titlex: str, fpsx: int):
         """
         Tests whether the plot_heatmap function works correctly on a specific test case.
 
@@ -364,6 +364,8 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             mock_funcanimation.return_value = mock_anim
             mock_ffmpegwriter.return_value = mock_writer
 
+            heatmap.plot_heatmap(arrx, titlex, output_pathx, fpsx)
+
             num_frames = arrx_0.shape[0]
 
             args_fig_add_gridspec, kwargs_fig_add_gridspec = mock_fig.add_gridspec.call_args
@@ -392,102 +394,59 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
                 angle_rad = np.radians(angle_deg)
                 x = 1.15 * np.cos(angle_rad)
                 y = 1.15 * np.sin(angle_rad)
-                args_ax_wheel_text
+                args_ax_wheel_text, kwargs_ax_wheel_text = mock_ax_wheel.text.call_args[i]
+                assert args_ax_wheel_text[0] == x
+                assert args_ax_wheel_text[1] == y
+                assert args_ax_wheel_text[2] == f"{angle_deg}°"
+                assert kwargs_ax_wheel_text['ha'] == "center"
+                assert kwargs_ax_wheel_text['va'] == "center"
+                assert kwargs_ax_wheel_text['fontsize'] == 10
 
-                #cont writing for this stuff below
-                ax_wheel.text(x, y, f"{angle_deg}°", ha="center", va="center", fontsize=10)
+            print_message = f"Creating animation with {num_frames} frames..."
 
+            args_funcanimation, kwargs_funcanimation = mock_funcanimation.call_args
+            assert args_funcanimation[0] == mock_fig
+            assert callable(args_funcanimation[1])
+            assert kwargs_funcanimation['frames'] == num_frames
+            assert kwargs_funcanimation['interval'] == 50
+            assert kwargs_funcanimation['blit'] == True
 
+            _, kwargs_ffmpegwriter = mock_ffmpegwriter.call_args
+            assert kwargs_ffmpegwriter['fps'] == fpsx
+            assert kwargs_ffmpegwriter['metadata'] == dict(artist="Matplotlib")
+            assert kwargs_ffmpegwriter['bitrate'] == 1800
 
+            args_anim_save, kwargs_anim_save = mock_anim.save.call_args
+            assert args_anim_save[0] == output_pathx
+            assert kwargs_anim_save['writer'] == mock_writer
 
             mock_convert_stack_to_polar.assert_called_once_with(arrx_0)
             mock_figure.assert_called_once_with(figsize=(14, 8))
+            mock_fig.add_gridspec.assert_called_once()
+            assert mock_fig.add_subplot.call_count == 2
             mock_ax_main.set_xlabel.assert_called_once_with("Width")
             mock_ax_main.set_ylabel.assert_called_once_with("Height")
+            mock_polar_to_heatmap.assert_called_once()
+            mock_ax_main.imshow.assert_called_once()
             mock_ax_main.set_title.assert_called_once_with(f"{titlex} - Frame 0/{num_frames-1}")
             mock_create_color_wheel.assert_called_once_with(300)
+            mock_ax_wheel.imshow.assert_called_once()
             mock_ax_wheel.set_aspect.assert_called_once_with("equal")
+            assert mock_ax_wheel.text.call_count == len(angles_deg)
+            mock_ax_wheel.set_xlim.assert_called_once_with(-1.4, 1.4)
+            mock_ax_wheel.set_ylim.assert_called_once_with(-1.4, 1.4)
+            mock_ax_wheel.axis.assert_called_once_with("off")
+            mock_tight_layout.assert_called_once_with()
+            mock_print.assert_called_once_with(print_message)
+            mock_funcanimation.assert_called_once()
+            mock_ffmpegwriter.assert_called_once()
+            mock_anim.save.assert_called_once()
 
-            #CONTINUE
-
-            """
-            Assert args of:
-            np.radians (called multiple times)
-            np.cos (called multiple times)
-            np.sin (called multiple times)
-            ax_wheel.text (called multiple times)
-            ax_wheel.set_xlim
-            ax_wheel.set_ylim
-            ax_wheel.axis
-            plt.tight_layout
-            polar_to_heatmap (in update) (called multiple times)
-            im.set_array (in update) (called multiple times)
-            title_text.set_text (in update) (called multiple times)
-            mock_print (printing)
-            FuncAnimation
-            FFMpegWriter
-            anim.save
-            """
-
-            """
-            Assert called:
-            fig.add_gridspec
-            fig.add_subplot (called multiple times)
-            polar_to_heatmap (called multiple times)
-            ax_main.imshow
-            fig.add_subplot (called multiple times)
-            ax_wheel.imshow
-            np.radians (called multiple times)
-            np.cos (called multiple times)
-            np.sin (called multiple times)
-            ax_wheel.text (called multiple times)
-            ax_wheel.set_xlim
-            ax_wheel.set_ylim
-            ax_wheel.axis
-            plt.tight_layout
-            polar_to_heatmap (in update) (called multiple times)
-            im.set_array (in update) (called multiple times)
-            title_text.set_text (in update) (called multiple times)
-            mock_print (printing)
-            FuncAnimation
-            FFMpegWriter
-            anim.save
-            """
-
-
-
-            """
-            This is just a template. delete after.
-            convert_stack_to_polar
-            plt.figure
-            fig.add_gridspec
-            fig.add_subplot (called multiple times)
-            ax_main.set_xlabel
-            ax_main.set_ylabel
-            polar_to_heatmap (called multiple times)
-            ax_main.imshow
-            ax_main.set_title
-            fig.add_subplot (called multiple times)
-            create_color_wheel
-            ax_wheel.imshow
-            ax_wheel.set_aspect
-            np.radians (called multiple times)
-            np.cos (called multiple times)
-            np.sin (called multiple times)
-            ax_wheel.text (called multiple times)
-            ax_wheel.set_xlim
-            ax_wheel.set_ylim
-            ax_wheel.axis
-            plt.tight_layout
-            polar_to_heatmap (in update) (called multiple times)
-            im.set_array (in update) (called multiple times)
-            title_text.set_text (in update) (called multiple times)
-            mock_print (printing)
-            FuncAnimation
-            FFMpegWriter
-            anim.save
-            """
-
-#have some not have fpsx! fps0 means no fps as a function parameter
-
-# note: when working with stuff of shape like (f-1, c, h, w, 2), use stuff i wrote for test_plot_basic_kymo
+    test_case_x(title1, fps1)
+    test_case_x(title1, fps2)
+    test_case_x(title1, fps3)
+    test_case_x(title1, fps4)
+    test_case_x(title2, fps1)
+    test_case_x(title2, fps2)
+    test_case_x(title2, fps3)
+    test_case_x(title2, fps4)
