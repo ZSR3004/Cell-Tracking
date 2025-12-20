@@ -231,6 +231,9 @@ def test_save_arr(init_tiff: tuple, tmp_path):
         assert args_np_save[0] == unique_path
         assert np.array_equal(args_np_save[1], tiff_arr)
 
+        mock_get_unique_path.assert_called_once()
+        mock_np_save.assert_called_once()
+
 
 def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     """
@@ -281,30 +284,37 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
     )
 
     name1 = "Test_Name"
-    save_dir = tmp_path / "save_dir"
+    main_path = tmp_path / name1
+    unique_path = main_path / "saved_path"
 
-    with patch("xyz_py.save_xyz") as mock_save_xyz:
+    with (
+        patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
+        patch("xyz_py.save_xyz") as mock_save_xyz
+    ):
+        mock_get_unique_path.return_value = unique_path
+
         dx_dy_arr = tiff_arr.reshape(-1, 2)
         zeros = np.zeros((len(dx_dy_arr), 1), dtype=int)
         tiff_arr_xyz = np.hstack((dx_dy_arr, zeros))
         number_labels_arr = list(range(len(dx_dy_arr)))
 
-        save.save_optical_flow_as_xyz(name1, tiff_arr, save_dir)
-        save_path = save.get_unique_path(
-            name1, lambda i: f"{name1}_flow{i}.xyz", save_dir
-        )
+        save.save_optical_flow_as_xyz(name1, tiff_arr, main_path)
+
+        args_get_unique_path, _ = mock_get_unique_path.call_args
+        assert args_get_unique_path[0] == name1
+        assert callable(args_get_unique_path[1])
+        assert args_get_unique_path[2] == main_path
 
         _, kwargs_save_xyz = mock_save_xyz.call_args
-        assert kwargs_save_xyz["f_name"] == save_path
+        assert kwargs_save_xyz["f_name"] == unique_path
         assert np.array_equal(kwargs_save_xyz["labels"], number_labels_arr)
         assert np.array_equal(kwargs_save_xyz["coords"], tiff_arr_xyz)
         assert kwargs_save_xyz["coords"].shape == tiff_arr_xyz.shape
         assert len(kwargs_save_xyz["labels"]) == kwargs_save_xyz["coords"].shape[0]
         assert kwargs_save_xyz["comment"] == "Atoms"
 
+        mock_get_unique_path.assert_called_once()
         mock_save_xyz.assert_called_once()
-
-    #EDIT THIS: MOCK xyz_py.save_xyz, MOCK get_unique_path
 
 
 def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
