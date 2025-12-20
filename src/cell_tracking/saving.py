@@ -161,7 +161,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
             - img_disp: Matplotlib image display object for the original frames.
             - arr: Optical flow array of shape (f-1, h, w, 2) where f-1 is the number of frames,
                    h is height, w is width, and the last dimension contains the flow vectors (dx, dy).
-            - og_arr: Original image frames array of shape (f, h, w, c). Default is None.
+            - og_arr: Original image frames array of shape (f, c, h, w). Default is None.
             - step: Step size for downsampling the flow vectors for visualization. Default is 20.
             - fps: Frames per second for the video. Default is 10.
             - quiver: Matplotlib quiver object for displaying flow vectors.
