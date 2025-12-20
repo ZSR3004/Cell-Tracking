@@ -223,14 +223,12 @@ def test_create_vector_field_video(init_tiff: tuple):
     test_case_x(name1, arr0, og_arr1, step3, scale3, color3, fps3, figsize2, title1, flag1)
     test_case_x(name1, arr0, og_arr2, step2, scale2, color2, fps2, figsize1, title2, flag2)
     test_case_x(name2, arr0, og_arr2, step1, scale1, color3, fps2, figsize3, title3, flag3)
-
     test_case_x(name2, arr1, og_arr1, step3, scale2, color2, fps3, figsize2, title1, flag1)
     test_case_x(name2, arr1, og_arr2, step1, scale1, color3, fps1, figsize1, title2, flag2)
     test_case_x(name1, arr1, og_arr1, step2, scale3, color3, fps3, figsize3, title3, flag3)
     test_case_x(name1, arr1, og_arr2, step1, scale1, color1, fps2, figsize3, title1, flag2)
     test_case_x(name2, arr1, og_arr1, step3, scale2, color1, fps2, figsize1, title2, flag1)
     test_case_x(name1, arr1, og_arr2, step2, scale3, color2, fps1, figsize2, title3, flag3)
-
     test_case_x(name1, arr2, og_arr1, step2, scale3, color3, fps2, figsize1, title1, flag2)
     test_case_x(name1, arr2, og_arr1, step2, scale1, color2, fps2, figsize2, title2, flag3)
     test_case_x(name1, arr2, og_arr2, step1, scale1, color3, fps1, figsize3, title3, flag1)
