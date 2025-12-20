@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, json, pytest, gc, xyz_py, tifffile, matplotlib
+import cv2, json, pytest, xyz_py, tifffile, matplotlib
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
@@ -300,8 +300,6 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
 
         mock_save_xyz.assert_called_once()
 
-        gc.collect()
-
     #EDIT THIS: MOCK xyz_py.save_xyz, MOCK get_unique_path
 
 
@@ -344,8 +342,6 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
         assert do_compression == False
         mock_savemat.assert_called_once()
 
-        gc.collect()
-
     #EDIT THIS: MOCK savemat, MOCK get_unique_path, MOCK np.asfortranarray ?
 
 
@@ -384,8 +380,6 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
         assert np.array_equal(opt_flow, tiff_arr)
         assert opt_flow.shape == tiff_arr.shape
         mock_save.assert_called_once()
-
-        gc.collect()
 
     #EDIT THIS: MOCK NP.SAVE, MOCK get_unique_path
 
@@ -494,8 +488,6 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             )
             mock_funcanimation.assert_called_once()
             mock_ffmpegwriter.assert_called_once()
-
-            gc.collect()
 
     test_case_x(image_stack1, stack1_kwargs1_path, kwargs1)
     test_case_x(image_stack1, stack1_kwargs2_path, kwargs2)
