@@ -167,19 +167,19 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
             - quiver: Matplotlib quiver object for displaying flow vectors.
             - ax: Matplotlib axes object for the plot.
             - fig: Matplotlib figure object for the plot.
-            - T_minus_1: Total number of frames minus one (T-1).
+            - T: Total number of frames minus one (T-1).
     Returns:
         None: Just saves the video to the specified path.
     """
     img_disp = kwargs.get('img_disp', None)
-    arr = kwargs.get('arr', None)
+    arr = kwargs['arr']
     og_arr = kwargs.get('og_arr', None)
-    step = kwargs.get('step', None)
-    fps = kwargs.get('fps', None)
-    quiver = kwargs.get('quiver', None)
-    ax = kwargs.get('ax', None)
-    fig = kwargs.get('fig', None)
-    T = kwargs.get('T', None)
+    step = kwargs.get('step', 20)
+    fps = kwargs.get('fps', 10)
+    quiver = kwargs['quiver']
+    ax = kwargs['ax']
+    fig = kwargs['fig']
+    T = kwargs['T']
 
     if flag[0] not in ['f', 't']:
         raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
@@ -191,7 +191,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
         V = arr[frame, ::step, ::step, 1]
         quiver.set_UVC(U, V)
 
-        if img_disp is not None:
+        if (img_disp is not None) and (og_arr is not None):
             img_disp.set_data(og_arr[frame])
 
         ax.set_title(f"Frame {frame}")

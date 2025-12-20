@@ -504,11 +504,3 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
 
 
 def test_save_vector_video()
-    
-"""
-Cont once I get the answers to these questions:
-For the save_vector_video function, since we’re assuming that all values are present in kwargs and are of the correct type, then why can’t we just have them as regular parameters in save_vector_video? Or why can’t we replace things like arr = kwargs.get('arr', None) with arr = kwargs[‘arr’]?
-Or if the default for something like step is 20, then why don’t we just have step = kwargs.get('step', 20) instead of step = kwargs.get('step', None)
-
-GOT PERMISSION TO EDIT IT
-"""
