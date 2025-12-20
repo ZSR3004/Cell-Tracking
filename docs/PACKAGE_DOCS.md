@@ -346,18 +346,21 @@ in the top right corner. Next, replace the file path of that file with "example_
 file-explorer and copying the absolute path.
 
 ```python
-from cell_tracking import Tiff, calculate_optical_flow, calcOpticalFlowRAFT, ModelSize
+from cell_tracking import Tiff, calculate_optical_flow
 import numpy as np
 import matplotlib.pyplot as plt
 
 # Step 1: Load your TIFF file
+print("Loading TIFF file...")
 tiff_file = Tiff("example_stack.tif")
 
 # Step 2: Inspect the first frame
+print("Inspecting the first frame...")
 first_frame = tiff_file.arr[0, 0]  # first frame of first channel
-tiff_file.show_image(first_frame, title="First Frame")
+tiff_file.show_image(first_frame, title="First Frame", save_path="first_frame.png")
 
 # Step 3: Preprocess the TIFF stack
+print("Preprocessing the TIFF stack...")
 preprocess_params = {
     "gauss": {"ksize": (5, 5), "sigmaX": 1.2},
     "median": {"ksize": 3},
@@ -373,6 +376,7 @@ processed_stack3 = tiff_file.preprocess_stack(tiff_file.arr[:, 2, :, :], **prepr
 processed_stacks = np.stack((processed_stack1, processed_stack2, processed_stack3), axis=0) # make them into one big array again
 
 # Step 4: Compute optical flow using Farneback (nuclei-labeled example)
+print("Calculating optical flow using Farneback method...")
 flow_farneback = calculate_optical_flow(
     processed_stacks,
     pyr_scale=0.5,
@@ -384,40 +388,15 @@ flow_farneback = calculate_optical_flow(
     flags=0
 )
 
-# Step 5: Compute optical flow using RAFT (cytoplasm-labeled / phase contrast example)
-
-# Scale-down the TIFF if you're using the example image
-h, w = tiff_file.arr.shape[-2:]
-crop_h = h // 4
-crop_w = w // 4
-if crop_h == 0 or crop_w == 0:
-    raise ValueError("Image too small to crop by 1/4 on each side.")
-tiff_file.arr = tiff_file.arr[..., crop_h : h - crop_h, crop_w : w - crop_w]
-
-flow_raft = calcOpticalFlowRAFT(
-    tiff_file,
-    model_size=ModelSize.SMALL,
-    gpu_flag=False,
-    **preprocess_params  # optional preprocessing applied before RAFT; this is actually preprocessing the image twice
-)
-
 # Step 6: Inspect results
 
 # Show first frame of Farneback optical flow (visualization example)
+print("Displaying Farneback optical flow for the first frame...")
 plt.imshow(flow_farneback[0, 0, :, :, 0], cmap='viridis')  # x-direction flow
 plt.title("Farneback Optical Flow - First Frame (X)")
 plt.colorbar()
-plt.show()
-
-# Show first frame of RAFT optical flow
-plt.imshow(flow_raft[0, :, :, 0], cmap='viridis')  # x-direction flow
-plt.title("RAFT Optical Flow - First Frame (X)")
-plt.colorbar()
-plt.show()
+plt.savefig("farneback_flow_first_frame_x.png")
 ```
-
-## What's Next?
-We plan to implement features that allow you to make heatmap and kymograph visualizations of the optical flow. We have not implemented these features yet.
 
 <!-- ## The Tiff Class -->
 <!-- The Tiff Class is initialized by creating an instance of it with the desired Tiff file. You'll need to provide the full path nameFor example: -->
