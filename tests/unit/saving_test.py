@@ -6,7 +6,7 @@ ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../"))
 if ROOT_DIR not in sys.path:
     sys.path.insert(0, ROOT_DIR)
 
-import cv2, json, pytest, gc, xyz_py, tifffile, matplotlib
+import cv2, json, pytest, xyz_py, tifffile, matplotlib
 from src.cell_tracking import tiffclass as tiff
 from src.cell_tracking import saving as save
 import matplotlib.pyplot as plt
@@ -214,16 +214,18 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     save_dir = tmp_path / name1
     assert not save_dir.exists()
 
-    save_arr1 = save.save_arr(name1, img, save_dir)
+    save.save_arr(name1, img, save_dir)
     save_arr1_path = get_last_saved_pattern_fn_path(
         name1, lambda i: f"{name1}_flow{i}.npy", save_dir
     )
 
-    print(save_arr1_path)
     assert save_dir.exists()
     assert save_arr1_path.exists()
 
     assert np.array_equal(np.load(save_arr1_path), tiff_arr)
+
+
+    #EDIT THIS: MOCK NP.SAVE, MOCK get_unique_path
 
 
 def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
@@ -274,29 +276,31 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
         ),
     )
 
-    name = "Test_Name"
+    name1 = "Test_Name"
     save_dir = tmp_path / "save_dir"
 
     with patch("xyz_py.save_xyz") as mock_save_xyz:
         dx_dy_arr = tiff_arr.reshape(-1, 2)
-        zeros = np.zeros((len(dx_dy_arr), 1), dtype=dx_dy_arr[0][0].dtype)
+        zeros = np.zeros((len(dx_dy_arr), 1), dtype=int)
         tiff_arr_xyz = np.hstack((dx_dy_arr, zeros))
+        number_labels_arr = list(range(len(dx_dy_arr)))
 
-        save.save_optical_flow_as_xyz(name, tiff_arr, save_dir)
+        save.save_optical_flow_as_xyz(name1, tiff_arr, save_dir)
+        save_path = save.get_unique_path(
+            name1, lambda i: f"{name1}_flow{i}.xyz", save_dir
+        )
 
-        _, call_kwargs = mock_save_xyz.call_args
-        f_name = call_kwargs["f_name"]
-        labels = call_kwargs["labels"]
-        coords = call_kwargs["coords"]
+        _, save_xyz_kwargs = mock_save_xyz.call_args
+        assert save_xyz_kwargs["f_name"] == save_path
+        assert np.array_equal(save_xyz_kwargs["labels"], number_labels_arr)
+        assert np.array_equal(save_xyz_kwargs["coords"], tiff_arr_xyz)
+        assert save_xyz_kwargs["coords"].shape == tiff_arr_xyz.shape
+        assert len(save_xyz_kwargs["labels"]) == save_xyz_kwargs["coords"].shape[0]
+        assert save_xyz_kwargs["comment"] == "Atoms"
 
-        assert np.array_equal(labels, np.array(["I"] * coords.shape[0]))
-        assert np.array_equal(coords, tiff_arr_xyz)
-        assert coords.shape == tiff_arr_xyz.shape
-        assert len(labels) == coords.shape[0]
         mock_save_xyz.assert_called_once()
 
-        del dx_dy_arr, zeros, tiff_arr_xyz
-        gc.collect()
+    #EDIT THIS: MOCK xyz_py.save_xyz, MOCK get_unique_path
 
 
 def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
@@ -338,8 +342,7 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
         assert do_compression == False
         mock_savemat.assert_called_once()
 
-        del tiff_arr_fortran
-        gc.collect()
+    #EDIT THIS: MOCK savemat, MOCK get_unique_path, MOCK np.asfortranarray ?
 
 
 def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
@@ -378,7 +381,7 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
         assert opt_flow.shape == tiff_arr.shape
         mock_save.assert_called_once()
 
-        gc.collect()
+    #EDIT THIS: MOCK NP.SAVE, MOCK get_unique_path
 
 
 def test_save_original_video(init_tiff: tuple, tmp_path):
@@ -484,8 +487,6 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
             )
             mock_funcanimation.assert_called_once()
             mock_ffmpegwriter.assert_called_once()
-
-            gc.collect()
 
     test_case_x(image_stack1, stack1_kwargs1_path, kwargs1)
     test_case_x(image_stack1, stack1_kwargs2_path, kwargs2)

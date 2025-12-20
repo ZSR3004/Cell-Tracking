@@ -1,9 +1,11 @@
 import os
 from pathlib import Path
 import sys
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from src.cell_tracking import tiffclass
-import file_input_cli as fic
+from . import file_input_cli as fic
 
 # Add the project root (Cell-Tracking) to sys.path
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
@@ -21,7 +23,7 @@ def save_flow_cli(name: str, opt_flow: np.ndarray, main_path: str):
     Args:
         xyz_name: name of the xyz array
         matlab_name: name of the matlab array
-        numpy_name: name of the numpy arrayj
+        numpy_name: name of the numpy array
         opt_flow: the optical flow array to save
         main_path: the path to the file to save
 

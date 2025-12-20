@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cell Tracking Software</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+</head>
+<body class = "upload-page">
+  <div class="upload-container" id="uploadContainer">
+    <h2>Upload your file</h2>
+    <input type="file" id="fileInput" accept=".tif,.tiff">
+
+    <div id="UploadedVideoContainer" style="display:none;">
+      <h2>Uploaded File</h2>
+      <video id="uploadedVideo" controls width="500"></video>
+    </div>
+
+    <button id="goBtn" style="display:none;">Go</button>
+
+    <p id="status">File Status</p>
+  </div>
+</body>
+</html>

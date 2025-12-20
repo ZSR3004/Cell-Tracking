@@ -226,7 +226,7 @@ def process_single_tiff(
             v.plot_heatmap_cli(
                 combined_flow,
                 "Nuclei Dyed Heatmap",
-                os.path.join(os.getcwd(), "heatmap_nuclei_dyed_flow.mp4"),
+                os.path.join(os.getcwd(), "heatmap_nuclei_dyed_flow.mp4")
             )
 
         if "Kymograph" in outputs:
@@ -259,7 +259,7 @@ def process_single_tiff(
             v.plot_heatmap_cli(
                 raft_flow,
                 "Phase Contrast Heatmap",
-                os.path.join(os.getcwd(), "heatmap_phase_contrast.mp4"),
+                os.path.join(os.getcwd(), "heatmap_phase_contrast.mp4")
             )
 
         if "Kymograph" in outputs:

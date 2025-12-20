@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Cell Tracking Software</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+  <script src="{{ url_for('static', filename='controls.js') }}" defer></script>
+</head>
+
+<body class="control-page">
+  <div class="ControlsContainer">
+
+    <!-- LEFT COLUMN -->
+    <div class="controls">
+      <h2>Control Center</h2>
+
+      <!-- Preprocessing -->
+      <div class="control-box collapsible">
+        <div class="collapsible-header">
+          <h3>Preprocessing Parameters</h3>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="collapsible-content">
+          <h4>Gaussian Blur</h4>
+          <div class="param">
+            <label>Kernel size</label>
+            <input type="number" name="gaussK" id="gaussK" value="5" step="2" min="1" />
+          </div>
+          <div class="param">
+            <label>Sigma X</label>
+            <input type="number" name="gaussSigma" id="gaussSigma" value="1.5" step="0.1" />
+          </div>
+
+          <h4>Median Filter</h4>
+          <div class="param">
+            <label>Kernel size</label>
+            <input type="number" name="medianK" id="medianK" value="5" step="2" min="1" />
+          </div>
+
+          <h4>Contrast Adjustment</h4>
+          <div class="param">
+            <label>Alpha</label>
+            <input type="number" name="contrastAlpha" id="contrastAlpha" value="1.0" step="0.1" />
+          </div>
+          <div class="param">
+            <label>Beta</label>
+            <input type="number" name="contrastBeta" id="contrastBeta" value="0.0" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Farneback -->
+      <div class="control-box collapsible">
+        <div class="collapsible-header">
+          <h3>Farneback Flow Arguments</h3>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="param">
+            <label>Pyramid Scale</label>
+            <input type="number" name="fbPyrScale" id="fbPyrScale" value="0.5" step="0.1" />
+          </div>
+          <div class="param">
+            <label>Levels</label>
+            <input type="number" name="fbLevels" id="fbLevels" value="3" min="1" />
+          </div>
+          <div class="param">
+            <label>Window Size</label>
+            <input type="number" name="fbWinSize" id="fbWinSize" value="15" min="1" />
+          </div>
+          <div class="param">
+            <label>Iterations</label>
+            <input type="number" name="fbIterations" id="fbIterations" value="3" min="1" />
+          </div>
+          <div class="param">
+            <label>Polynomial N</label>
+            <input type="number" name="fbPolyN" id="fbPolyN" value="5" step="2" min="1" />
+          </div>
+          <div class="param">
+            <label>Polynomial Sigma</label>
+            <input type="number" name="fbPolySigma" id="fbPolySigma" value="1.2" step="0.1" />
+          </div>
+        </div>
+      </div>
+
+      <!-- RAFT -->
+      <div class="control-box collapsible">
+        <div class="collapsible-header">
+          <h3>RAFT Flow Arguments</h3>
+          <span class="chevron">▾</span>
+        </div>
+        <div class="collapsible-content">
+          <div class="param">
+            <label>Model Size</label>
+            <input type="number" name="rfModSize" id="rfModSize" value="1" min="1" />
+          </div>
+          <div class="param">
+            <label>Model Weight</label>
+            <input type="text" name="rfModWeight" id="rfModWeight" />
+          </div>
+          <label class="checkbox">
+            <input type="checkbox" name="rfGPU" id="rfGPU" /> Use GPU
+          </label>
+        </div>
+      </div>
+
+      <!-- Output Options -->
+      <div class="control-box">
+        <h3>Output</h3>
+        <label class="checkbox">
+          <input type="checkbox" name="outKymograph" id="outKymograph" /> Kymograph
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="outHeatmap" id="outHeatmap" /> Heatmap
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="outVectorMag" id="outVectorMag" /> Vector Magnitude Graph
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="outFarnebackIsolated" id="outFarnebackIsolated" /> Farneback Optical Flow (isolated)
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="outFarneback" id="outFarneback" /> Farneback Optical Flow
+        </label>
+        <label class="checkbox">
+          <input type="checkbox" name="outRAFT" id="outRAFT" /> RAFT Optical Flow
+        </label>
+      </div>
+
+      <button id="runBtn" type="submit">Run</button>
+      <p id="status_two">Analysis Status</p>
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="output">
+      <h2>Output</h2>
+      <div id="dynamic-outputs"></div>
+      <button id="downloadBtn" style="margin-top:20px; display:none;">Download All</button>
+    </div>
+
+  </div>
+</body>
+</html>

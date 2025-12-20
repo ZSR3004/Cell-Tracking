@@ -13,42 +13,81 @@ In this user guide, there are step by step instructions on how to upload your Ti
 1. Computer with storage space available
 2. Completed Tiff video
 3. Internet access
+
+You will also need.
+1. Python 3 is installed 
+2. A Command Line Interface, such as: 
+    * Terminal (Mac)
+    * Command Prompt or Powershell (Windows)
+    * Integrated Terminal in VS Code
 <br><br>
 ## How To Use Our Software
 
 This next section will go over the sub-tasks that the user can follow to run our software.
 
-### 1. Download the app
+### 1. Download and Run the App
+NOTE: These are the same instructions as the CLI. 
 
 1. Open Google Chrome or a supporting internet browser.
 
 2. Follow this [link](https://github.com/ZSR3004/Cell-Tracking/tree/main)
     - Note: After step 2, you should have arrived at the GitHub homepage, titled "Cell Tracking." (this page will contain all of the files you need to download.) You will see a screen like the image below, ![FIGURE 1](../images/Homepage.png) which displays the GitHub homepage.
 
-3. Click on the newest release (which looks like image below) \
-![FIGURE 2](../images/Release.png) \
-and download the attached package by clicking the "Source Code" button as seen on the image below. ![FIGURE 3](../images/Download.png)
+3. Clone the Github repository using your terminal. Just open up the terminal and type
+```bash
+git clone https://github.com/ZSR3004/Cell-Tracking
+```
 
-    - Note: Software should now be downloaded and ready to run. You'll likely find it within your downloads folder.
+4. `cd` into the repository.
+```bash
+cd Cell-Tracking
+```
+
+5. Once inside the directory, you need to setup the dependencies. Just type the following into the command line.
+```bash
+python3.13 -m venv .venv
+source .venv/bin/activate # or the equivalent for your device
+pip install poetry
+poetry install
+```
+
+6. Now, you can run the tool in two ways. You can use Python directly: 
+```bash
+.venv/bin/python3.13 frontend/flask/app.py
+```
+
+Or you can use the provided script to launch the CLI. 
+```bash
+chmod +x ctwb // Tell your computer this is safe to execute.
+./ctwb
+```
+If you 
+plan to use the CLI frequently, you may wish to use the bash
+script and add it to you PATH.
+
+7. You should see an output that looks something like this.
+```bash
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:5000
+Press CTRL+C to quit
+```
+
+Just click on that link or type it into your preferred web-browser, and the webapp should show up.
 
 ### 2. Upload video to our software
 
 1. Open the downloaded application.
 
-2. Run the installer by following the prompts within the installer window. Figure [FIGUREX] displays the first screen that initiates the installer window. Once completed, you should arricve at a screen that says "Finish". Click "Finish".
-
-3. Open the application (that you downloaded in the previous step) by double clicking on the icon on your desktop or by searching for the application "Cell-Tracker" in your Finder app (for Mac) or File Explorer (for Windows 10 and Windows 11).
-
-    - Note: You should have arrived at the main page of the application as shown in figure [FIGUREX].
-
-4. On the main page, select "Upload Tiff Video." You'll now see a new window with a button saying "Upload file". You have two options to upload files.
+2. On the main page, select "Upload Tiff Video." You'll now see a new window with a button saying "Upload file". You have two options to upload files.
 
   - Click the "Upload file" button. This will open your Finder or File Explorer. You can navigate to wherever your TIFF file is located, double-click it, and then press "Open" in the bottom right corner of this window. You should see a progress bar and the uploading will have begun.
   - If you already have the file open (say on your desktop or in Finder/File Explorer), you can select the file and drag it into this window. You will see a progress bar and uploading will have begun.
 
     - Note: If the file you attempt to upload is not a TIFF file (specficailly, a file with extension .tiff, .tif, .tiff.ome, or .tif.ome), then the program will tell you this is an invalid file type.
 
-5. Once the upload is complete, you will see a screen like figure [FIGUREX] with the file name in the middle of the page. Confirm this file name matches the file you intended to upload and click "Next". If you accidentally uploaded the wrong file, click the "Remove" button on the same screen and try step 3 again.
+3. Once the upload is complete, you will see a screen like figure [FIGUREX] with the file name in the middle of the page. Confirm this file name matches the file you intended to upload and click "Next". If you accidentally uploaded the wrong file, click the "Remove" button on the same screen and try step 3 again.
 
 
 ### 3. Select desired output
