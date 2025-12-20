@@ -9,6 +9,8 @@ if ROOT_DIR not in sys.path:
 import pytest, tifffile
 from unittest.mock import patch, Mock, MagicMock, ANY
 from multiprocessing import Pool, cpu_count
+from src.cell_tracking import vector_magnitude_map
+from src.cell_tracking import saving
 from src.cell_tracking import tiffclass as tiff
 import numpy as np
 
@@ -143,6 +145,13 @@ def test_create_vector_field_video(init_tiff: tuple):
 
             mock_subplots.return_value = (mock_fig, mock_ax)
             mock_ax.quiver.return_value = mock_quiver
+            if og_arrx is not None:
+                mock_img_disp = MagicMock()
+                mock_ax.imshow.return_value = mock_img_disp
+            else:
+                mock_img_disp = None
+
+            vector_magnitude_map.create_vector_field_video(namex, arrx, og_arrx, stepx, scalex, colorx, fpsx, figsizex, titlex, flagx)
             
             T, H, W, _ = arrx.shape
             Y, X = np.mgrid[0:H:stepx, 0:W:stepx]
@@ -154,16 +163,23 @@ def test_create_vector_field_video(init_tiff: tuple):
 
             if og_arrx is not None:
                 is_gray = og_arrx.ndim == 3
-                mock_ax.imshow.assert_called_once_with(og_arrx[0], cmap='gray' if is_gray else None)
+
+                args_ax_imshow, kwargs_ax_imshow = mock_ax.imshow.call_args
+                assert np.array_equal(args_ax_imshow[0], og_arrx[0])
+                if is_gray:
+                    assert kwargs_ax_imshow['cmap'] == 'gray'
+                else:
+                    assert kwargs_ax_imshow['cmap'] == None
+
+                mock_ax.imshow.assert_called_once()
             else:
-                img_disp = None
                 mock_ax.imshow.assert_not_called()
 
             args_ax_quiver, kwargs_ax_quiver = mock_ax.quiver.call_args
-            assert args_ax_quiver[0] == X
-            assert args_ax_quiver[1] == Y
-            assert args_ax_quiver[2] == U
-            assert args_ax_quiver[3] == V
+            assert np.array_equal(args_ax_quiver[0], X)
+            assert np.array_equal(args_ax_quiver[1], Y)
+            assert np.array_equal(args_ax_quiver[2], U)
+            assert np.array_equal(args_ax_quiver[3], V)
             assert kwargs_ax_quiver['scale'] == scalex
             assert kwargs_ax_quiver['pivot'] == 'tail'
             assert kwargs_ax_quiver['color'] == colorx
@@ -172,9 +188,12 @@ def test_create_vector_field_video(init_tiff: tuple):
                 args_save_vector_video, kwargs_save_vector_video = mock_save_vector_video.call_args
                 assert args_save_vector_video[0] == namex
                 assert args_save_vector_video[1] == flagx
-                assert kwargs_save_vector_video['img_disp'] == img_disp
-                assert kwargs_save_vector_video['arr'] == arrx
-                assert kwargs_save_vector_video['og_arr'] == og_arrx
+                assert kwargs_save_vector_video['img_disp'] == mock_img_disp
+                assert np.array_equal(kwargs_save_vector_video['arr'], arrx)
+                if og_arrx is not None:
+                    assert np.array_equal(kwargs_save_vector_video['og_arr'], og_arrx)
+                else:
+                    assert kwargs_save_vector_video['og_arr'] == og_arrx
                 assert kwargs_save_vector_video['step'] == stepx
                 assert kwargs_save_vector_video['fps'] == fpsx
                 assert kwargs_save_vector_video['figsize'] == figsizex
@@ -196,7 +215,6 @@ def test_create_vector_field_video(init_tiff: tuple):
             mock_ax.set_aspect.assert_called_once_with('equal')
             mock_ax.axis.assert_called_once_with('off')
             mock_ax.quiver.assert_called_once()
-            mock_save_vector_video.assert_called_once()
             mock_close.assert_called_once_with(mock_fig)
 
     test_case_x(name1, arr0, og_arr1, step1, scale1, color1, fps1, figsize3, title1, flag1)
