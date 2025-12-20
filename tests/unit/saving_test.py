@@ -15,8 +15,8 @@ import numpy as np
 from pathlib import Path
 from scipy.io import savemat
 import matplotlib.animation as animation
-from src.cell_tracking.defaults import default_process, default_flow
 from tests.unit.sample_tiffs import TIFF_PATHS
+from src.cell_tracking.defaults import default_process, default_flow
 
 
 @pytest.fixture(params=TIFF_PATHS)
@@ -428,9 +428,6 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     mock_ax = MagicMock()
     mock_im = MagicMock()
 
-    mock_im.set_data = MagicMock()
-    mock_ax.set_title = MagicMock()
-
     kwargs1 = {"T": 10, "fps": 20}
     kwargs2 = {"T": 40}
     kwargs3 = {"fps": 35}
@@ -475,6 +472,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
                 "src.cell_tracking.saving.animation.FuncAnimation"
             ) as mock_funcanimation,
         ):
+            mock_im.set_data = MagicMock()
+            mock_ax.set_title = MagicMock()
             mock_ani = MagicMock()
             mock_funcanimation.return_value = mock_ani
             mock_writer_instance = MagicMock()
@@ -521,3 +520,211 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     test_case_x(image_stack3, stack3_kwargs2_path, kwargs2)
     test_case_x(image_stack3, stack3_kwargs3_path, kwargs3)
     test_case_x(image_stack3, stack3_kwargs4_path, kwargs4)
+
+
+def test_save_vector_video(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the save_vector_video method works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    def dummy_arr(channel: int):
+        """
+        A function that creates an array of shape (f-1, h, w, 2).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    # arr0, arr1, and arr2 have shape (f-1, h, w, 2)
+    arr0 = dummy_arr(0)
+    arr1 = dummy_arr(1)
+    arr2 = dummy_arr(2)
+
+    mock_img_disp = MagicMock()
+    mock_quiver = MagicMock()
+    mock_ax = MagicMock()
+    mock_fig = MagicMock()
+
+    name1 = "save_vector_video0"
+    name2 = "Test Save"
+
+    flag0 = ''
+    flag00 = ' '
+    flag000 = 'ft'
+    flag0000 = 'f '
+    flag1 = 'f'
+    flag2 = 't'
+
+    og_arr0 = None
+    og_arr1 = tiff_arr
+
+    step1 = 10
+    step2 = 35
+    step3 = 20
+
+    fps1 = 5
+    fps2 = 32
+    fps3 = 10
+
+    T = f-1
+
+    file_path1 = tmp_path / "path1"
+    file_path2 = tmp_path / "path2"
+    file_path3 = tmp_path / "path3"
+    file_path4 = tmp_path / "path4"
+    file_path5 = tmp_path / "path5"
+    file_path6 = tmp_path / "path6"
+    file_path7 = tmp_path / "path7"
+    file_path8 = tmp_path / "path8"
+    file_path9 = tmp_path / "path9"
+    file_path10 = tmp_path / "path10"
+    file_path11 = tmp_path / "path11"
+    file_path12 = tmp_path / "path12"
+    file_path13 = tmp_path / "path13"
+    file_path14 = tmp_path / "path14"
+    file_path15 = tmp_path / "path15"
+    file_path16 = tmp_path / "path16"
+    file_path17 = tmp_path / "path17"
+    file_path18 = tmp_path / "path18"
+    file_path19 = tmp_path / "path19"
+    file_path20 = tmp_path / "path20"
+
+    kwargs1 = {'img_disp': mock_img_disp, 'arr': arr0, 'og_arr': og_arr1, 'step': step1, 'fps': fps1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs2 = {'img_disp': mock_img_disp, 'arr': arr1, 'og_arr': og_arr1, 'step': step2, 'fps': fps2, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs3 = {'img_disp': mock_img_disp, 'arr': arr2, 'og_arr': og_arr1, 'step': step3, 'fps': fps3, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs4 = {'arr': arr0, 'step': step1, 'fps': fps3, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs5 = {'img_disp': mock_img_disp, 'arr': arr1, 'og_arr': og_arr0, 'fps': fps1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs6 = {'img_disp': mock_img_disp, 'arr': arr2, 'fps': fps1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs7 = {'img_disp': mock_img_disp, 'arr': arr0, 'og_arr': og_arr1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs8 = {'arr': arr1, 'og_arr': og_arr1, 'step': step2, 'fps': fps2, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs9 = {'arr': arr2, 'og_arr': og_arr0, 'step': step3, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs10 = {'arr': arr1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+
+    def test_case_x(namex: str, flagx: str, file_pathx: str, **kwargsx: dict):
+        """
+        Tests whether the save_vector_video method works correctly on a given test case.
+
+        Args:
+            name (str): Name of the video file to save.
+            flag (str): Flag to determine the type of video being saved.
+            file_pathx (str): Path that the vector video will be saved to. Return value of mocked get_unique_path.
+            **kwargs: Additional keyword arguments that include:
+                - img_disp: Matplotlib image display object for the original frames.
+                - arr: Optical flow array of shape (f-1, h, w, 2) where f-1 is the number of frames,
+                    h is height, w is width, and the last dimension contains the flow vectors (dx, dy).
+                - og_arr: Original image frames array of shape (f, c, h, w). Default is None.
+                - step: Step size for downsampling the flow vectors for visualization. Default is 20.
+                - fps: Frames per second for the video. Default is 10.
+                - quiver: Matplotlib quiver object for displaying flow vectors.
+                - ax: Matplotlib axes object for the plot.
+                - fig: Matplotlib figure object for the plot.
+                - T: Total number of frames minus one (T-1).
+
+        Returns:
+            None.
+        """
+        with (
+            patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
+            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation,
+            patch("src.cell_tracking.saving.animation.writers") as mock_ani_writers
+        ):
+            mock_quiver.set_UVC = MagicMock()
+            mock_img_disp.set_data = MagicMock()
+            mock_ax.set_title = MagicMock()
+
+            mock_get_unique_path.return_value = file_pathx
+            mock_ani = MagicMock()
+            mock_funcanimation.return_value = mock_ani
+            mock_Writer = MagicMock()
+            mock_ani_writers.__getitem__.return_value = mock_Writer
+            mock_writer = MagicMock()
+            mock_Writer.return_value = mock_writer
+
+            img_disp = kwargsx.get('img_disp', None)
+            arr = kwargsx['arr']
+            og_arr = kwargsx.get('og_arr', None)
+            step = kwargsx.get('step', 20)
+            fpsx = kwargsx.get('fps', 10)
+            quiver = kwargsx['quiver']
+            ax = kwargsx['ax']
+            figx = kwargsx['fig']
+            Tx = kwargsx['T']
+
+            if flagx not in ['f', 't']:
+                match_message = f'Invalid flag. Expected f or t, but got {flagx}'
+                with pytest.raises(ValueError, match=match_message):
+                    save.save_vector_video(namex, flagx, **kwargsx)
+            else:
+                save.save_vector_video(namex, flagx, **kwargsx)
+                
+                args_get_unique_path, _ = mock_get_unique_path.call_args
+                assert args_get_unique_path[0] == namex
+                assert args_get_unique_path[1] == 'video'
+                assert callable(args_get_unique_path[2])
+
+                args_mock_funcanimation, kwargs_mock_funcanimation = mock_funcanimation.call_args
+                assert args_mock_funcanimation[0] == figx
+                assert callable(args_mock_funcanimation[1])
+                assert kwargs_mock_funcanimation['frames'] == range(Tx)
+                assert kwargs_mock_funcanimation['interval'] == 1000/fpsx
+                assert kwargs_mock_funcanimation['blit'] == False
+
+                _, kwargs_Writer = mock_Writer.call_args
+                assert kwargs_Writer['fps'] == fpsx
+                assert kwargs_Writer['metadata'] == dict(artist='Flow')
+                assert kwargs_Writer['bitrate'] == 1800
+
+                args_ani_save, kwargs_ani_save = mock_ani.save.call_args
+                assert args_ani_save[0] == file_pathx
+                assert kwargs_ani_save['writer'] == mock_writer
+
+                mock_get_unique_path.assert_called_once()
+                mock_funcanimation.assert_called_once()
+                mock_ani_writers.__getitem__.assert_called_once_with('ffmpeg')
+                mock_Writer.assert_called_once()
+                mock_ani.save.assert_called_once()
+
+    test_case_x(name1, flag0, file_path1, **kwargs1)
+    test_case_x(name2, flag1, file_path2, **kwargs2)
+    test_case_x(name1, flag2, file_path3, **kwargs3)
+    test_case_x(name2, flag2, file_path4, **kwargs4)
+    test_case_x(name1, flag1, file_path5, **kwargs5)
+    test_case_x(name2, flag2, file_path6, **kwargs6)
+    test_case_x(name1, flag00, file_path7, **kwargs7)
+    test_case_x(name2, flag1, file_path8, **kwargs8)
+    test_case_x(name1, flag1, file_path9, **kwargs9)
+    test_case_x(name2, flag2, file_path10, **kwargs10)
+    test_case_x(name1, flag2, file_path11, **kwargs1)
+    test_case_x(name2, flag2, file_path12, **kwargs2)
+    test_case_x(name1, flag000, file_path13, **kwargs3)
+    test_case_x(name2, flag1, file_path14, **kwargs4)
+    test_case_x(name1, flag2, file_path15, **kwargs5)
+    test_case_x(name2, flag1, file_path16, **kwargs6)
+    test_case_x(name1, flag1, file_path17, **kwargs7)
+    test_case_x(name2, flag0000, file_path18, **kwargs8)
+    test_case_x(name1, flag2, file_path19, **kwargs9)
+    test_case_x(name2, flag1, file_path20, **kwargs10)
