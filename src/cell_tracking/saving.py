@@ -168,7 +168,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
             - ax: Matplotlib axes object for the plot.
             - fig: Matplotlib figure object for the plot.
             - T: Total number of frames minus one (T-1).
-            
+
     Returns:
         None: Just saves the video to the specified path.
     """
@@ -182,7 +182,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
     fig = kwargs['fig']
     T = kwargs['T']
 
-    if flag[0] not in ['f', 't']:
+    if flag not in ['f', 't']:
         raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
 
     file_path = get_unique_path(name, 'video', lambda i: f"{name}_v{flag}_{i}.mp4")
