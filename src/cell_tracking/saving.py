@@ -161,33 +161,30 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
         flag (str): Flag to determine the type of video being saved.
         **kwargs: Additional keyword arguments that include:
             - img_disp: Matplotlib image display object for the original frames.
-            - arr: Optical flow array of shape (T, H, W, 2) where T is the number of frames,
-                   H is height, W is width, and the last dimension contains the flow vectors (dx, dy).
-            - og_arr: Original image frames array of shape (T, H, W, C). Default is None.
+            - arr: Optical flow array of shape (f-1, h, w, 2) where f-1 is the number of frames,
+                   h is height, w is width, and the last dimension contains the flow vectors (dx, dy).
+            - og_arr: Original image frames array of shape (f, c, h, w). Default is None.
             - step: Step size for downsampling the flow vectors for visualization. Default is 20.
             - fps: Frames per second for the video. Default is 10.
             - quiver: Matplotlib quiver object for displaying flow vectors.
             - ax: Matplotlib axes object for the plot.
             - fig: Matplotlib figure object for the plot.
-            - T_minus_1: Total number of frames minus one (T-1).
+            - T: Total number of frames minus one (T-1).
+
     Returns:
         None: Just saves the video to the specified path.
-
-    Invariant:
-        Assumes, that all values are present in kwargs and are of the correct type. The check occurs in the
-        `create_optical_flow_video` function (in TiffVisualize.py) before this function is called.
     """
     img_disp = kwargs.get('img_disp', None)
-    arr = kwargs.get('arr', None)
+    arr = kwargs['arr']
     og_arr = kwargs.get('og_arr', None)
-    step = kwargs.get('step', None)
-    fps = kwargs.get('fps', None)
-    quiver = kwargs.get('quiver', None)
-    ax = kwargs.get('ax', None)
-    fig = kwargs.get('fig', None)
-    T = kwargs.get('T', None)
+    step = kwargs.get('step', 20)
+    fps = kwargs.get('fps', 10)
+    quiver = kwargs['quiver']
+    ax = kwargs['ax']
+    fig = kwargs['fig']
+    T = kwargs['T']
 
-    if flag[0] not in ['f', 't']:
+    if flag not in ['f', 't']:
         raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
 
     file_path = get_unique_path(name, 'video', lambda i: f"{name}_v{flag}_{i}.mp4")
@@ -197,7 +194,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
         V = arr[frame, ::step, ::step, 1]
         quiver.set_UVC(U, V)
 
-        if img_disp is not None:
+        if (img_disp is not None) and (og_arr is not None):
             img_disp.set_data(og_arr[frame])
 
         ax.set_title(f"Frame {frame}")
