@@ -10,8 +10,11 @@ import numpy as np
 from src.cell_tracking import raft
 from src.cell_tracking import tiffclass as tiff
 from unittest.mock import Mock, patch
+from tests.unit.sample_tiffs import TIFF_PATHS
 
-TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
+pytestmark = pytest.mark.skip(
+    reason="We were in the middle of updating this module when we decided to deprecate RAFT. The tests are not expected to pass, but we worked hard on them, so we are not deleting them. Please run pytest - m 'no deprecated' to avoidthis module which may take considerable time to run."
+)
 
 
 @pytest.fixture(params=TIFF_PATHS)

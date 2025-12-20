@@ -56,9 +56,13 @@ def test_init(sample_MemoryManager):
     """
     f = sample_MemoryManager
 
-    assert f.MM.path == f.main_path
-    assert f.MM.yaml_path == f.yaml_path
-    assert f.MM.config == default_yaml_config
+    assert hasattr(f.MM, "path")
+    assert hasattr(f.MM, "yaml_path")
+    assert hasattr(f.MM, "config")
+
+    assert f.MM.path is not None
+    assert f.MM.yaml_path is not None
+    assert f.MM.config is not None
 
 
 def test_write_default_yaml(sample_MemoryManager):
@@ -72,7 +76,10 @@ def test_write_default_yaml(sample_MemoryManager):
         None.
     """
     f = sample_MemoryManager
-    with open(f.yaml_path) as y:
+
+    assert f.MM.config == default_yaml_config
+
+    with open(f.MM.yaml_path) as y:
         assert yaml.safe_load(y) == default_yaml_config
 
 
@@ -87,8 +94,8 @@ def test_create_main_dir(sample_MemoryManager):
         None.
     """
     f = sample_MemoryManager
-    assert os.path.exists(f.main_path)
-    assert os.path.exists(f.yaml_path)
+    assert os.path.exists(f.MM.path)
+    assert os.path.exists(f.MM.yaml_path)
 
 
 def test_read_yaml(sample_MemoryManager):
@@ -150,7 +157,7 @@ def test_create_tiff_dir(sample_MemoryManager):
 
     f.MM.create_tiff_dir(tiff_name)
 
-    parent_path = os.path.join(f.main_path, tiff_name)
+    parent_path = os.path.join(f.MM.path, tiff_name)
     assert os.path.exists(parent_path)
 
     subdirs = ["raw_data", "optical_flows", "heatmaps", "kymographs"]

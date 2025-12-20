@@ -149,7 +149,14 @@ pytest                                                     # run all tests
 If you're planning on contributing, we ask that you skim the [pytest documentation](https://docs.pytest.org/en/stable/index.html) so you know how to 
 create tests and run them. If you're just interesetd in running the tests, there are plenty of tutorials online that may be easier to understand.
 
-### How To Get Cell-Tracking's Path
+### Sample TIFFs for Testing
+You can find a few sample TIFFs at this [Google Drive](https://drive.google.com/file/d/138OTydtlO0J2soF5VD6eKD5Zc3mLB24I/view?usp=sharing) link.
+Just download and unzip the files. There is a README in the
+file with instructions on how to use this particular 
+dataset. Special thanks to Audrey Clay-Streib and Liam Jones
+for these files.
+
+## How To Get Cell-Tracking's Path
 
 Use your computer's search bar (the one that searches the contents of your computer), and search "Cell-Tracking". Click on the folder called "Cell-Tracking".
 
