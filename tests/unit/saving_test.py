@@ -559,6 +559,9 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
     flag1 = 'f'
     flag2 = 't'
 
+    og_arr0 = None
+    og_arr1 = tiff_arr
+
     step1 = 10
     step2 = 35
     step3 = 20
@@ -569,20 +572,32 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
 
     T = f-1
 
+    MAKE PERSONALIZED FILE PATHS HERE
+    file_path1 = tmp_path / 
 
-    MAKE KWARGS HERE ONCE I KNOW WHAT FLAGS ARE
+    2 3 3 4 4
+    #one with all none
+
+    kwargs1 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
+    kwargs2 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
+    kwargs3 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
+    kwargs4 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
+    kwargs5 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
+    kwargs6 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
+
 
 
     #FOR ONES WITH kwargs.get, HAVE SOME OF THEM BE NONE!!
 
 
-    def test_case_x(namex: str, flagx: str, kwargsx: dict):
+    def test_case_x(namex: str, flagx: str, file_pathx: str, kwargsx: dict):
         """
         Tests whether the save_vector_video method works correctly on a given test case.
 
         Args:
             name (str): Name of the video file to save.
             flag (str): Flag to determine the type of video being saved.
+            file_pathx (str): Path that the vector video will be saved to. Return value of mocked get_unique_path.
             **kwargs: Additional keyword arguments that include:
                 - img_disp: Matplotlib image display object for the original frames.
                 - arr: Optical flow array of shape (f-1, h, w, 2) where f-1 is the number of frames,
@@ -601,30 +616,61 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
         with (
             patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
             patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation,
-            patch("src.cell_tracking.saving.animation.writers") as mock_writers
+            patch("src.cell_tracking.saving.animation.writers") as mock_ani_writers
         ):
             mock_quiver.set_UVC = MagicMock()
             mock_img_disp.set_data = MagicMock()
             mock_ax.set_title = MagicMock()
-            
 
-            img_disp = kwargsx.get('img_disp', None)
-            arr = kwargsx['arr']
-            og_arr = kwargsx.get('og_arr', None)
-            step = kwargsx.get('step', 20)
-            fps = kwargsx.get('fps', 10)
-            quiver = kwargsx['quiver']
-            ax = kwargsx['ax']
-            fig = kwargsx['fig']
-            T = kwargsx['T']
+            mock_get_unique_path.return_value = file_pathx
+            mock_ani = MagicMock()
+            mock_funcanimation.return_value = mock_ani
+            mock_Writer = MagicMock()
+            mock_ani_writers.return_value = mock_Writer
+            mock_writer = MagicMock()
+            # This is Writer
+            mock_ani_writers.__getitem__.return_value = mock_writer
 
-            if flag not in ['f', 't']:
-                raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
+            img_dispx = kwargsx.get('img_disp', None)
+            arrx = kwargsx['arr']
+            og_arrx = kwargsx.get('og_arr', None)
+            stepx = kwargsx.get('step', 20)
+            fpsx = kwargsx.get('fps', 10)
+            quiverx = kwargsx['quiver']
+            axx = kwargsx['ax']
+            figx = kwargsx['fig']
+            Tx = kwargsx['T']
 
-            file_path = get_last_saved_pattern_fn_path(namex, 'video', lambda i: f"{namex}_v{flagx}_{i}.mp4")
+            if flagx not in ['f', 't']:
+                match_message = f'Invalid flag. Expected f or t, but got {flagx}'
+                with pytest.raises(ValueError, match=match_message):
+                    save.save_vector_video(namex, flagx, **kwargsx)
+            else:
+                save.save_vector_video(namex, flagx, **kwargsx)
+                
+            args_get_unique_path, _ = mock_get_unique_path.call_args
+            assert args_get_unique_path[0] == namex
+            assert args_get_unique_path[1] == 'video'
+            assert callable(args_get_unique_path[2])
 
-        """
-        Args to check:
-        ValueError
-        get_unique_path
-        """
+            args_mock_funcanimation, kwargs_mock_funcanimation = mock_funcanimation.call_args
+            assert args_mock_funcanimation[0] == figx
+            assert callable(args_mock_funcanimation[1])
+            assert kwargs_mock_funcanimation['frames'] == range(Tx)
+            assert kwargs_mock_funcanimation['interval'] == 1000/fpsx
+            assert kwargs_mock_funcanimation['blit'] == False
+
+            _, kwargs_Writer = mock_Writer.call_args
+            assert kwargs_Writer['fps'] == fpsx
+            assert kwargs_Writer['metadata'] == dict(artist='Flow')
+            assert kwargs_Writer['bitrate'] == 1800
+
+            args_ani_save, kwargs_ani_save = mock_ani.save.call_args
+            assert args_ani_save[0] == file_pathx
+            assert kwargs_ani_save['writer'] == mock_writer
+
+            mock_get_unique_path.assert_called_once()
+            mock_funcanimation.assert_called_once()
+            mock_ani_writers.__getitem__.assert_called_once_with('ffmpeg')
+            mock_Writer.assert_called_once()
+            mock_ani.save.assert_called_once()
