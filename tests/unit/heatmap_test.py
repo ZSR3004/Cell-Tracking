@@ -348,10 +348,10 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             arrx_0 = arrx[:, 0]
             # polar_to_heatmap_return has shape (f-1, h, w, 3), which is the same shape as polar_to_heatmap(polar_arr[0]), where polar_arr = arrx_0
             polar_to_heatmap_return = np.repeat(arrx_0[:, :, :1], 3, axis=-1)
-            #
-            create_color_wheel_rgb_return = np.random.rand(ADD)
-            #
-            create_color_wheel_mask_return = np.random.rand(ADD)
+            # create_color_wheel_rgb_return has shape (300, 300, 3), which is the same shape as rgb, where (rgb, mask) = create_color_wheel(300)
+            create_color_wheel_rgb_return = np.random.rand(300, 300, 3)
+            # create_color_wheel_mask_return has shape (300, 300), which is the same shape as mask, where (rgb, mask) = create_color_wheel(300)
+            create_color_wheel_mask_return = np.random.rand(300, 300)
 
             mock_convert_stack_to_polar.return_value = arrx_0
             mock_figure.return_value = mock_fig
@@ -360,7 +360,7 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             mock_polar_to_heatmap.return_value = polar_to_heatmap_return
             mock_ax_main.imshow.return_value = mock_im
             mock_ax_main.set_title.return_value = mock_title_text
-            #ADD WHEN I KNOW THE OUTPUTS OF CREATE COLOR WHEEL
+            mock_create_color_wheel.return_value = (create_color_wheel_rgb_return, create_color_wheel_mask_return)
             mock_funcanimation.return_value = mock_anim
             mock_ffmpegwriter.return_value = mock_writer
 
@@ -384,11 +384,15 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             assert kwargs_ax_main_imshow["origin"] == "lower"
 
 
+
+
             mock_convert_stack_to_polar.assert_called_once_with(arrx_0)
             mock_figure.assert_called_once_with(figsize=(14, 8))
             mock_ax_main.set_xlabel.assert_called_once_with("Width")
             mock_ax_main.set_ylabel.assert_called_once_with("Height")
             mock_ax_main.set_title.assert_called_once_with(f"{titlex} - Frame 0/{num_frames-1}")
+
+            #CONTINUE
 
             """
             Assert args of:
