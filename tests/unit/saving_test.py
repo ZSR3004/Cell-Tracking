@@ -208,21 +208,25 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     """
     img, info = init_tiff
     f, c, h, w = info
-    tiff_arr = img.arr
 
     name1 = "Test_Name"
     save_dir = tmp_path / name1
-    assert not save_dir.exists()
 
-    save.save_arr(name1, img, save_dir)
-    save_arr1_path = get_last_saved_pattern_fn_path(
-        name1, lambda i: f"{name1}_flow{i}.npy", save_dir
-    )
+    with (
+        patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
+        patch("numpy.save") as mock_np_save
+    ):
+        save.save_arr(name1, img, save_dir)
+        
+        tiff_arr = img.arr
+        save_arr1_path = get_last_saved_pattern_fn_path(
+            name1, lambda i: f"{name1}_flow{i}.npy", save_dir
+        )
 
-    assert save_dir.exists()
-    assert save_arr1_path.exists()
+        assert save_dir.exists()
+        assert save_arr1_path.exists()
 
-    assert np.array_equal(np.load(save_arr1_path), tiff_arr)
+        assert np.array_equal(np.load(save_arr1_path), tiff_arr)
 
 
     #EDIT THIS: MOCK NP.SAVE, MOCK get_unique_path
