@@ -152,6 +152,7 @@ def save_original_video(
     writer = animation.FFMpegWriter(fps=fps)
     ani.save(file_path, writer=writer)
 
+
 def save_vector_video(name : str, flag : str, **kwargs) -> None:
     """
     Creates a video of optical flow vectors overlaid on the original image frames.

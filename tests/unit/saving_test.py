@@ -385,23 +385,30 @@ def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    name = "Test_Name"
-    save_dir = tmp_path / "save_dir"
+    name1 = "Test_Name"
+    main_path = tmp_path / name1
+    unique_path = main_path / "saved_path"
 
-    with patch("numpy.save") as mock_save:
-        save.save_optical_flow_as_numpy(name, tiff_arr, save_dir)
+    with (
+        patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
+        patch("numpy.save") as mock_save
+    ):
+        mock_get_unique_path.return_value = unique_path
 
-        args, _ = mock_save.call_args
-        save_path = args[0]
-        opt_flow = args[1]
+        save.save_optical_flow_as_numpy(name1, tiff_arr, main_path)
 
-        assert name in str(save_path)
-        assert str(save_path).endswith(".npy")
-        assert np.array_equal(opt_flow, tiff_arr)
-        assert opt_flow.shape == tiff_arr.shape
+        args_get_unique_path, _ = mock_get_unique_path.call_args
+        assert args_get_unique_path[0] == name1
+        assert callable(args_get_unique_path[1])
+        assert args_get_unique_path[2] == main_path
+
+        args_save, _ = mock_save.call_args
+        assert args_save[0] == unique_path
+        assert np.array_equal(args_save[1], tiff_arr)
+        assert args_save[1].shape == tiff_arr.shape
+
+        mock_get_unique_path.assert_called_once()
         mock_save.assert_called_once()
-
-    #EDIT THIS: MOCK NP.SAVE, MOCK get_unique_path
 
 
 def test_save_original_video(init_tiff: tuple, tmp_path):
