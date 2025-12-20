@@ -97,12 +97,14 @@ function collectInputs() {
           video.controls = true;
           video.width = 500;
           dynamicOutputs.appendChild(video);
+          
         } else {
           const img = document.createElement("img");
           img.src = url;
           img.width = 500;
           dynamicOutputs.appendChild(img);
         }
+        dynamicOutputs.appendChild(container);
       }
       downloadBtn.style.display = "inline-block";
       downloadBtn.disabled = false;
