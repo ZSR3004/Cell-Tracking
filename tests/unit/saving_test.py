@@ -337,26 +337,32 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    name = "Test_Name"
-    save_dir = tmp_path / "save_dir"
+    name1 = "Test_Name"
+    main_path = tmp_path / name1
+    unique_path = main_path / "saved_path"
 
-    with patch("src.cell_tracking.saving.savemat") as mock_savemat:
-        save.save_optical_flow_as_matlab(name, tiff_arr, save_dir)
+    with (
+        patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
+        patch("src.cell_tracking.saving.savemat") as mock_savemat
+    ):
+        mock_get_unique_path.return_value = unique_path
+        save.save_optical_flow_as_matlab(name1, tiff_arr, main_path)
+
+        args_get_unique_path, _ = mock_get_unique_path.call_args
+        assert args_get_unique_path[0] == name1
+        assert callable(args_get_unique_path[1])
+        assert args_get_unique_path[2] == main_path
+
+        opt_flow_fortran = np.asfortranarray(tiff_arr)
 
         args_savemat, kwargs_savemat = mock_savemat.call_args
-        save_path = args_savemat[0]
-        opt_flow_fortran = args_savemat[1]["optical_flow"]
-        do_compression = kwargs_savemat["do_compression"]
+        assert args_savemat[0] == unique_path
+        assert np.array_equal(args_savemat[1]["optical_flow"], opt_flow_fortran)
+        assert args_savemat[1]["optical_flow"].shape == opt_flow_fortran.shape
+        assert kwargs_savemat["do_compression"] == False
 
-        assert name in str(save_path)
-        assert str(save_path).endswith(".mat")
-        tiff_arr_fortran = np.asfortranarray(tiff_arr)
-        assert np.array_equal(opt_flow_fortran, tiff_arr_fortran)
-        assert opt_flow_fortran.shape == tiff_arr_fortran.shape
-        assert do_compression == False
+        mock_get_unique_path.assert_called_once()
         mock_savemat.assert_called_once()
-
-    #EDIT THIS: MOCK savemat, MOCK get_unique_path, MOCK np.asfortranarray ?
 
 
 def test_save_optical_flow_as_numpy(init_tiff: tuple, tmp_path):
