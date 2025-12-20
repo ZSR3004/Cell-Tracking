@@ -35,7 +35,6 @@ function collectInputs() {
     const output = {
       kymograph: document.getElementById("outKymograph").checked,
       heatmap: document.getElementById("outHeatmap").checked,
-      vector_magnitude: document.getElementById("outVectorMag").checked,
       farneback_isolated: document.getElementById("outFarnebackIsolated").checked,
       farneback: document.getElementById("outFarneback").checked,
       raft: document.getElementById("outRAFT").checked

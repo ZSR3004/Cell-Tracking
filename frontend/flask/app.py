@@ -126,7 +126,7 @@ def run_analysis():
         shutil.move(video_path, dest_path)
         outputs["channel_1"] = url_for("static", filename=f"uploads/Channel_1.mp4")
 
-        s.save_original_video_cli("Channel_2", str(uploaded_file_path), 1)
+        s.save_original_video_cli("Channel_2", str(uploaded_file_path), 2)
         video_path = Path("Channel_2.mp4")  
         uploads_dir = Path("static/uploads")
         dest_path = uploads_dir / video_path.name
