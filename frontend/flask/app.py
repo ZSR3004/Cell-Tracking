@@ -1,4 +1,5 @@
-from flask import Flask, request, render_template, jsonify, send_file, url_for, session
+from flask import Flask, request, render_template, jsonify, send_file, url_for, session, after_this_request
+import zipfile
 import tempfile
 import os, sys
 import shutil
@@ -109,57 +110,89 @@ def run_analysis():
     outFarneback = config["output"]["farneback"]
     outRAFT = config["output"]["raft"]
 
+    outputs = {}
+    outputs["original_video"] = url_for("static", filename=f"uploads/Original_Video.mp4")
+    combined_flow = opt.calculate_optical_flow(my_video.arr, **farneback_params)
+
     if outFarneback:
-        combined_flow = opt.calculate_optical_flow(my_video.arr, **farneback_params)
         s.save_flow_cli("farneback", combined_flow, str(UPLOAD_FOLDER))
 
-        if outFarnebackIsolated:
-            flow_channel_one = opt.optical_flow(my_video.arr, 1, **farneback_params)
-            flow_channel_two = opt.optical_flow(my_video.arr, 2, **farneback_params)
+    if outFarnebackIsolated:
+        flow_channel_one = opt.optical_flow(my_video.arr, 1, **farneback_params)
+        flow_channel_two = opt.optical_flow(my_video.arr, 2, **farneback_params)
 
-            s.save_original_video_cli("Channel_1", str(uploaded_file_path), 1)
+        s.save_original_video_cli("Channel_1", str(uploaded_file_path), 1)
+        video_path = Path("Channel_1.mp4")  
+        uploads_dir = Path("static/uploads")
+        dest_path = uploads_dir / video_path.name
+        shutil.move(video_path, dest_path)
+        outputs["channel_1"] = url_for("static", filename=f"uploads/Channel_1.mp4")
 
-            video_path = Path("Channel_1.mp4")  
-            uploads_dir = Path("static/uploads")
-            dest_path = uploads_dir / video_path.name
-            shutil.move(video_path, dest_path)
-
-            s.save_original_video_cli("Channel_2", str(uploaded_file_path), 1)
-            video_path = Path("Channel_2.mp4")  
-            uploads_dir = Path("static/uploads")
-            dest_path = uploads_dir / video_path.name
-            shutil.move(video_path, dest_path)
+        s.save_original_video_cli("Channel_2", str(uploaded_file_path), 1)
+        video_path = Path("Channel_2.mp4")  
+        uploads_dir = Path("static/uploads")
+        dest_path = uploads_dir / video_path.name
+        shutil.move(video_path, dest_path)
+        outputs["channel_2"] = url_for("static", filename=f"uploads/Channel_2.mp4")
 
             
-            s.save_flow_cli("farneback_channel_1", flow_channel_one, str(UPLOAD_FOLDER))
-            s.save_flow_cli("farneback_channel_2", flow_channel_two, str(UPLOAD_FOLDER))
+        s.save_flow_cli("farneback_channel_1", flow_channel_one, str(UPLOAD_FOLDER))
+        s.save_flow_cli("farneback_channel_2", flow_channel_two, str(UPLOAD_FOLDER))
             
 
-        if outKymograph:
-            v.plot_basic_kymo_cli(combined_flow, os.path.join(str(UPLOAD_FOLDER), "kymograph_nuclei_dyed_flow.png"))
+    if outKymograph:
+        v.plot_basic_kymo_cli(combined_flow, os.path.join(str(UPLOAD_FOLDER), "kymograph_nuclei_dyed_flow.png"))
+        outputs["kymograph"] = url_for("static", filename=f"uploads/kymograph_nuclei_dyed_flow.png")
 
+    if outHeatmap:
+        v.plot_heatmap_cli(combined_flow, "Nuclei Dyed Heatmap",
+                            os.path.join(str(UPLOAD_FOLDER), "heatmap_nuclei_dyed_flow.mp4"))
+        outputs["heatmap"] = url_for("static", filename=f"uploads/heatmap_nuclei_dyed_flow.mp4")
 
-        if outHeatmap:
-            v.plot_heatmap_cli(combined_flow, "Nuclei Dyed Heatmap",
-                               os.path.join(str(UPLOAD_FOLDER), "heatmap_nuclei_dyed_flow.mp4"))
-            
-        if outVectorMag:
-            v.vector_video_cli("vector_field_video", combined_flow)
-            
+    if outVectorMag:
+        v.vector_video_cli("vector_field_video", combined_flow)
+        outputs["vector"] = url_for("static", filename=f"uploads/vector_field_video.mp4")
 
     if outRAFT:
         raft_flow = r.calcOpticalFlowRAFT(my_video, rfModSize, rfModWeight, rfGPU, **preprocessing_params)
 
         if outKymograph:
             v.plot_basic_kymo_cli(raft_flow, os.path.join(str(UPLOAD_FOLDER), "kymograph_phase_contrast_flow.png"))
+            outputs["kymograph"] = url_for("static", filename=f"uploads/kymograph_nuclei_dyed_flow.png")
 
         if outHeatmap:
             v.plot_heatmap_cli(raft_flow, "Phase Contrast Heatmap",
                                os.path.join(str(UPLOAD_FOLDER), "heatmap_raft_flow.mp4"))
+            outputs["heatmap"] = url_for("static", filename=f"uploads/heatmap_nuclei_dyed_flow.mp4")
+
         if outVectorMag:
             v.vector_video_cli("vector_field_video", raft_flow)
+            outputs["vector"] = url_for("static", filename=f"uploads/vector_field_video.mp4")
     
-    return jsonify({"message": "Analysis finished!"})
+    return jsonify({"message": "Analysis finished!", "outputs": outputs})
+
+@app.route('/download_all')
+def download_all():
+    zip_filename = "cell_tracking_outputs.zip"
+    zip_path = UPLOAD_FOLDER / zip_filename
+
+    # Create zip of all files in UPLOAD_FOLDER
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        for file in UPLOAD_FOLDER.iterdir():
+            zipf.write(file, arcname=file.name)
+
+    @after_this_request
+    def cleanup(response):
+        try:
+            if os.path.exists(zip_path):
+                os.remove(zip_path)
+            if os.path.exists(UPLOAD_FOLDER):
+                shutil.rmtree(UPLOAD_FOLDER)
+        except Exception as e:
+            print(f"Error cleaning up files: {e}")
+        return response
+
+    return send_file(zip_path, as_attachment=True)
 
 
 if __name__ == "__main__":

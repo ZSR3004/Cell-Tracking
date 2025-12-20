@@ -59,6 +59,8 @@ function collectInputs() {
   });
   
   document.addEventListener("DOMContentLoaded", () => {
+    const downloadBtn = document.getElementById("downloadBtn");
+    downloadBtn.disabled = true;
     const runBtn = document.getElementById("runBtn");
     const statusTextTwo = document.getElementById("status_two");
   
@@ -76,5 +78,38 @@ function collectInputs() {
   
       const data = await response.json();
       statusTextTwo.textContent = data.message;
+
+      const dynamicOutputs = document.getElementById("dynamic-outputs");
+      dynamicOutputs.innerHTML = ""; // only clear the videos/images
+
+      for (const [type, url] of Object.entries(data.outputs)) {
+        const container = document.createElement("div");
+        container.style.marginBottom = "20px";
+    
+        const label = document.createElement("p");
+        label.textContent = type.replace(/_/g, " ").toUpperCase();
+        label.style.fontWeight = "bold";
+        container.appendChild(label);
+
+        if (url.endsWith(".mp4")) {
+          const video = document.createElement("video");
+          video.src = url;
+          video.controls = true;
+          video.width = 500;
+          dynamicOutputs.appendChild(video);
+        } else {
+          const img = document.createElement("img");
+          img.src = url;
+          img.width = 500;
+          dynamicOutputs.appendChild(img);
+        }
+      }
+      downloadBtn.style.display = "inline-block";
+      downloadBtn.disabled = false;
     });
+  });
+
+  downloadBtn.addEventListener("click", () => {
+    downloadBtn.disabled = true;
+    window.location.href = "/download_all";
   });

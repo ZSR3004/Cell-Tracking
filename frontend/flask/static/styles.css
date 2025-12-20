@@ -29,12 +29,6 @@ body.control-page {
     align-self: stretch;
   }
   
-  /* RIGHT PANEL */
-  .output {
-    flex: 1;
-    padding: 20px;
-  }
-  
   .control-box {
     background: #fafafa;
     border: 1px solid #e3e3e3;
@@ -177,3 +171,56 @@ body.control-page {
     margin-top: 10px;
     font-weight: bold;
   }
+
+  .output {
+    display: flex;
+    flex-direction: column; /* stack children vertically */
+    align-items: center;    /* center horizontally */
+    padding: 20px;
+    text-align: center;     /* center text like h2 */
+  }
+
+
+  #dynamic-outputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;     
+    width: 100%;
+  }
+
+ #dynamic-outputs p {
+    margin: 5px 0;
+  }
+  
+  .output h2 {
+    margin-bottom: 20px;    
+  }
+  
+  .output video,
+  .output img {
+    margin: 10px 0;
+    max-width: 100%;
+    display: block;         
+  }
+  #dynamic-outputs video,
+  #dynamic-outputs img {
+    margin: 10px 0;
+    max-width: 100%;    
+    height: auto;
+}
+
+#downloadBtn {
+  width: 50%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 1rem;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+#downloadBtn:hover {
+  background-color: #3a7fcf;
+}
