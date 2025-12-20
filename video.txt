@@ -1,0 +1,13 @@
+GUI:
+    Starts at 00:00
+    We skip over the processing because it is just loading. The cut is at 00:56.
+
+Command Line:
+    Starts at 04:26.
+    We skip over the processing because it is just loading. The cut is at 06:05.
+
+Package:
+    Starts at 07:08.
+
+Downloading Tiffs for testing:
+    Starts at 10:00.
