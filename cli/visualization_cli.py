@@ -3,7 +3,7 @@ import os
 from src.cell_tracking import heatmap as hm
 from src.cell_tracking import kymograph as kg
 from src.cell_tracking import vector_magnitude_map as vm
-from . import optical_flow_cli as ofc
+import optical_flow_cli as ofc
 
 
 def plot_heatmap_cli(flow, title, output_path):
