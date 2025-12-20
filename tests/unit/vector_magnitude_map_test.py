@@ -104,13 +104,13 @@ def test_create_vector_field_video(init_tiff: tuple):
     figsize2 = (14, 14)
     figsize3 = (12, 8)
 
-    title1: "Video Title"
-    title2: "test_title0"
-    title3: None
+    title1 = "Video Title"
+    title2 = "test_title0"
+    title3 = None
 
-    flag1: 'f'
-    flag2: 't'
-    flag3: None
+    flag1 = 'f'
+    flag2 = 't'
+    flag3 = ''
 
     def test_case_x(namex: str, arrx: np.ndarray, og_arrx, stepx: int, scalex: int, colorx: str, fpsx: int, figsizex: tuple, titlex, flagx: str):
         """
@@ -132,4 +132,46 @@ def test_create_vector_field_video(init_tiff: tuple):
         Returns:
             None
         """
+        with (
+            patch("matplotlib.pyplot.subplots") as mock_subplots,
+            patch("src.cell_tracking.saving.save_vector_video") as mock_save_vector_video,
+            patch("matplotlib.pyplot.close") as mock_close
+        ):
+            mock_fig = MagicMock()
+            mock_ax = MagicMock()
 
+            mock_subplots.return_value = (mock_fig, mock_ax)
+            
+            T, H, W, _ = arrx.shape
+            Y, X = np.mgrid[0:H:stepx, 0:W:stepx]
+
+            _ , kwargs_subplots = mock_subplots.call_args
+            assert kwargs_subplots["figsize"] == (12, 6)
+
+
+
+
+            mock_ax.set_xlim.assert_called_once_with(0, W)
+            mock_ax.set_ylim.assert_called_once_with(H, 0)
+            mock_ax.set_xlabel.assert_called_once_with("X")
+            mock_ax.set_ylabel.assert_called_once_with("Y")
+            mock_ax.set_title.assert_called_once_with("Optical Flow")
+            mock_ax.set_aspect.assert_called_once_with('equal')
+            mock_ax.axis.assert_called_once_with('off')
+
+            """
+            Args:
+            ax.imshow
+            ax.quiver
+            saving.save_vector_video
+            plt.close
+            """
+
+            """
+            Assert called:
+            plt.subplots
+            ax.imshow
+            ax.quiver
+            saving.save_vector_video
+            plt.close
+            """
