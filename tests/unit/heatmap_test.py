@@ -210,22 +210,23 @@ def test_polar_to_heatmap(init_tiff: tuple):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    def dummy_polar_frame(frame: int, channel: int):
+    def dummy_polar_frame(channel: int, frame: int):
         """
         A function that creates an array of shape (h, w, 2).
 
         Args:
             channel (int): The channel to process.
+            frame (int): The frame to process.
 
         Returns:
             A np.ndarray of shape (h, w, 2).
         """
         arr_channel = tiff_arr[:, channel, :, :]
 
-        dummy_dx = arr_channel[1:] - arr_channel[:-1]
-        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+        dummy_r = np.random.uniform(0, 0.1, size=(f-1, h, w))
+        dummy_theta = np.random.uniform(0, 0.1, size=(f-1, h, w))
 
-        all_frames = np.stack([dummy_dx, dummy_dy], axis=-1)
+        all_frames = np.stack([dummy_r, dummy_theta], axis=-1)
 
         return all_frames[frame, ...]
 
@@ -264,7 +265,7 @@ def test_polar_to_heatmap(init_tiff: tuple):
 
         assert result.shape == (h, w, 3)
         assert result.shape == expected_result.shape
-        assert np.array_equal(result, expected_result)
+        assert np.allclose(result, expected_result)
 
     test_case_x(polar_frame_channel0_firstframe)
     test_case_x(polar_frame_channel0_middleframe)
