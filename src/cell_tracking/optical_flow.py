@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 from multiprocessing import Pool, cpu_count
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 
