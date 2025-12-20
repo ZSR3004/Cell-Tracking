@@ -1,5 +1,7 @@
 import numpy as np
 from pathlib import Path
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.animation as animation
 import xyz_py
 from scipy.io import savemat
@@ -69,7 +71,7 @@ def save_optical_flow_as_xyz(name: str, opt_flow: np.ndarray, main_path: str) ->
     labels_arr = ["I"] * len(dx_dy_arr)
 
     xyz_py.save_xyz(
-        f_name=f"{name}_flow.xyz", labels=labels_arr, coords=xyz_arr, comment=None
+        save_path, labels=labels_arr, coords=xyz_arr, comment=None
     )
 
 

@@ -4,6 +4,8 @@ import datetime
 import cv2
 from scipy.ndimage import gaussian_laplace
 from multiprocessing import Pool, cpu_count
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 

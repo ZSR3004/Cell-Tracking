@@ -23,7 +23,7 @@ def save_flow_cli(name: str, opt_flow: np.ndarray, main_path: str):
     Args:
         xyz_name: name of the xyz array
         matlab_name: name of the matlab array
-        numpy_name: name of the numpy arrayj
+        numpy_name: name of the numpy array
         opt_flow: the optical flow array to save
         main_path: the path to the file to save
 
