@@ -210,26 +210,26 @@ def test_save_arr(init_tiff: tuple, tmp_path):
     f, c, h, w = info
 
     name1 = "Test_Name"
-    save_dir = tmp_path / name1
+    main_path = tmp_path / name1
+    unique_path = main_path / name1 / "saved_path"
 
     with (
         patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
         patch("numpy.save") as mock_np_save
     ):
-        save.save_arr(name1, img, save_dir)
+        mock_get_unique_path.return_value = unique_path
+        save.save_arr(name1, img, main_path)
         
         tiff_arr = img.arr
-        save_arr1_path = get_last_saved_pattern_fn_path(
-            name1, lambda i: f"{name1}_flow{i}.npy", save_dir
-        )
+        
+        args_get_unique_path, _ = mock_get_unique_path.call_args
+        assert args_get_unique_path[0] == name1
+        assert callable(args_get_unique_path[1])
+        assert args_get_unique_path[2] == main_path
 
-        assert save_dir.exists()
-        assert save_arr1_path.exists()
-
-        assert np.array_equal(np.load(save_arr1_path), tiff_arr)
-
-
-    #EDIT THIS: MOCK NP.SAVE, MOCK get_unique_path
+        args_np_save, _ = mock_np_save.call_args
+        assert args_np_save[0] == unique_path
+        assert np.array_equal(args_np_save[1], tiff_arr)
 
 
 def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
@@ -294,13 +294,13 @@ def test_save_optical_flow_as_xyz(init_tiff: tuple, tmp_path):
             name1, lambda i: f"{name1}_flow{i}.xyz", save_dir
         )
 
-        _, save_xyz_kwargs = mock_save_xyz.call_args
-        assert save_xyz_kwargs["f_name"] == save_path
-        assert np.array_equal(save_xyz_kwargs["labels"], number_labels_arr)
-        assert np.array_equal(save_xyz_kwargs["coords"], tiff_arr_xyz)
-        assert save_xyz_kwargs["coords"].shape == tiff_arr_xyz.shape
-        assert len(save_xyz_kwargs["labels"]) == save_xyz_kwargs["coords"].shape[0]
-        assert save_xyz_kwargs["comment"] == "Atoms"
+        _, kwargs_save_xyz = mock_save_xyz.call_args
+        assert kwargs_save_xyz["f_name"] == save_path
+        assert np.array_equal(kwargs_save_xyz["labels"], number_labels_arr)
+        assert np.array_equal(kwargs_save_xyz["coords"], tiff_arr_xyz)
+        assert kwargs_save_xyz["coords"].shape == tiff_arr_xyz.shape
+        assert len(kwargs_save_xyz["labels"]) == kwargs_save_xyz["coords"].shape[0]
+        assert kwargs_save_xyz["comment"] == "Atoms"
 
         mock_save_xyz.assert_called_once()
 
@@ -333,10 +333,10 @@ def test_save_optical_flow_as_matlab(init_tiff: tuple, tmp_path):
     with patch("src.cell_tracking.saving.savemat") as mock_savemat:
         save.save_optical_flow_as_matlab(name, tiff_arr, save_dir)
 
-        args, kwargs = mock_savemat.call_args
-        save_path = args[0]
-        opt_flow_fortran = args[1]["optical_flow"]
-        do_compression = kwargs["do_compression"]
+        args_savemat, kwargs_savemat = mock_savemat.call_args
+        save_path = args_savemat[0]
+        opt_flow_fortran = args_savemat[1]["optical_flow"]
+        do_compression = kwargs_savemat["do_compression"]
 
         assert name in str(save_path)
         assert str(save_path).endswith(".mat")
