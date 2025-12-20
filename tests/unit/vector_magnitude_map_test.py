@@ -56,7 +56,7 @@ def test_create_vector_field_video(init_tiff: tuple):
     f, c, h, w = info
     tiff_arr = img.arr
 
-    def dummy_optical_flow(channel: int):
+    def dummy_arr(channel: int):
         """
         A function that creates an array of shape (f-1, h, w, 2).
 
@@ -73,21 +73,63 @@ def test_create_vector_field_video(init_tiff: tuple):
 
         return np.stack([dummy_dx, dummy_dy], axis=-1)
 
-    # flow0, flow1, and flow2 have shape (f-1, h, w, 2)
-    flow0 = dummy_optical_flow(0)
-    flow1 = dummy_optical_flow(1)
-    flow2 = dummy_optical_flow(2)
+    # arr0, arr1, and arr2 have shape (f-1, h, w, 2)
+    arr0 = dummy_arr(0)
+    arr1 = dummy_arr(1)
+    arr2 = dummy_arr(2)
 
-    def test_case_x():
+    name1 = "create_vector_field_video_test"
+    name2 = "Test Name"
+
+    og_arr1 = tiff_arr
+    og_arr2 = None
+
+    step1 = 10
+    step2 = 40
+    step3 = 20
+
+    scale1 = 250
+    scale2 = 800
+    scale3 = 500
+
+    color1 = 'red'
+    color2 = 'green'
+    color3 = 'blue'
+
+    fps1 = 6
+    fps2 = 20
+    fps3 = 10
+
+    figsize1 = (6, 10)
+    figsize2 = (14, 14)
+    figsize3 = (12, 8)
+
+    title1: "Video Title"
+    title2: "test_title0"
+    title3: None
+
+    flag1: 'f'
+    flag2: 't'
+    flag3: None
+
+    def test_case_x(namex: str, arrx: np.ndarray, og_arrx, stepx: int, scalex: int, colorx: str, fpsx: int, figsizex: tuple, titlex, flagx: str):
         """
         Tests whether the create_vector_field_video function works correctly on a specific test case.
 
         Args:
+            namex (str): Name of the video file to save.
+            arrx (np.ndarray): Optical flow array of shape (f-1, h, w, 2) where f-1 is the number of frames,
+                            h is height, w is width, and the last dimension contains the flow vectors (dx, dy).
+            og_arrx (np.ndarray): Original image frames array of shape (f, c, h, w). Default is None.
+            stepx (int): Step size for downsampling the flow vectors for visualization. Default is 20.
+            scalex (int): Scale factor for the quiver arrows. Default is 500.
+            colorx (str): Color of the arrows. Default is 'blue'.
+            fpsx (int): Frames per second for the video. Default is 10.
+            figsizex (tuple): Figure size in inches (width, height). Default is (12, 8).
+            titlex (str): Title of the video. Default is None.
+            flagx (str): Flag to determine if the video should be saved ('f' for flow, 't' for trajectory). Default is None.
 
         Returns:
             None
         """
 
-        
-
-#do examples when og_arr = None, title = None, and flag = None
