@@ -5,7 +5,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from src.cell_tracking import tiffclass
-from . import file_input_cli as fic
+import file_input_cli as fic
 
 # Add the project root (Cell-Tracking) to sys.path
 ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
