@@ -15,7 +15,6 @@ import src.cell_tracking.tiffclass as tf
 import src.cell_tracking.optical_flow as opt
 import cli.visualization_cli as v
 import cli.saving_cli as s
-import cli.file_input_cli
 import src.cell_tracking.raft as r
 
 app = Flask(__name__)
@@ -105,7 +104,6 @@ def run_analysis():
     # --- Output Options ---
     outKymograph = config["output"]["kymograph"]
     outHeatmap = config["output"]["heatmap"]
-    outVectorMag = config["output"]["vector_magnitude"]
     outFarnebackIsolated = config["output"]["farneback_isolated"]
     outFarneback = config["output"]["farneback"]
     outRAFT = config["output"]["raft"]
@@ -149,10 +147,6 @@ def run_analysis():
                             os.path.join(str(UPLOAD_FOLDER), "heatmap_nuclei_dyed_flow.mp4"))
         outputs["heatmap"] = url_for("static", filename=f"uploads/heatmap_nuclei_dyed_flow.mp4")
 
-    if outVectorMag:
-        v.vector_video_cli("vector_field_video", combined_flow)
-        outputs["vector"] = url_for("static", filename=f"uploads/vector_field_video.mp4")
-
     if outRAFT:
         raft_flow = r.calcOpticalFlowRAFT(my_video, rfModSize, rfModWeight, rfGPU, **preprocessing_params)
 
@@ -164,10 +158,6 @@ def run_analysis():
             v.plot_heatmap_cli(raft_flow, "Phase Contrast Heatmap",
                                os.path.join(str(UPLOAD_FOLDER), "heatmap_raft_flow.mp4"))
             outputs["heatmap"] = url_for("static", filename=f"uploads/heatmap_nuclei_dyed_flow.mp4")
-
-        if outVectorMag:
-            v.vector_video_cli("vector_field_video", raft_flow)
-            outputs["vector"] = url_for("static", filename=f"uploads/vector_field_video.mp4")
     
     return jsonify({"message": "Analysis finished!", "outputs": outputs})
 

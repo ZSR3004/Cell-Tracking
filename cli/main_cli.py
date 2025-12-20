@@ -1,9 +1,9 @@
 import click
 
-import file_input_cli as fic
-import optical_flow_cli as opt
-import visualization_cli as v
-import saving_cli as s
+from . import file_input_cli as fic
+from . import optical_flow_cli as opt
+from . import visualization_cli as v
+from . import saving_cli as s
 import questionary
 import matplotlib.pyplot as plt
 from pathlib import Path
@@ -207,9 +207,7 @@ def process_single_tiff(
                 os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
                 print("Saving isolated optical flow data...")
                 s.save_flow_cli("Channel_1", flow_channel_1, os.getcwd())
-                v.vector_video_cli("Vector_Channel_1.mp4", flow_channel_1)
                 s.save_flow_cli("Channel_2", flow_channel_2, os.getcwd())
-                v.vector_video_cli("Vector_Channel_2.mp4", flow_channel_1)
 
         # all the procedures for combined flow
         if "Optical Flow Data" in outputs:
@@ -217,7 +215,6 @@ def process_single_tiff(
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
             print("Saving combined flow data...")
             s.save_flow_cli("farneback", combined_flow, os.getcwd())
-            v.vector_video_cli("Vector_Farneback.mp4", combined_flow)
 
         if "Heatmap" in outputs:
             # Change to heatmap directory, save combined heatmap video
@@ -251,7 +248,6 @@ def process_single_tiff(
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/optical_flows")
             print("Saving optical flow...")
             s.save_flow_cli("raft_flow", raft_flow, os.getcwd())
-            v.vector_video_cli("Vector_Raft.mp4", raft_flow)
 
         if "Heatmap" in outputs:
             os.chdir(parent_dir + "/Cell-Tracking/" + tiff_name + "/heatmaps")
