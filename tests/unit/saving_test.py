@@ -593,18 +593,18 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
     file_path19 = tmp_path / "path19"
     file_path20 = tmp_path / "path20"
 
-    kwargs1 = {mock_img_disp, arr0, og_arr1, step1, fps1, mock_quiver, mock_ax, mock_fig, T}
-    kwargs2 = {mock_img_disp, arr1, og_arr1, step2, fps2, mock_quiver, mock_ax, mock_fig, T}
-    kwargs3 = {mock_img_disp, arr2, og_arr1, step3, fps3, mock_quiver, mock_ax, mock_fig, T}
-    kwargs4 = {arr0, step1, fps3, mock_quiver, mock_ax, mock_fig, T}
-    kwargs5 = {mock_img_disp, arr1, og_arr0, fps1, mock_quiver, mock_ax, mock_fig, T}
-    kwargs6 = {mock_img_disp, arr2, fps1, mock_quiver, mock_ax, mock_fig, T}
-    kwargs7 = {mock_img_disp, arr0, og_arr1, mock_quiver, mock_ax, mock_fig, T}
-    kwargs8 = {arr1, og_arr1, step2, fps2, mock_quiver, mock_ax, mock_fig, T}
-    kwargs9 = {arr2, og_arr0, step3, mock_quiver, mock_ax, mock_fig, T}
-    kwargs10 = {arr1, mock_quiver, mock_ax, mock_fig, T}
+    kwargs1 = {'img_disp': mock_img_disp, 'arr': arr0, 'og_arr': og_arr1, 'step': step1, 'fps': fps1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs2 = {'img_disp': mock_img_disp, 'arr': arr1, 'og_arr': og_arr1, 'step': step2, 'fps': fps2, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs3 = {'img_disp': mock_img_disp, 'arr': arr2, 'og_arr': og_arr1, 'step': step3, 'fps': fps3, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs4 = {'arr': arr0, 'step': step1, 'fps': fps3, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs5 = {'img_disp': mock_img_disp, 'arr': arr1, 'og_arr': og_arr0, 'fps': fps1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs6 = {'img_disp': mock_img_disp, 'arr': arr2, 'fps': fps1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs7 = {'img_disp': mock_img_disp, 'arr': arr0, 'og_arr': og_arr1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs8 = {'arr': arr1, 'og_arr': og_arr1, 'step': step2, 'fps': fps2, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs9 = {'arr': arr2, 'og_arr': og_arr0, 'step': step3, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
+    kwargs10 = {'arr': arr1, 'quiver': mock_quiver, 'ax': mock_ax, 'fig': mock_fig, 'T': T}
 
-    def test_case_x(namex: str, flagx: str, file_pathx: str, kwargsx: dict):
+    def test_case_x(namex: str, flagx: str, file_pathx: str, **kwargsx: dict):
         """
         Tests whether the save_vector_video method works correctly on a given test case.
 
@@ -640,18 +640,17 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
             mock_ani = MagicMock()
             mock_funcanimation.return_value = mock_ani
             mock_Writer = MagicMock()
-            mock_ani_writers.return_value = mock_Writer
+            mock_ani_writers.__getitem__.return_value = mock_Writer
             mock_writer = MagicMock()
-            # This is Writer
-            mock_ani_writers.__getitem__.return_value = mock_writer
+            mock_Writer.return_value = mock_writer
 
-            img_dispx = kwargsx.get('img_disp', None)
-            arrx = kwargsx['arr']
-            og_arrx = kwargsx.get('og_arr', None)
-            stepx = kwargsx.get('step', 20)
+            img_disp = kwargsx.get('img_disp', None)
+            arr = kwargsx['arr']
+            og_arr = kwargsx.get('og_arr', None)
+            step = kwargsx.get('step', 20)
             fpsx = kwargsx.get('fps', 10)
-            quiverx = kwargsx['quiver']
-            axx = kwargsx['ax']
+            quiver = kwargsx['quiver']
+            ax = kwargsx['ax']
             figx = kwargsx['fig']
             Tx = kwargsx['T']
 
@@ -662,32 +661,32 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
             else:
                 save.save_vector_video(namex, flagx, **kwargsx)
                 
-            args_get_unique_path, _ = mock_get_unique_path.call_args
-            assert args_get_unique_path[0] == namex
-            assert args_get_unique_path[1] == 'video'
-            assert callable(args_get_unique_path[2])
+                args_get_unique_path, _ = mock_get_unique_path.call_args
+                assert args_get_unique_path[0] == namex
+                assert args_get_unique_path[1] == 'video'
+                assert callable(args_get_unique_path[2])
 
-            args_mock_funcanimation, kwargs_mock_funcanimation = mock_funcanimation.call_args
-            assert args_mock_funcanimation[0] == figx
-            assert callable(args_mock_funcanimation[1])
-            assert kwargs_mock_funcanimation['frames'] == range(Tx)
-            assert kwargs_mock_funcanimation['interval'] == 1000/fpsx
-            assert kwargs_mock_funcanimation['blit'] == False
+                args_mock_funcanimation, kwargs_mock_funcanimation = mock_funcanimation.call_args
+                assert args_mock_funcanimation[0] == figx
+                assert callable(args_mock_funcanimation[1])
+                assert kwargs_mock_funcanimation['frames'] == range(Tx)
+                assert kwargs_mock_funcanimation['interval'] == 1000/fpsx
+                assert kwargs_mock_funcanimation['blit'] == False
 
-            _, kwargs_Writer = mock_Writer.call_args
-            assert kwargs_Writer['fps'] == fpsx
-            assert kwargs_Writer['metadata'] == dict(artist='Flow')
-            assert kwargs_Writer['bitrate'] == 1800
+                _, kwargs_Writer = mock_Writer.call_args
+                assert kwargs_Writer['fps'] == fpsx
+                assert kwargs_Writer['metadata'] == dict(artist='Flow')
+                assert kwargs_Writer['bitrate'] == 1800
 
-            args_ani_save, kwargs_ani_save = mock_ani.save.call_args
-            assert args_ani_save[0] == file_pathx
-            assert kwargs_ani_save['writer'] == mock_writer
+                args_ani_save, kwargs_ani_save = mock_ani.save.call_args
+                assert args_ani_save[0] == file_pathx
+                assert kwargs_ani_save['writer'] == mock_writer
 
-            mock_get_unique_path.assert_called_once()
-            mock_funcanimation.assert_called_once()
-            mock_ani_writers.__getitem__.assert_called_once_with('ffmpeg')
-            mock_Writer.assert_called_once()
-            mock_ani.save.assert_called_once()
+                mock_get_unique_path.assert_called_once()
+                mock_funcanimation.assert_called_once()
+                mock_ani_writers.__getitem__.assert_called_once_with('ffmpeg')
+                mock_Writer.assert_called_once()
+                mock_ani.save.assert_called_once()
 
     test_case_x(name1, flag0, file_path1, **kwargs1)
     test_case_x(name2, flag1, file_path2, **kwargs2)
