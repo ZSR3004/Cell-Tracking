@@ -88,5 +88,6 @@ def test_create_vector_field_video(init_tiff: tuple):
             None
         """
 
-#cont writing when I get the answer to this question: 
-#Is og_arr supposed to be just the original tiff array? If so, its shape should be (f, c, h, w)
+        
+
+#do examples when og_arr = None, title = None, and flag = None
