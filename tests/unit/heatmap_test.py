@@ -112,11 +112,80 @@ def test_convert_stack_to_polar(init_tiff: tuple):
     test_case_x(frame_stack2)
 
 
-def test_create_color_wheel():
+def test_create_color_wheel(init_tiff: tuple):
     """
-    Cont when I get the answers to these questions:
-    What is supposed to be in the returns part of the docstring?
+    Tests whether the create_color_wheel function works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file.
+            - path (str): The path to the TIFF file.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+
+    Returns:
+        None.
     """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    size0 = 0
+    size1 = 100
+    size2 = 50
+    size3 = 400
+    size4 = 200
+
+    def test_case_x(sizex: int):
+        """
+        Tests whether the create_color_wheel function works correctly on a specific test case.
+
+        Args:
+            sizex (int): Radius of the color wheel in pixels.
+
+        Returns:
+            None.
+        """
+        y, x = np.ogrid[-1 : 1 : sizex * 1j, -1 : 1 : sizex * 1j]
+        r = np.sqrt(x**2 + y**2)
+        theta = np.arctan2(y, x)
+        hue = (theta + np.pi) / (2 * np.pi)
+        saturation = np.clip(r, 0, 1)
+        value = np.ones_like(r)
+        mask = r <= 1
+        hsv = np.stack([hue, saturation, value], axis=-1)
+        rgb = hsv_to_rgb(hsv)
+        rgb[~mask] = 1
+
+        expected_rgb = rgb
+        expected_mask = mask
+
+        if sizex == 0:
+            result_rgb, result_mask = heatmap.create_color_wheel()
+            result_rgb_200size, result_mask_200size = heatmap.create_color_wheel(200)
+            assert np.array_equal(result_rgb, result_rgb_200size)
+            assert np.array_equal(result_mask, result_mask_200size)
+
+            assert result_rgb.shape == (200, 200, 3)
+            assert result_mask.shape == (200, 200)
+
+        else:
+            result_rgb, result_mask = heatmap.create_color_wheel(sizex)
+
+            assert result_rgb.shape == (sizex, sizex, 3)
+            assert result_mask.shape == (sizex, sizex)
+
+        assert result_rgb.shape == expected_rgb.shape
+        assert np.array_equal(result_rgb, expected_rgb) 
+        assert result_mask.shape == expected_mask.shape
+        assert np.array_equal(result_mask, expected_mask) 
+
+    test_case_x(size0)
+    test_case_x(size1)
+    test_case_x(size2)
+    test_case_x(size3)
+    test_case_x(size4)
 
 
 def test_polar_to_heatmap(init_tiff: tuple):
@@ -237,6 +306,7 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
 
     output_pathx = tmp_path / "arrx"
 
+    fps0 = 0
     fps1 = 5
     fps2 = 50
     fps3 = 20
@@ -274,6 +344,10 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             arrx_0 = arrx[:, 0]
             # polar_to_heatmap_return has shape (f-1, h, w, 3), which is the same shape as polar_to_heatmap(polar_arr[0]), where polar_arr = arrx_0
             polar_to_heatmap_return = np.repeat(arrx_0[:, :, :1], 3, axis=-1)
+            #
+            create_color_wheel_rgb_return = np.random.rand(ADD)
+            #
+            create_color_wheel_mask_return = np.random.rand(ADD)
 
             mock_convert_stack_to_polar.return_value = arrx_0
             mock_figure.return_value = mock_fig
@@ -395,6 +469,6 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             anim.save
             """
 
-#have some not have fpsx!
+#have some not have fpsx! fps0 means no fps as a function parameter
 
 # note: when working with stuff of shape like (f-1, c, h, w, 2), use stuff i wrote for test_plot_basic_kymo
