@@ -503,4 +503,113 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     test_case_x(image_stack3, stack3_kwargs4_path, kwargs4)
 
 
-def test_save_vector_video()
+def test_save_vector_video(init_tiff: tuple, tmp_path):
+    """
+    Tests whether the save_vector_video method works correctly.
+
+    Args:
+        init_tiff (tuple): A tuple containing information about the TIFF file:
+            - img (str): A TIFF instance.
+            - f (int): Number of frames.
+            - c (int): Number of channels.
+            - h (int): Height.
+            - w (int): Width.
+        tmp_path (pathlib.Path): A path to a temporary directory (this is a fixture in Pytest).
+
+    Return:
+        None
+    """
+    img, info = init_tiff
+    f, c, h, w = info
+    tiff_arr = img.arr
+
+    def dummy_arr(channel: int):
+        """
+        A function that creates an array of shape (f-1, h, w, 2).
+
+        Args:
+            channel (int): The channel to process.
+
+        Returns:
+            A np.ndarray of shape (f-1, h, w, 2).
+        """
+        arr_channel = tiff_arr[:, channel, :, :]
+
+        dummy_dx = arr_channel[1:] - arr_channel[:-1]
+        dummy_dy = arr_channel[1:] - arr_channel[:-1]
+
+        return np.stack([dummy_dx, dummy_dy], axis=-1)
+
+    # arr0, arr1, and arr2 have shape (f-1, h, w, 2)
+    arr0 = dummy_arr(0)
+    arr1 = dummy_arr(1)
+    arr2 = dummy_arr(2)
+
+    mock_img_disp = MagicMock()
+    mock_quiver = MagicMock()
+    mock_ax = MagicMock()
+    mock_fig = MagicMock()
+
+    name1 = "save_vector_video0"
+    name2 = "Test Save"
+
+    ADD FLAGS IN WHEN I KNOW WHAT THEY ARE! GET TEXT BACK
+
+    step1 = 10
+    step2 = 35
+    step3 = 20
+
+    fps1 = 5
+    fps2 = 32
+    fps3 = 10
+
+    T = f-1
+
+
+    MAKE KWARGS HERE ONCE I KNOW WHAT FLAGS ARE
+
+
+    #FOR ONES WITH kwargs.get, HAVE SOME OF THEM BE NONE!!
+
+
+    def test_case_x(namex: str, flagx: str, kwargsx: dict):
+        """
+        Tests whether the save_vector_video method works correctly on a given test case.
+
+        Args:
+            name (str): Name of the video file to save.
+            flag (str): Flag to determine the type of video being saved.
+            **kwargs: Additional keyword arguments that include:
+                - img_disp: Matplotlib image display object for the original frames.
+                - arr: Optical flow array of shape (f-1, h, w, 2) where f-1 is the number of frames,
+                    h is height, w is width, and the last dimension contains the flow vectors (dx, dy).
+                - og_arr: Original image frames array of shape (f, c, h, w). Default is None.
+                - step: Step size for downsampling the flow vectors for visualization. Default is 20.
+                - fps: Frames per second for the video. Default is 10.
+                - quiver: Matplotlib quiver object for displaying flow vectors.
+                - ax: Matplotlib axes object for the plot.
+                - fig: Matplotlib figure object for the plot.
+                - T: Total number of frames minus one (T-1).
+
+        Returns:
+            None.
+        """
+        img_disp = kwargsx.get('img_disp', None)
+        arr = kwargsx['arr']
+        og_arr = kwargsx.get('og_arr', None)
+        step = kwargsx.get('step', 20)
+        fps = kwargsx.get('fps', 10)
+        quiver = kwargsx['quiver']
+        ax = kwargsx['ax']
+        fig = kwargsx['fig']
+        T = kwargsx['T']
+
+
+        DO FLAG STUFF HERE ONCE I GET RESPONSE
+        """
+        stuff is related to this:
+        if flag[0] not in ['f', 't']:
+            raise ValueError(f'Invalid flag. Expected f or t, but got {flag}')
+        """
+
+        file_path = get_last_saved_pattern_fn_path(namex, 'video', lambda i: f"{namex}_v{flagx}_{i}.mp4")

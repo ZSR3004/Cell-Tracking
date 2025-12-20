@@ -168,6 +168,7 @@ def save_vector_video(name : str, flag : str, **kwargs) -> None:
             - ax: Matplotlib axes object for the plot.
             - fig: Matplotlib figure object for the plot.
             - T: Total number of frames minus one (T-1).
+            
     Returns:
         None: Just saves the video to the specified path.
     """
