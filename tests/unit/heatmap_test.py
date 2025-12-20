@@ -331,8 +331,8 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             patch("src.cell_tracking.heatmap.polar_to_heatmap") as mock_polar_to_heatmap,
             patch("src.cell_tracking.heatmap.create_color_wheel") as mock_create_color_wheel,
             patch("builtins.print") as mock_print,
-            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation,
-            patch("src.cell_tracking.saving.animation.FFMpegWriter") as mock_ffmpegwriter,
+            patch("src.cell_tracking.heatmap.FuncAnimation") as mock_funcanimation,
+            patch("src.cell_tracking.heatmap.FFMpegWriter") as mock_ffmpegwriter,
             patch("matplotlib.pyplot.tight_layout") as mock_tight_layout
         ):
             mock_fig = MagicMock()
@@ -368,6 +368,9 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
 
             num_frames = arrx_0.shape[0]
 
+            args_mock_convert_stack_to_polar, _ = mock_convert_stack_to_polar.call_args
+            assert np.array_equal(args_mock_convert_stack_to_polar[0], arrx_0)
+
             args_fig_add_gridspec, kwargs_fig_add_gridspec = mock_fig.add_gridspec.call_args
             assert args_fig_add_gridspec[0] == 1
             assert args_fig_add_gridspec[1] == 2
@@ -379,10 +382,10 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
 
             # first polar_to_heatmap call
             first_args_polar_to_heatmap, _ = mock_polar_to_heatmap.call_args_list[0]
-            assert first_args_polar_to_heatmap[0] == arrx_0[0]
+            assert np.array_equal(first_args_polar_to_heatmap[0], arrx_0[0])
 
             args_ax_main_imshow, kwargs_ax_main_imshow = mock_ax_main.imshow.call_args
-            assert args_ax_main_imshow[0] == polar_to_heatmap_return
+            assert np.array_equal(args_ax_main_imshow[0], polar_to_heatmap_return)
             assert kwargs_ax_main_imshow['origin'] == "lower"
 
             args_ax_wheel_imshow, kwargs_ax_wheel_imshow = mock_ax_wheel.imshow.call_args
@@ -394,7 +397,7 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
                 angle_rad = np.radians(angle_deg)
                 x = 1.15 * np.cos(angle_rad)
                 y = 1.15 * np.sin(angle_rad)
-                args_ax_wheel_text, kwargs_ax_wheel_text = mock_ax_wheel.text.call_args[i]
+                args_ax_wheel_text, kwargs_ax_wheel_text = mock_ax_wheel.text.call_args_list[i]
                 assert args_ax_wheel_text[0] == x
                 assert args_ax_wheel_text[1] == y
                 assert args_ax_wheel_text[2] == f"{angle_deg}°"
@@ -420,7 +423,7 @@ def test_plot_heatmap(init_tiff: tuple, tmp_path):
             assert args_anim_save[0] == output_pathx
             assert kwargs_anim_save['writer'] == mock_writer
 
-            mock_convert_stack_to_polar.assert_called_once_with(arrx_0)
+            mock_convert_stack_to_polar.assert_called_once()
             mock_figure.assert_called_once_with(figsize=(14, 8))
             mock_fig.add_gridspec.assert_called_once()
             assert mock_fig.add_subplot.call_count == 2
