@@ -572,23 +572,37 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
 
     T = f-1
 
-    MAKE PERSONALIZED FILE PATHS HERE
-    file_path1 = tmp_path / 
+    file_path1 = tmp_path / "path1"
+    file_path2 = tmp_path / "path2"
+    file_path3 = tmp_path / "path3"
+    file_path4 = tmp_path / "path4"
+    file_path5 = tmp_path / "path5"
+    file_path6 = tmp_path / "path6"
+    file_path7 = tmp_path / "path7"
+    file_path8 = tmp_path / "path8"
+    file_path9 = tmp_path / "path9"
+    file_path10 = tmp_path / "path10"
+    file_path11 = tmp_path / "path11"
+    file_path12 = tmp_path / "path12"
+    file_path13 = tmp_path / "path13"
+    file_path14 = tmp_path / "path14"
+    file_path15 = tmp_path / "path15"
+    file_path16 = tmp_path / "path16"
+    file_path17 = tmp_path / "path17"
+    file_path18 = tmp_path / "path18"
+    file_path19 = tmp_path / "path19"
+    file_path20 = tmp_path / "path20"
 
-    2 3 3 4 4
-    #one with all none
-
-    kwargs1 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
-    kwargs2 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
-    kwargs3 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
-    kwargs4 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
-    kwargs5 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
-    kwargs6 = {xxxx, xxxx, xxxx, xxxx, xxxx, mock_quiver, mock_ax, mock_fig, T}
-
-
-
-    #FOR ONES WITH kwargs.get, HAVE SOME OF THEM BE NONE!!
-
+    kwargs1 = {mock_img_disp, arr0, og_arr1, step1, fps1, mock_quiver, mock_ax, mock_fig, T}
+    kwargs2 = {mock_img_disp, arr1, og_arr1, step2, fps2, mock_quiver, mock_ax, mock_fig, T}
+    kwargs3 = {mock_img_disp, arr2, og_arr1, step3, fps3, mock_quiver, mock_ax, mock_fig, T}
+    kwargs4 = {arr0, step1, fps3, mock_quiver, mock_ax, mock_fig, T}
+    kwargs5 = {mock_img_disp, arr1, og_arr0, fps1, mock_quiver, mock_ax, mock_fig, T}
+    kwargs6 = {mock_img_disp, arr2, fps1, mock_quiver, mock_ax, mock_fig, T}
+    kwargs7 = {mock_img_disp, arr0, og_arr1, mock_quiver, mock_ax, mock_fig, T}
+    kwargs8 = {arr1, og_arr1, step2, fps2, mock_quiver, mock_ax, mock_fig, T}
+    kwargs9 = {arr2, og_arr0, step3, mock_quiver, mock_ax, mock_fig, T}
+    kwargs10 = {arr1, mock_quiver, mock_ax, mock_fig, T}
 
     def test_case_x(namex: str, flagx: str, file_pathx: str, kwargsx: dict):
         """
@@ -674,3 +688,24 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
             mock_ani_writers.__getitem__.assert_called_once_with('ffmpeg')
             mock_Writer.assert_called_once()
             mock_ani.save.assert_called_once()
+
+    test_case_x(name1, flag0, file_path1, **kwargs1)
+    test_case_x(name2, flag1, file_path2, **kwargs2)
+    test_case_x(name1, flag2, file_path3, **kwargs3)
+    test_case_x(name2, flag2, file_path4, **kwargs4)
+    test_case_x(name1, flag1, file_path5, **kwargs5)
+    test_case_x(name2, flag2, file_path6, **kwargs6)
+    test_case_x(name1, flag00, file_path7, **kwargs7)
+    test_case_x(name2, flag1, file_path8, **kwargs8)
+    test_case_x(name1, flag1, file_path9, **kwargs9)
+    test_case_x(name2, flag2, file_path10, **kwargs10)
+    test_case_x(name1, flag2, file_path11, **kwargs1)
+    test_case_x(name2, flag2, file_path12, **kwargs2)
+    test_case_x(name1, flag000, file_path13, **kwargs3)
+    test_case_x(name2, flag1, file_path14, **kwargs4)
+    test_case_x(name1, flag2, file_path15, **kwargs5)
+    test_case_x(name2, flag1, file_path16, **kwargs6)
+    test_case_x(name1, flag1, file_path17, **kwargs7)
+    test_case_x(name2, flag0000, file_path18, **kwargs8)
+    test_case_x(name1, flag2, file_path19, **kwargs9)
+    test_case_x(name2, flag1, file_path20, **kwargs10)
