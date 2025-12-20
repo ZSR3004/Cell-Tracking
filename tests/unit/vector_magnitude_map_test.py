@@ -12,9 +12,8 @@ from multiprocessing import Pool, cpu_count
 from src.cell_tracking import vector_magnitude_map
 from src.cell_tracking import saving
 from src.cell_tracking import tiffclass as tiff
+from tests.unit.sample_tiffs import TIFF_PATHS
 import numpy as np
-
-TIFF_PATHS = ["datasets/20220929_MCF_Rab5a_WH_heterotypic_s1_SCALED.tif"]
 
 
 @pytest.fixture(params=TIFF_PATHS)
