@@ -406,9 +406,6 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
     mock_ax = MagicMock()
     mock_im = MagicMock()
 
-    mock_im.set_data = MagicMock()
-    mock_ax.set_title = MagicMock()
-
     kwargs1 = {"T": 10, "fps": 20}
     kwargs2 = {"T": 40}
     kwargs3 = {"fps": 35}
@@ -453,6 +450,8 @@ def test_save_original_video(init_tiff: tuple, tmp_path):
                 "src.cell_tracking.saving.animation.FuncAnimation"
             ) as mock_funcanimation,
         ):
+            mock_im.set_data = MagicMock()
+            mock_ax.set_title = MagicMock()
             mock_ani = MagicMock()
             mock_funcanimation.return_value = mock_ani
             mock_writer_instance = MagicMock()
@@ -600,8 +599,15 @@ def test_save_vector_video(init_tiff: tuple, tmp_path):
             None.
         """
         with (
-
+            patch("src.cell_tracking.saving.get_unique_path") as mock_get_unique_path,
+            patch("src.cell_tracking.saving.animation.FuncAnimation") as mock_funcanimation,
+            patch("src.cell_tracking.saving.animation.writers") as mock_writers
         ):
+            mock_quiver.set_UVC = MagicMock()
+            mock_img_disp.set_data = MagicMock()
+            mock_ax.set_title = MagicMock()
+            
+
             img_disp = kwargsx.get('img_disp', None)
             arr = kwargsx['arr']
             og_arr = kwargsx.get('og_arr', None)
